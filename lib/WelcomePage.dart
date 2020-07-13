@@ -52,7 +52,7 @@ class _WelcomePageState extends State<WelcomePage> {
     double _maxWidth;
 
     if(_screenWidth>_screenHeight){
-      _maxWidth = _screenWidth*0.7;
+      _maxWidth = _screenWidth*0.6;
     }else{
       _maxWidth = _screenWidth*0.9;
     }
@@ -150,7 +150,7 @@ class _WelcomePageState extends State<WelcomePage> {
   Widget _registerButton() {
     return InkWell(
       onTap: () {
-        Navigator.pushNamed(context, '/RegisterPage');
+        Navigator.pushNamed(context, '/RegisterPage1');
       },
       child: Container(
         width: MediaQuery.of(context).size.width,

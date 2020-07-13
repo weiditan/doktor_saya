@@ -1,5 +1,7 @@
+import 'package:doktorsaya/RegisterPage2.dart';
 import 'package:flutter/material.dart';
 
+import 'RegisterPage1.dart';
 import 'WelcomePage.dart';
 import 'LoginPage.dart';
 
@@ -13,8 +15,9 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
-        brightness: Brightness.light,
+        //brightness: Brightness.light,
         primarySwatch: Colors.orange,
+        scaffoldBackgroundColor: Colors.grey[200],
 
       ),
       darkTheme: ThemeData(
@@ -25,8 +28,10 @@ class MyApp extends StatelessWidget {
       ),
       home: WelcomePage(),
       routes: <String, WidgetBuilder>{
-        //'/HomePage': (BuildContext context) => HomePage(),
+        '/WelcomePage': (BuildContext context) => WelcomePage(),
         '/LoginPage': (BuildContext context) => LoginPage(),
+        '/RegisterPage1': (BuildContext context) => RegisterPage1(),
+        '/RegisterPage2': (BuildContext context) => RegisterPage2(),
       }
     );
   }
