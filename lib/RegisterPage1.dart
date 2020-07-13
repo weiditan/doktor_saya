@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 
+import 'RegisterPage2.dart';
+
 class RegisterPage1 extends StatefulWidget {
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _RegisterPage1State createState() => _RegisterPage1State();
 }
 
-class _LoginPageState extends State<RegisterPage1> {
+class _RegisterPage1State extends State<RegisterPage1> {
+
+  final _emailController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +45,7 @@ class _LoginPageState extends State<RegisterPage1> {
                       padding: EdgeInsets.only(top:10,bottom: 20),
                       child: _logo(_maxWidth),
                     ),
-                    _entryField("Email",TextInputType.emailAddress,false),
+                    _emailField(),
                     SizedBox(height: 20),
                     _nextButton(),
                     _divider(),
@@ -69,21 +73,22 @@ class _LoginPageState extends State<RegisterPage1> {
     );
   }
 
-  Widget _entryField(_label,_keyboardType,_obscureText){
+  Widget _emailField(){
     return TextFormField(
       style: TextStyle(
         fontSize: 16,
       ),
       decoration: new InputDecoration(
         border: OutlineInputBorder(),
-        labelText: _label,
+        labelText: "Email",
         labelStyle: TextStyle(
           fontFamily: "Montserrat",
           fontWeight: FontWeight.bold,
         ),
       ),
-      keyboardType: _keyboardType,
-      obscureText: _obscureText,
+      keyboardType: TextInputType.emailAddress,
+      obscureText: false,
+      controller: _emailController,
     );
   }
 
@@ -106,7 +111,10 @@ class _LoginPageState extends State<RegisterPage1> {
           ),
         ),
         onPressed: (){
-
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context)=>RegisterPage2(email: _emailController.text,)),
+          );
         },
       ),
     );
@@ -177,6 +185,7 @@ class _LoginPageState extends State<RegisterPage1> {
         ),
 
         onPressed: (){
+
         },
       ),
     );

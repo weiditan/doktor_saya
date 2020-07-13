@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 
 class RegisterPage2 extends StatefulWidget {
+  final String email;
+  RegisterPage2({Key key, @required this.email}) : super(key: key);
+
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _RegisterPage2State createState() => _RegisterPage2State();
 }
 
-class _LoginPageState extends State<RegisterPage2> {
+class _RegisterPage2State extends State<RegisterPage2> {
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +40,7 @@ class _LoginPageState extends State<RegisterPage2> {
                   padding: EdgeInsets.only(top:10,bottom: 20),
                   child: _logo(_maxWidth),
                 ),
-                _entryField("Email",TextInputType.emailAddress,false),
+                _emailField(),
                 SizedBox(height: 20),
                 _verifyButton(),
               ],
@@ -57,21 +60,22 @@ class _LoginPageState extends State<RegisterPage2> {
     );
   }
 
-  Widget _entryField(_label,_keyboardType,_obscureText){
+  Widget _emailField(){
     return TextFormField(
       style: TextStyle(
         fontSize: 16,
       ),
       decoration: new InputDecoration(
         border: OutlineInputBorder(),
-        labelText: _label,
+        labelText: "Email",
         labelStyle: TextStyle(
           fontFamily: "Montserrat",
           fontWeight: FontWeight.bold,
         ),
       ),
-      keyboardType: _keyboardType,
-      obscureText: _obscureText,
+      enabled: false,
+      initialValue: widget.email,
+      obscureText: false,
     );
   }
 
