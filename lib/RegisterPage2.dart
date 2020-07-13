@@ -111,8 +111,7 @@ class _RegisterPage2State extends State<RegisterPage2> {
   Widget _pinField(){
     return Container(
       alignment: Alignment.topLeft,
-      child:
-      SizedBox(
+      child: SizedBox(
         width: 200,
         child: TextFormField(
           style: TextStyle(
