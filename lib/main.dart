@@ -1,5 +1,7 @@
-import 'package:doktorsaya/welcomePage.dart';
 import 'package:flutter/material.dart';
+
+import 'WelcomePage.dart';
+import 'LoginPage.dart';
 
 void main() => runApp(MyApp());
 
@@ -14,7 +16,6 @@ class MyApp extends StatelessWidget {
         brightness: Brightness.light,
         primarySwatch: Colors.orange,
 
-
       ),
       darkTheme: ThemeData(
         brightness: Brightness.dark,
@@ -23,6 +24,10 @@ class MyApp extends StatelessWidget {
 
       ),
       home: WelcomePage(),
+      routes: <String, WidgetBuilder>{
+        //'/HomePage': (BuildContext context) => HomePage(),
+        '/LoginPage': (BuildContext context) => LoginPage(),
+      }
     );
   }
 }
