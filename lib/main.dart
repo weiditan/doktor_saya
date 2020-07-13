@@ -12,9 +12,9 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(
         brightness: Brightness.light,
-        backgroundColor: Colors.orange,,
-        //primarySwatch: Colors.orange,
-        bottomAppBarColor: Colors.red,
+        primarySwatch: Colors.orange,
+
+
       ),
       darkTheme: ThemeData(
         brightness: Brightness.dark,

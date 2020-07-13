@@ -34,6 +34,19 @@ class _WelcomePageState extends State<WelcomePage> {
   @override
   Widget build(BuildContext context) {
 
+    Brightness _brightness = MediaQuery.of(context).platformBrightness;
+    BoxDecoration _boxDecoration;
+
+    if(_brightness==Brightness.light){
+      _boxDecoration = BoxDecoration(
+          gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0xfffbb448), Color(0xffe46b10)]
+          )
+      );
+    }
+
     double _screenHeight = MediaQuery.of(context).size.height;
     double _screenWidth = MediaQuery.of(context).size.width;
     double _maxWidth;
@@ -45,41 +58,43 @@ class _WelcomePageState extends State<WelcomePage> {
     }
 
     return Scaffold(
-
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
-        child: Center(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: _screenHeight,
-              minWidth: 20,
-              maxWidth: _maxWidth,
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                _logo(_maxWidth),
-                AnimatedCrossFade(
-                  // If the widget is visible, animate to 0.0 (invisible).
-                  // If the widget is hidden, animate to 1.0 (fully visible).
-                  crossFadeState: _buttonVisible ? CrossFadeState.showFirst : CrossFadeState.showSecond,
-                  firstCurve: Curves.easeOut,
-                  secondCurve: Curves.easeIn,
-                  duration: Duration(milliseconds: 500),
-                  firstChild: _loadingIcon(),
-                  secondChild: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: <Widget>[
-                      _loginButton(),
-                      SizedBox(height: 10,),
-                      _registerButton(),
-                    ],
-                  ),
+        child: Container(
+          decoration: _boxDecoration,
+          child: Center(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: _screenHeight,
+                  minWidth: 20,
+                  maxWidth: _maxWidth,
                 ),
-              ],
-            ),
-          )
-        ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    _logo(_maxWidth),
+                    AnimatedCrossFade(
+                      // If the widget is visible, animate to 0.0 (invisible).
+                      // If the widget is hidden, animate to 1.0 (fully visible).
+                      crossFadeState: _buttonVisible ? CrossFadeState.showFirst : CrossFadeState.showSecond,
+                      firstCurve: Curves.easeOut,
+                      secondCurve: Curves.easeIn,
+                      duration: Duration(milliseconds: 500),
+                      firstChild: _loadingIcon(),
+                      secondChild: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: <Widget>[
+                          _loginButton(),
+                          SizedBox(height: 10,),
+                          _registerButton(),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              )
+          ),
+        )
       ),
     );
   }
@@ -92,7 +107,9 @@ class _WelcomePageState extends State<WelcomePage> {
         // If the widget is hidden, animate to 1.0 (fully visible).
         opacity: _loadingIconVisible ? 1.0 : 0.0,
         duration: Duration(milliseconds: 1000),
-        child: CircularProgressIndicator(),
+        child: CircularProgressIndicator(
+            valueColor: new AlwaysStoppedAnimation<Color>(Colors.white)
+        ),
       ),
     );
   }
