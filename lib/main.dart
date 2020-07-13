@@ -1,4 +1,5 @@
-import 'package:doktorsaya/RegisterPage2.dart';
+import 'package:doktorsaya/HomePage.dart';
+import 'package:doktorsaya/RolePage.dart';
 import 'package:flutter/material.dart';
 
 import 'RegisterPage1.dart';
@@ -31,6 +32,9 @@ class MyApp extends StatelessWidget {
         '/WelcomePage': (BuildContext context) => WelcomePage(),
         '/LoginPage': (BuildContext context) => LoginPage(),
         '/RegisterPage1': (BuildContext context) => RegisterPage1(),
+        '/RolePage': (BuildContext context) => RolePage(),
+        '/HomePage': (BuildContext context) => HomePage(),
+
       }
     );
   }

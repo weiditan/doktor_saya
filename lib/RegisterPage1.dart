@@ -215,7 +215,7 @@ class _RegisterPage1State extends State<RegisterPage1> {
                 ),
               ),
               onTap: () {
-                Navigator.popAndPushNamed(context, '/LoginPage');
+                Navigator.pushNamedAndRemoveUntil(context, '/LoginPage', ModalRoute.withName('/'));
               },
             ),
           ],

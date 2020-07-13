@@ -161,7 +161,7 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ),
         onPressed: (){
-          Navigator.pushNamed(context, '/HomePage');
+          Navigator.pushNamed(context, '/RolePage');
         },
       ),
     );
@@ -228,7 +228,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
             onTap: () {
-              Navigator.popAndPushNamed(context, '/RegisterPage1');
+              Navigator.pushNamedAndRemoveUntil(context, '/RegisterPage1', ModalRoute.withName('/'));
             },
           ),
         ],
