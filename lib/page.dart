@@ -22,7 +22,7 @@ class _Page0State extends State<Page0> {
   }
 
   Future getData() async {
-    var url = 'http://www.breakvoid.com/mydoktor/dbconnect.php';
+    var url = 'http://www.breakvoid.com/mydoktor/viewdoctor.php';
     http.Response response = await retry(
       // Make a GET request
             () => http.get(url).timeout(Duration(seconds: 5)),
