@@ -12,7 +12,7 @@ class HomePage extends StatefulWidget {
 
 class _TestState extends State<HomePage> {
 
-  int _selectedIndex = 0;
+  int _selectedIndex = 2;
 
   var _arrayTitle = [
     'Mesej',

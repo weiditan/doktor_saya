@@ -17,13 +17,13 @@ class _WelcomePageState extends State<WelcomePage> {
     // TODO: implement initState
     super.initState();
 
-    Timer(Duration(milliseconds: 3000), (){
+    Timer(Duration(milliseconds: 5000), (){
       setState(() {
         _buttonVisible = false;
       });
     });
 
-    Timer(Duration(milliseconds: 2000), (){
+    Timer(Duration(milliseconds: 4000), (){
       setState(() {
         _loadingIconVisible = false;
       });
@@ -161,7 +161,7 @@ class _WelcomePageState extends State<WelcomePage> {
           border: Border.all(color: Colors.white, width: 2),
         ),
         child: Text(
-          'Buat Akaun',
+          'Daftar Akaun',
           style: TextStyle(
             fontFamily: "Montserrat",
             fontSize: 20,

@@ -27,7 +27,7 @@ class _RegisterPage2State extends State<RegisterPage2> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Buat Akaun"),
+        title: Text('Daftar Akaun'),
       ),
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),

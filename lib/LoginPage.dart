@@ -220,7 +220,7 @@ class _LoginPageState extends State<LoginPage> {
           ),
           InkWell(
             child: Text(
-              'Buat Account',
+              'Daftar Akaun',
               style: TextStyle(
                   fontFamily: "Montserrat",
                   color: Color(0xfff79c4f),
