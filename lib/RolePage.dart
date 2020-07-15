@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'RegisterPage3.dart';
+
 class RolePage extends StatelessWidget {
 
   @override
@@ -85,7 +87,10 @@ class RolePage extends StatelessWidget {
         ),
       ),
       onPressed: (){
-        Navigator.pushNamed(context, '/HomePage');
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context)=>RegisterPage3(role: "doctor",)),
+        );
       },
     );
   }
@@ -93,7 +98,10 @@ class RolePage extends StatelessWidget {
   Widget _patientButton(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.pushNamed(context, '/HomePage');
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context)=>RegisterPage3(role: "patient",)),
+        );
       },
       child: Container(
         width: MediaQuery.of(context).size.width,

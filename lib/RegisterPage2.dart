@@ -173,7 +173,7 @@ class _RegisterPage2State extends State<RegisterPage2> {
         color: Colors.orange,
         child:Padding(
           padding: EdgeInsets.symmetric(vertical: 10),
-          child: Text("Buat Akaun",
+          child: Text("Daftar",
             style: TextStyle(
               fontFamily: "Montserrat",
               fontSize: 20,
