@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class RegisterPage3 extends StatefulWidget {
+class RegisterUser extends StatefulWidget {
   final String role;
-  RegisterPage3({Key key, @required this.role}) : super(key: key);
+  RegisterUser({Key key, @required this.role}) : super(key: key);
 
   @override
-  _RegisterPage3State createState() => _RegisterPage3State();
+  _RegisterUserState createState() => _RegisterUserState();
 }
 
-class _RegisterPage3State extends State<RegisterPage3> {
+class _RegisterUserState extends State<RegisterUser> {
   @override
   Widget build(BuildContext context) {
-
 
     Widget _button;
 
@@ -136,7 +135,9 @@ class _RegisterPage3State extends State<RegisterPage3> {
             ),
           ),
         ),
-        onPressed: () {}
+        onPressed: () {
+          Navigator.pushNamed(context, '/RegisterDoctor');
+        }
 
       ),
     );

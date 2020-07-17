@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'RegisterPage3.dart';
+import 'RegisterUser.dart';
 
 class RolePage extends StatelessWidget {
 
@@ -89,7 +89,7 @@ class RolePage extends StatelessWidget {
       onPressed: (){
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context)=>RegisterPage3(role: "doctor",)),
+          MaterialPageRoute(builder: (context)=>RegisterUser(role: "doctor",)),
         );
       },
     );
@@ -100,7 +100,7 @@ class RolePage extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context)=>RegisterPage3(role: "patient",)),
+          MaterialPageRoute(builder: (context)=>RegisterUser(role: "patient",)),
         );
       },
       child: Container(

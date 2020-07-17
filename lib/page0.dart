@@ -11,7 +11,7 @@ class Page0 extends StatelessWidget {
           for (var i = 0; i <= 5; i++)
             Bubble(
               margin: BubbleEdges.only(top: 10),
-              nipRadius: i.toDouble(),
+              nipRadius: 4,
               alignment: Alignment.topRight,
               nipWidth: 30,
               nipHeight: 10,
@@ -19,15 +19,14 @@ class Page0 extends StatelessWidget {
               color: Color.fromRGBO(225, 255, 199, 1.0),
               child: Text('Hello, World!', textAlign: TextAlign.right),
             ),
-          for (var i = 0; i <= 5; i++)
             Bubble(
               margin: BubbleEdges.only(top: 10),
-              nipRadius: i.toDouble(),
+              nipRadius: 4,
               alignment: Alignment.topLeft,
               nipWidth: 30,
               nipHeight: 10,
               nip: BubbleNip.leftTop,
-              child: Text('Hi, developer!'),
+              child: Text('Hi, developer!/nasdad\nasd'),
             ),
         ],
       ),

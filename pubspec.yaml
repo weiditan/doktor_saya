@@ -27,8 +27,9 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  http:
-  retry:
+  http: ^0.12.2
+  retry: ^3.0.1
+  image_picker: ^0.6.7+4
 
 
 # For information on the generic Dart part of this file, see the

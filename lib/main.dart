@@ -2,8 +2,9 @@ import 'package:doktorsaya/HomePage.dart';
 import 'package:doktorsaya/RolePage.dart';
 import 'package:flutter/material.dart';
 
+import 'RegisterDoctor.dart';
 import 'RegisterPage1.dart';
-import 'RegisterPage3.dart';
+import 'RegisterUser.dart';
 import 'WelcomePage.dart';
 import 'LoginPage.dart';
 
@@ -34,8 +35,8 @@ class MyApp extends StatelessWidget {
         '/LoginPage': (BuildContext context) => LoginPage(),
         '/RegisterPage1': (BuildContext context) => RegisterPage1(),
         '/RolePage': (BuildContext context) => RolePage(),
+        '/RegisterDoctor': (BuildContext context) => RegisterDoctor(),
         '/HomePage': (BuildContext context) => HomePage(),
-        '/RegisterPage3': (BuildContext context) => RegisterPage3(),
 
       }
     );
