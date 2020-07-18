@@ -21,10 +21,13 @@ class Page4 extends StatelessWidget {
           ),
           child: ListView(
             children: <Widget>[
+              _profileImage(_maxWidth),
               Row(
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
-                  _profileImage(_maxWidth),
-                  Text("Dr. Azhar"),
+                  _callButton(),
+                  SizedBox(width: 10),
+                  _messageButton(),
                 ],
               ),
               _heading1("PROFIL"),
@@ -66,7 +69,7 @@ class Page4 extends StatelessWidget {
         padding: EdgeInsets.only(top: 10, bottom: 20),
         child: Icon(
           Icons.account_circle,
-          size: _maxWidth * 0.4,
+          size: _maxWidth * 0.7,
           color: Colors.grey,
         ) //_logo(_maxWidth),
         );
@@ -79,6 +82,7 @@ class Page4 extends StatelessWidget {
         fontSize: 22,
         fontFamily: "Montserrat",
         fontWeight: FontWeight.bold,
+        color: Colors.orange,
       ),
     );
   }
@@ -106,6 +110,62 @@ class Page4 extends StatelessWidget {
           fontSize: 16,
           fontFamily: "Montserrat",
         ),
+      ),
+    );
+  }
+
+  Widget _callButton() {
+    return SizedBox(
+      width: 120,
+      child: RaisedButton(
+        color: Colors.green,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(5)),
+        ),
+        child: Row(
+          children: <Widget>[
+            Icon(Icons.call),
+            SizedBox(
+              width: 5,
+            ),
+            Text(
+              "Panggil",
+              style: TextStyle(
+                fontFamily: "Montserrat",
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+        onPressed: () {},
+      ),
+    );
+  }
+
+  Widget _messageButton() {
+    return SizedBox(
+      width: 120,
+      child: RaisedButton(
+        color: Colors.orange,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(5)),
+        ),
+        child: Row(
+          children: <Widget>[
+            Icon(Icons.message),
+            SizedBox(
+              width: 5,
+            ),
+            Text(
+              "Mesej",
+              style: TextStyle(
+                fontFamily: "Montserrat",
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+        onPressed: () {},
       ),
     );
   }
