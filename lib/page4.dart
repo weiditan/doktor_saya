@@ -15,50 +15,28 @@ class Page4 extends StatelessWidget {
 
     return Scaffold(
       body: Center(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxWidth: _maxWidth,
-          ),
-          child: ListView(
-            children: <Widget>[
-              _profileImage(_maxWidth),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  _callButton(),
-                  SizedBox(width: 10),
-                  _messageButton(),
-                ],
-              ),
-              _heading1("PROFIL"),
-              _heading2("Azhar Bin Zainub"),
-              _heading3("Lelaki"),
-              _heading3("Umur 42 tahun"),
-              Divider(
-                thickness: 1,
-              ),
-              _heading1("PAKAR DOKTOR"),
-              _heading2("Pakar Bedah"),
-              _heading3("Pakar Oftalmologi"),
-              Divider(
-                thickness: 1,
-              ),
-              _heading1("TEMPAT KERJA"),
-              _heading2("Hospital Melaka Eye Specialist Clinic"),
-              _heading3("Melaka, Malaysia"),
-              Divider(
-                thickness: 1,
-              ),
-              _heading1("PENGALAMAN"),
-              _heading2("Hospital Melaka Eye Specialist Clinic"),
-              _heading3("2 tahun"),
-              _heading2("The Tun Hussein Onn National Eye Hospital"),
-              _heading3("3 tahun 8 bulan"),
-              Divider(
-                thickness: 1,
-              ),
-            ],
-          ),
+        child: ListView(
+          children: <Widget>[
+            _profileImage(_maxWidth),
+            _heading1("PROFIL"),
+            _heading2("Nama Penuh"),
+            _heading3("Azhar Bin Zainub"),
+            _heading2("Jantina"),
+            _heading3("Lelaki"),
+            _heading2("Umur"),
+            _heading3("42"),
+            Divider(
+              thickness: 1,
+            ),
+            _heading1("HUBUNGAN"),
+            _heading2("Email"),
+            _heading3("azhar@email.com"),
+            _heading2("No Telefon"),
+            _heading3("012-345 6789"),
+            Divider(
+              thickness: 1,
+            ),
+          ],
         ),
       ),
     );
@@ -76,20 +54,23 @@ class Page4 extends StatelessWidget {
   }
 
   Widget _heading1(_text) {
-    return Text(
-      _text,
-      style: TextStyle(
-        fontSize: 22,
-        fontFamily: "Montserrat",
-        fontWeight: FontWeight.bold,
-        color: Colors.orange,
+    return Padding(
+      padding: EdgeInsets.only(left: 10, top: 5),
+      child: Text(
+        _text,
+        style: TextStyle(
+          fontSize: 22,
+          fontFamily: "Montserrat",
+          fontWeight: FontWeight.bold,
+          color: Colors.orange,
+        ),
       ),
     );
   }
 
   Widget _heading2(_text) {
     return Padding(
-      padding: EdgeInsets.only(left: 10,top: 5),
+      padding: EdgeInsets.only(left: 20, top: 5),
       child: Text(
         _text,
         style: TextStyle(
@@ -103,7 +84,7 @@ class Page4 extends StatelessWidget {
 
   Widget _heading3(_text) {
     return Padding(
-      padding: EdgeInsets.only(left: 10,top: 3),
+      padding: EdgeInsets.only(left: 30, top: 3),
       child: Text(
         _text,
         style: TextStyle(

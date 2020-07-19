@@ -1,4 +1,7 @@
+import 'package:doktorsaya/Call.dart';
 import 'package:flutter/material.dart';
+
+import 'Message.dart';
 
 class ViewDoctorDetail extends StatelessWidget {
   @override
@@ -32,9 +35,9 @@ class ViewDoctorDetail extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: <Widget>[
-                          _callButton(),
+                          _callButton(context),
                           SizedBox(width: 10),
-                          _messageButton(),
+                          _messageButton(context),
                           SizedBox(width: 10),
                         ],
                       )
@@ -44,10 +47,21 @@ class ViewDoctorDetail extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 10),
-              _heading1("Dr. Azhar"),
-              _heading2("Azhar Bin Zainub"),
+              _heading1("DR. AZHAR"),
+              _heading2("Nama Penuh"),
+              _heading3("Azhar Bin Zainub"),
+              _heading2("Jantina"),
               _heading3("Lelaki"),
-              _heading3("Umur 42 tahun"),
+              _heading2("Umur"),
+              _heading3("42"),
+              Divider(
+                thickness: 1,
+              ),
+              _heading1("HUBUNGAN"),
+              _heading2("Email"),
+              _heading3("azhar@email.com"),
+              _heading2("No Telefon"),
+              _heading3("012-345 6789"),
               Divider(
                 thickness: 1,
               ),
@@ -79,12 +93,13 @@ class ViewDoctorDetail extends StatelessWidget {
                   physics: BouncingScrollPhysics(),
                   children: <Widget>[
                   SizedBox(width: 15),
-                    _certificateImage(),
-                    _certificateImage(),
-                    _certificateImage(),
-                    _certificateImage(),
-                    _certificateImage(),
-                    _certificateImage(),
+                    _certificateImage("http://www.breakvoid.com/doktorsaya/images/certificates/certificate1.jpg"),
+                    _certificateImage("http://www.breakvoid.com/doktorsaya/images/certificates/certificate2.jpg"),
+                    _certificateImage("http://www.breakvoid.com/doktorsaya/images/certificates/certificate3.jpg"),
+                    _certificateImage("http://www.breakvoid.com/doktorsaya/images/certificates/certificate1.jpg"),
+                    _certificateImage("http://www.breakvoid.com/doktorsaya/images/certificates/certificate2.jpg"),
+                    _certificateImage("http://www.breakvoid.com/doktorsaya/images/certificates/certificate3.jpg"),
+                    _certificateImage("http://www.breakvoid.com/doktorsaya/images/certificates/certificate1.jpg"),
                     SizedBox(width: 15),
                   ],
                 ),
@@ -185,7 +200,7 @@ class ViewDoctorDetail extends StatelessWidget {
     );
   }
 
-  Widget _callButton() {
+  Widget _callButton(context) {
     return SizedBox(
       width: 120,
       child: RaisedButton(
@@ -208,12 +223,17 @@ class ViewDoctorDetail extends StatelessWidget {
             ),
           ],
         ),
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Call()),
+          );
+        },
       ),
     );
   }
 
-  Widget _messageButton() {
+  Widget _messageButton(context) {
     return SizedBox(
       width: 120,
       child: RaisedButton(
@@ -236,12 +256,17 @@ class ViewDoctorDetail extends StatelessWidget {
             ),
           ],
         ),
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Message()),
+          );
+        },
       ),
     );
   }
 
-  Widget _certificateImage(){
+  Widget _certificateImage(_imageUrl){
     return Padding(
       padding: EdgeInsets.all(5),
       child: Container(
@@ -251,8 +276,7 @@ class ViewDoctorDetail extends StatelessWidget {
           shape: BoxShape.rectangle,
           image: DecorationImage(
               fit: BoxFit.fill,
-              image: NetworkImage(
-                  "http://www.breakvoid.com/maje/admin_area/product_images/jubahlaki3.jpg")),
+              image: NetworkImage(_imageUrl)),
           boxShadow: [
             BoxShadow(
               color: Colors.grey.withOpacity(0.3),

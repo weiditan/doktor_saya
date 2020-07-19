@@ -18,8 +18,7 @@ class _TestState extends State<HomePage> {
     'Mesej',
     'Panggilan',
     'Doktor',
-    'Hospital',
-    'Info'
+    'Profil'
   ];
 
   void _onItemTapped(int index) {
@@ -32,7 +31,6 @@ class _TestState extends State<HomePage> {
     Page0(),
     Page1(),
     Page2(),
-    Page3(),
     Page4(),
   ];
 
@@ -45,7 +43,7 @@ class _TestState extends State<HomePage> {
         title: Text(_arrayTitle[_selectedIndex]),
 
         actions: <Widget>[
-          IconButton(icon: Icon(Icons.search),onPressed: (){})
+          //IconButton(icon: Icon(Icons.search),onPressed: (){})
         ],
 
       ),
@@ -67,12 +65,8 @@ class _TestState extends State<HomePage> {
             title: Text(_arrayTitle[2]),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.business),
-            title: Text(_arrayTitle[3]),
-          ),
-          BottomNavigationBarItem(
             icon: Icon(Icons.info),
-            title: Text(_arrayTitle[4]),
+            title: Text(_arrayTitle[3]),
           ),
         ],
         currentIndex: _selectedIndex,

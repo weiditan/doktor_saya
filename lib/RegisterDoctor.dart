@@ -62,6 +62,7 @@ class _RegisterDoctorState extends State<RegisterDoctor> {
                   ),
                 ],
               ),
+              _entryField("Nombor Pendaftaran MMC", TextInputType.text, true, null, null, true),
               _entryField("Jenis Pakar Doktor", TextInputType.text, true, null, null, true),
               _entryField("Pakar Doktor", TextInputType.text, true, null, null, true),
               _entryField("Tempat Kerja", TextInputType.text, true, null, null, true),
