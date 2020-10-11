@@ -1,4 +1,8 @@
+import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:retry/retry.dart';
 
 import 'RegisterPage2.dart';
 
@@ -111,10 +115,12 @@ class _RegisterPage1State extends State<RegisterPage1> {
           ),
         ),
         onPressed: (){
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context)=>RegisterPage2(email: _emailController.text,)),
-          );
+          postData(_emailController.text).whenComplete(() {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context)=>RegisterPage2(email: _emailController.text,)),
+            );
+          });
         },
       ),
     );
@@ -220,6 +226,16 @@ class _RegisterPage1State extends State<RegisterPage1> {
             ),
           ],
         )
+    );
+  }
+
+  Future postData(String _email) async {
+    var url = 'http://www.breakvoid.com/DoktorSaya/SendVerificationEmail.php';
+    await retry(
+      // Make a GET request
+          () => http.post(url, body: {'email': _email}).timeout(Duration(seconds: 5)),
+      // Retry on SocketException or TimeoutException
+      retryIf: (e) => e is SocketException || e is TimeoutException,
     );
   }
 

@@ -47,15 +47,6 @@ class RolePage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
-                      Text(
-                        "Kamu ialah...",
-                        style: TextStyle(
-                          fontFamily: "Montserrat",
-                          fontWeight: FontWeight.bold,
-                          fontSize: 50,
-                        ),
-                      ),
-                      SizedBox(height: 50,),
                       _doctorButton(context),
                       SizedBox(height: 30,),
                       _patientButton(context),
@@ -112,7 +103,7 @@ class RolePage extends StatelessWidget {
           border: Border.all(color: Colors.white, width: 2),
         ),
         child: Text(
-          'Penyakit',
+          'Pesakit',
           style: TextStyle(
             fontFamily: "Montserrat",
             fontSize: 20,

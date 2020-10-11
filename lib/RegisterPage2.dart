@@ -1,5 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'dart:io';
+import 'dart:async';
+import 'package:http/http.dart' as http;
+import 'package:retry/retry.dart';
 
 class RegisterPage2 extends StatefulWidget {
   final String email;
@@ -12,6 +18,8 @@ class RegisterPage2 extends StatefulWidget {
 class _RegisterPage2State extends State<RegisterPage2> {
 
   bool _isVisible = true;
+  final _codeController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
 
@@ -131,6 +139,7 @@ class _RegisterPage2State extends State<RegisterPage2> {
             WhitelistingTextInputFormatter.digitsOnly
           ],
           maxLength: 6,
+          controller: _codeController,
         ),
       )
     );
@@ -155,8 +164,12 @@ class _RegisterPage2State extends State<RegisterPage2> {
           ),
         ),
         onPressed: (){
-          setState(() {
-            _isVisible = false;
+          postData(widget.email,_codeController.text).then((s){
+            if(s=="Correct"){
+              setState(() {
+                _isVisible = false;
+              });
+            }
           });
         },
       ),
@@ -186,6 +199,20 @@ class _RegisterPage2State extends State<RegisterPage2> {
         },
       ),
     );
+  }
+
+  Future<String> postData(String _email, String _code) async {
+    var url = 'http://www.breakvoid.com/DoktorSaya/CheckCode.php';
+    http.Response response = await retry(
+      // Make a GET request
+          () => http.post(url, body: {'email': _email,'code':_code}).timeout(Duration(seconds: 5)),
+      // Retry on SocketException or TimeoutException
+      retryIf: (e) => e is SocketException || e is TimeoutException,
+    );
+
+    var data = jsonDecode(response.body);
+
+    return data['status'].toString();
   }
 
 }
