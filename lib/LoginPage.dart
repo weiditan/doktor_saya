@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
+import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:retry/retry.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -6,6 +12,9 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -41,9 +50,9 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 Column(
                   children: <Widget>[
-                    _entryField("Email",TextInputType.emailAddress,false),
+                    _entryField("Email",TextInputType.emailAddress,false,_emailController),
                     SizedBox(height: 8),
-                    _entryField("Kata Laluan",TextInputType.text,true),
+                    _entryField("Kata Laluan",TextInputType.text,true,_passwordController),
                     _forgotPassword(),
                     SizedBox(height: 5),
                     _loginButton(),
@@ -72,7 +81,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _entryField(_label,_keyboardType,_obscureText){
+  Widget _entryField(_label,_keyboardType,_obscureText,_controller){
     return TextFormField(
       style: TextStyle(
         fontSize: 16,
@@ -87,6 +96,7 @@ class _LoginPageState extends State<LoginPage> {
       ),
       keyboardType: _keyboardType,
       obscureText: _obscureText,
+      controller: _controller,
     );
   }
 
@@ -161,7 +171,19 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ),
         onPressed: (){
-          Navigator.pushNamed(context, '/RolePage');
+          _login(_emailController.text, _passwordController.text)
+              .timeout(new Duration(seconds: 15))
+              .then((s){
+                if(s["status"]=="Correct"){
+                  _saveUserIdSharedPreferences(int.parse(s["user_id"]));
+                  Navigator.pushNamed(context, '/RolePage');
+                }else{
+                  print(s);
+                }
+              })
+              .catchError((e){
+                print(e);
+              });
         },
       ),
     );
@@ -234,6 +256,25 @@ class _LoginPageState extends State<LoginPage> {
         ],
       )
     );
+  }
+
+  Future<Map> _login(_email, _password) async {
+    var url = 'http://www.breakvoid.com/DoktorSaya/Login.php';
+    http.Response response = await retry(
+      // Make a GET request
+          () => http.post(url, body: {'email': _email,'password':_password}).timeout(Duration(seconds: 5)),
+      // Retry on SocketException or TimeoutException
+      retryIf: (e) => e is SocketException || e is TimeoutException,
+    );
+
+    Map data = jsonDecode(response.body);
+
+    return data;
+  }
+
+  Future _saveUserIdSharedPreferences(_userId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('user_id', _userId );
   }
 
 }

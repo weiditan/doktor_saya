@@ -1,9 +1,9 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:io';
 import 'dart:async';
+import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:retry/retry.dart';
 
@@ -19,6 +19,8 @@ class _RegisterPage2State extends State<RegisterPage2> {
 
   bool _isVisible = true;
   final _codeController = TextEditingController();
+  final _password1Controller = TextEditingController();
+  final _password12Controller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -68,8 +70,8 @@ class _RegisterPage2State extends State<RegisterPage2> {
                   ),
                   secondChild: Column(
                     children: <Widget>[
-                      _entryField("Kata Laluan Baru",TextInputType.text,true,null,null,true),
-                      _entryField("Ulang Kata Laluan",TextInputType.text,true,null,null,true),
+                      _entryField("Kata Laluan Baru",TextInputType.text,true,null,_password1Controller,true),
+                      _entryField("Ulang Kata Laluan",TextInputType.text,true,null,_password12Controller,true),
                       SizedBox(height: 20),
                       _registerButton(),
                     ],
@@ -83,7 +85,7 @@ class _RegisterPage2State extends State<RegisterPage2> {
     );
   }
 
-  Widget _logo(double _maxWidth) {
+  Widget _logo(_maxWidth) {
     return Container(
       child: Image(
         image: AssetImage("assets/logo.png"),
@@ -164,13 +166,18 @@ class _RegisterPage2State extends State<RegisterPage2> {
           ),
         ),
         onPressed: (){
-          postData(widget.email,_codeController.text).then((s){
-            if(s=="Correct"){
-              setState(() {
-                _isVisible = false;
+          _checkCode(widget.email,_codeController.text)
+              .timeout(new Duration(seconds: 15))
+              .then((s){
+                if(s=="Correct"){
+                  setState(() {
+                    _isVisible = false;
+                  });
+                }
+              })
+              .catchError((e){
+                print(e);
               });
-            }
-          });
         },
       ),
     );
@@ -195,13 +202,27 @@ class _RegisterPage2State extends State<RegisterPage2> {
           ),
         ),
         onPressed: (){
-          Navigator.pushNamedAndRemoveUntil(context, '/LoginPage', ModalRoute.withName('/'));
+          if(_password1Controller.text==_password12Controller.text){
+
+            _registerAccount(widget.email, _password1Controller.text)
+                .timeout(new Duration(seconds: 15))
+                .then((s){
+              if(s=="Successfully"){
+                Navigator.pushNamedAndRemoveUntil(context, '/LoginPage', ModalRoute.withName('/'));
+              }else{
+                print(s);
+              }
+            })
+                .catchError((e){
+              print(e);
+            });
+          }
         },
       ),
     );
   }
 
-  Future<String> postData(String _email, String _code) async {
+  Future<String> _checkCode(_email, _code) async {
     var url = 'http://www.breakvoid.com/DoktorSaya/CheckCode.php';
     http.Response response = await retry(
       // Make a GET request
@@ -212,7 +233,21 @@ class _RegisterPage2State extends State<RegisterPage2> {
 
     var data = jsonDecode(response.body);
 
-    return data['status'].toString();
+    return Future.value(data['status'].toString());
+  }
+
+  Future<String> _registerAccount(_email, _password) async {
+    var url = 'http://www.breakvoid.com/DoktorSaya/RegisterAccount.php';
+    http.Response response = await retry(
+      // Make a GET request
+          () => http.post(url, body: {'email': _email,'password': _password}).timeout(Duration(seconds: 5)),
+      // Retry on SocketException or TimeoutException
+      retryIf: (e) => e is SocketException || e is TimeoutException,
+    );
+
+    var data = jsonDecode(response.body);
+
+    return Future.value(data['status'].toString());
   }
 
 }

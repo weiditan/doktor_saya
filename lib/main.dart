@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'RegisterDoctor.dart';
 import 'RegisterPage1.dart';
-import 'RegisterUser.dart';
+import 'RegisterPatient.dart';
 import 'WelcomePage.dart';
 import 'LoginPage.dart';
 
@@ -35,6 +35,7 @@ class MyApp extends StatelessWidget {
         '/LoginPage': (BuildContext context) => LoginPage(),
         '/RegisterPage1': (BuildContext context) => RegisterPage1(),
         '/RolePage': (BuildContext context) => RolePage(),
+        '/RegisterPatient': (BuildContext context) => RegisterPatient(),
         '/RegisterDoctor': (BuildContext context) => RegisterDoctor(),
         '/HomePage': (BuildContext context) => HomePage(),
 

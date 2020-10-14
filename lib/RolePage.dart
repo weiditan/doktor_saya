@@ -1,7 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-import 'RegisterUser.dart';
+import 'dart:io';
+import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:retry/retry.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RolePage extends StatelessWidget {
 
@@ -78,10 +81,19 @@ class RolePage extends StatelessWidget {
         ),
       ),
       onPressed: (){
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context)=>RegisterUser(role: "doctor",)),
-        );
+        _saveRoleSharedPreferences("doctor");
+        _checkRole("doctor")
+            .timeout(new Duration(seconds: 15))
+            .then((s){
+          if(s=="Exists"){
+            print(s);
+          }else if(s=="Not Exists"){
+            Navigator.pushNamed(context, '/RegisterDoctor');
+          }
+        })
+            .catchError((e){
+          print(e);
+        });
       },
     );
   }
@@ -89,10 +101,19 @@ class RolePage extends StatelessWidget {
   Widget _patientButton(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context)=>RegisterUser(role: "patient",)),
-        );
+        _saveRoleSharedPreferences("patient");
+        _checkRole("patient")
+            .timeout(new Duration(seconds: 15))
+            .then((s){
+              if(s=="Exists"){
+                print(s);
+              }else if(s=="Not Exists"){
+                Navigator.pushNamed(context, '/RegisterPatient');
+              }
+            })
+            .catchError((e){
+              print(e);
+            });
       },
       child: Container(
         width: MediaQuery.of(context).size.width,
@@ -112,5 +133,29 @@ class RolePage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<int> _getUserIdSharedPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('user_id');
+  }
+
+  Future _saveRoleSharedPreferences(_role) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('role', _role );
+  }
+
+  Future<String> _checkRole(_role) async {
+    var url = 'http://www.breakvoid.com/DoktorSaya/CheckRole.php';
+    http.Response response = await retry(
+      // Make a GET request
+          () => http.post(url, body: {'user_id': _getUserIdSharedPreferences().toString(), 'role':_role}).timeout(Duration(seconds: 5)),
+      // Retry on SocketException or TimeoutException
+      retryIf: (e) => e is SocketException || e is TimeoutException,
+    );
+
+    var data = jsonDecode(response.body);
+
+    return Future.value(data['status'].toString());
   }
 }
