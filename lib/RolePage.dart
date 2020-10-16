@@ -3,8 +3,10 @@ import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:progress_dialog/progress_dialog.dart';
 import 'package:retry/retry.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
+import 'SharedPreferencesFunction.dart';
 
 class RolePage extends StatelessWidget {
 
@@ -81,18 +83,22 @@ class RolePage extends StatelessWidget {
         ),
       ),
       onPressed: (){
-        _saveRoleSharedPreferences("doctor");
-        _checkRole("doctor")
-            .timeout(new Duration(seconds: 15))
-            .then((s){
-          if(s=="Exists"){
-            print(s);
-          }else if(s=="Not Exists"){
-            Navigator.pushNamed(context, '/RegisterDoctor');
-          }
-        })
-            .catchError((e){
-          print(e);
+        SharedPreferencesFunction sp = SharedPreferencesFunction();
+        sp.saveRole("doctor");
+        sp.getUserId().then((id){
+          _checkRole(id.toString(), "doctor")
+              .timeout(new Duration(seconds: 15))
+              .then((s){
+            if(s["status"]){
+              sp.saveRoleId(int.parse(s["data"]));
+              Navigator.pushNamedAndRemoveUntil(context,'/HomePage', (Route<dynamic> route) => false);
+            }else{
+              Navigator.pushNamed(context, '/RegisterDoctor');
+            }
+          })
+              .catchError((e){
+            print(e);
+          });
         });
       },
     );
@@ -100,20 +106,40 @@ class RolePage extends StatelessWidget {
 
   Widget _patientButton(BuildContext context) {
     return InkWell(
-      onTap: () {
-        _saveRoleSharedPreferences("patient");
-        _checkRole("patient")
-            .timeout(new Duration(seconds: 15))
-            .then((s){
-              if(s=="Exists"){
-                print(s);
-              }else if(s=="Not Exists"){
-                Navigator.pushNamed(context, '/RegisterPatient');
-              }
-            })
-            .catchError((e){
-              print(e);
-            });
+      onTap: () async {
+
+        final ProgressDialog pr = ProgressDialog(
+          context,
+          type: ProgressDialogType.Normal,
+          isDismissible: true,
+        );
+
+        pr.style(
+          message: "Memuatkan",
+        );
+
+        await pr.show();
+
+        SharedPreferencesFunction sp = SharedPreferencesFunction();
+        sp.saveRole("patient");
+        sp.getUserId().then((id){
+          _checkRole(id.toString(), "patient")
+              .timeout(new Duration(seconds: 15))
+              .then((s) async {
+            if(s["status"]){
+
+              sp.saveRoleId(int.parse(s["data"]));
+              await pr.hide();
+              Navigator.pushNamedAndRemoveUntil(context,'/HomePage', (Route<dynamic> route) => false);
+            }else{
+              await pr.hide();
+              Navigator.pushNamed(context, '/RegisterPatient');
+            }
+          })
+              .catchError((e){
+            print(e);
+          });
+        });
       },
       child: Container(
         width: MediaQuery.of(context).size.width,
@@ -135,27 +161,17 @@ class RolePage extends StatelessWidget {
     );
   }
 
-  Future<int> _getUserIdSharedPreferences() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getInt('user_id');
-  }
-
-  Future _saveRoleSharedPreferences(_role) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('role', _role );
-  }
-
-  Future<String> _checkRole(_role) async {
+  Future<Map> _checkRole(_userId, _role) async {
     var url = 'http://www.breakvoid.com/DoktorSaya/CheckRole.php';
     http.Response response = await retry(
       // Make a GET request
-          () => http.post(url, body: {'user_id': _getUserIdSharedPreferences().toString(), 'role':_role}).timeout(Duration(seconds: 5)),
+          () => http.post(url, body: {'user_id': _userId, 'role':_role}).timeout(Duration(seconds: 5)),
       // Retry on SocketException or TimeoutException
       retryIf: (e) => e is SocketException || e is TimeoutException,
     );
 
-    var data = jsonDecode(response.body);
+    Map data = jsonDecode(response.body);
 
-    return Future.value(data['status'].toString());
+    return data;
   }
 }

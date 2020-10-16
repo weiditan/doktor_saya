@@ -28,7 +28,7 @@ class _Page2State extends State<Page2> {
   }
 
   Future _getData() async {
-    var url = 'http://www.breakvoid.com/doktorsaya/viewdoctor.php';
+    var url = 'http://www.breakvoid.com/DoktorSaya/viewdoctor.php';
     http.Response response = await retry(
       // Make a GET request
       () => http.get(url).timeout(Duration(seconds: 5)),
@@ -78,7 +78,7 @@ class _Page2State extends State<Page2> {
                   );
                 },
                 child: _row(
-                    "http://www.breakvoid.com/doktorsaya/images/profiles/profile" +
+                    "http://www.breakvoid.com/DoktorSaya/Images/profiles/profile" +
                         (i + 1).toString() +
                         ".jpg",
                     "Dr " + _data[i]["nickname"].toString(),

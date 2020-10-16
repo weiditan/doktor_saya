@@ -1,10 +1,14 @@
+
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:progress_dialog/progress_dialog.dart';
 import 'package:retry/retry.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
+import 'SharedPreferencesFunction.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -13,8 +17,11 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
 
+  SharedPreferencesFunction sp = SharedPreferencesFunction();
+
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -48,18 +55,22 @@ class _LoginPageState extends State<LoginPage> {
                   padding: EdgeInsets.only(top:10,bottom: 10),
                   child: _logo(_maxWidth),
                 ),
-                Column(
-                  children: <Widget>[
-                    _entryField("Email",TextInputType.emailAddress,false,_emailController),
-                    SizedBox(height: 8),
-                    _entryField("Kata Laluan",TextInputType.text,true,_passwordController),
-                    _forgotPassword(),
-                    SizedBox(height: 5),
-                    _loginButton(),
-                    _divider(),
-                    _googleButton()
-                  ],
+                Form(
+                  key: _formKey,
+                  child:Column(
+                    children: <Widget>[
+                      _emailField(),
+                      SizedBox(height: 8),
+                      _entryField("Kata Laluan",TextInputType.text,true,_passwordController),
+                      _forgotPassword(),
+                      SizedBox(height: 5),
+                      _loginButton(),
+                      _divider(),
+                      _googleButton()
+                    ],
+                  ),
                 ),
+
                 Padding(
                   padding: EdgeInsets.only(top:10,bottom: 10),
                   child: _register(),
@@ -97,6 +108,44 @@ class _LoginPageState extends State<LoginPage> {
       keyboardType: _keyboardType,
       obscureText: _obscureText,
       controller: _controller,
+      onChanged: (String value) {
+        _formKey.currentState.validate();
+      },
+      validator: (String value) {
+          if (value.isEmpty) {
+            return 'Please enter some text';
+          }
+          return null;
+      },
+    );
+  }
+
+  Widget _emailField(){
+    return TextFormField(
+      style: TextStyle(
+        fontSize: 16,
+      ),
+      decoration: new InputDecoration(
+        border: OutlineInputBorder(),
+        labelText: "Email",
+        labelStyle: TextStyle(
+          fontFamily: "Montserrat",
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      keyboardType: TextInputType.emailAddress,
+      obscureText: false,
+      onChanged: (String value) {
+        _formKey.currentState.validate();
+      },
+      controller: _emailController,
+      validator: (String value) {
+        if(value.isNotEmpty){
+          return EmailValidator.validate(value) ? null : "Please enter a valid email";
+        }else {
+          return 'Please enter some text';
+        }
+      },
     );
   }
 
@@ -170,21 +219,39 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
         ),
-        onPressed: (){
-          _login(_emailController.text, _passwordController.text)
-              .timeout(new Duration(seconds: 15))
-              .then((s){
-                if(s["status"]=="Correct"){
-                  _saveUserIdSharedPreferences(int.parse(s["user_id"]));
-                  Navigator.pushNamed(context, '/RolePage');
-                }else{
-                  print(s);
-                }
-              })
-              .catchError((e){
-                print(e);
-              });
-        },
+        onPressed: () async {
+          final ProgressDialog pr = ProgressDialog(
+            context,
+            type: ProgressDialogType.Normal,
+            isDismissible: false,
+          );
+
+          pr.style(
+            message: "Log Masuk",
+          );
+
+
+          if (_formKey.currentState.validate()) {
+            await pr.show();
+
+            _login(_emailController.text, _passwordController.text)
+                .timeout(new Duration(seconds: 15))
+                .then((s) async {
+              if (s["status"]) {
+                sp.saveUserId(int.parse(s["data"]));
+                await pr.hide();
+                Navigator.pushNamedAndRemoveUntil(
+                    context, '/RolePage', (Route<dynamic> route) => false);
+              } else {
+                await pr.hide();
+                print(s);
+              }
+            })
+                .catchError((e) {
+              print(e);
+            });
+          }
+        }
       ),
     );
   }
@@ -271,10 +338,4 @@ class _LoginPageState extends State<LoginPage> {
 
     return data;
   }
-
-  Future _saveUserIdSharedPreferences(_userId) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('user_id', _userId );
-  }
-
 }

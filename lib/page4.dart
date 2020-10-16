@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'SharedPreferencesFunction.dart';
+
 class Page4 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -36,6 +38,7 @@ class Page4 extends StatelessWidget {
             Divider(
               thickness: 1,
             ),
+            _logoutButton(context),
           ],
         ),
       ),
@@ -95,7 +98,7 @@ class Page4 extends StatelessWidget {
     );
   }
 
-  Widget _callButton() {
+  Widget _logoutButton(context) {
     return SizedBox(
       width: 120,
       child: RaisedButton(
@@ -103,22 +106,19 @@ class Page4 extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(5)),
         ),
-        child: Row(
-          children: <Widget>[
-            Icon(Icons.call),
-            SizedBox(
-              width: 5,
-            ),
-            Text(
-              "Panggil",
+        child: Text(
+              "logout",
               style: TextStyle(
                 fontFamily: "Montserrat",
                 fontSize: 14,
               ),
-            ),
-          ],
         ),
-        onPressed: () {},
+        onPressed: () {
+          SharedPreferencesFunction sp = SharedPreferencesFunction();
+          sp.clear().then((s){
+            Navigator.pushNamedAndRemoveUntil(context,'/WelcomePage', (Route<dynamic> route) => false);
+          });
+        },
       ),
     );
   }

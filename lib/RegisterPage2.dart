@@ -169,10 +169,12 @@ class _RegisterPage2State extends State<RegisterPage2> {
           _checkCode(widget.email,_codeController.text)
               .timeout(new Duration(seconds: 15))
               .then((s){
-                if(s=="Correct"){
+                if(s["status"]){
                   setState(() {
                     _isVisible = false;
                   });
+                }else{
+                  print(s);
                 }
               })
               .catchError((e){
@@ -207,12 +209,12 @@ class _RegisterPage2State extends State<RegisterPage2> {
             _registerAccount(widget.email, _password1Controller.text)
                 .timeout(new Duration(seconds: 15))
                 .then((s){
-              if(s=="Successfully"){
-                Navigator.pushNamedAndRemoveUntil(context, '/LoginPage', ModalRoute.withName('/'));
-              }else{
-                print(s);
-              }
-            })
+                  if(s["status"]){
+                    Navigator.popUntil(context, ModalRoute.withName('/'));
+                  }else{
+                    print(s);
+                  }
+                })
                 .catchError((e){
               print(e);
             });
@@ -222,7 +224,7 @@ class _RegisterPage2State extends State<RegisterPage2> {
     );
   }
 
-  Future<String> _checkCode(_email, _code) async {
+  Future<Map> _checkCode(_email, _code) async {
     var url = 'http://www.breakvoid.com/DoktorSaya/CheckCode.php';
     http.Response response = await retry(
       // Make a GET request
@@ -231,12 +233,12 @@ class _RegisterPage2State extends State<RegisterPage2> {
       retryIf: (e) => e is SocketException || e is TimeoutException,
     );
 
-    var data = jsonDecode(response.body);
+    Map data = jsonDecode(response.body);
 
-    return Future.value(data['status'].toString());
+    return data;
   }
 
-  Future<String> _registerAccount(_email, _password) async {
+  Future<Map> _registerAccount(_email, _password) async {
     var url = 'http://www.breakvoid.com/DoktorSaya/RegisterAccount.php';
     http.Response response = await retry(
       // Make a GET request
@@ -245,9 +247,9 @@ class _RegisterPage2State extends State<RegisterPage2> {
       retryIf: (e) => e is SocketException || e is TimeoutException,
     );
 
-    var data = jsonDecode(response.body);
+    Map data = jsonDecode(response.body);
 
-    return Future.value(data['status'].toString());
+    return data;
   }
 
 }

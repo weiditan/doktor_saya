@@ -2,6 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'dart:io';
+import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:retry/retry.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 class RegisterPatient extends StatefulWidget {
@@ -10,6 +16,7 @@ class RegisterPatient extends StatefulWidget {
 }
 
 class _RegisterPatientState extends State<RegisterPatient> {
+
 
   int _valueGender;
   DateTime _dateOfBirth;
@@ -140,7 +147,6 @@ class _RegisterPatientState extends State<RegisterPatient> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          keyboardType: null,
           controller: _dateController,
           onTap: _showDateDialog,
           focusNode: FocusNode(),
@@ -153,7 +159,7 @@ class _RegisterPatientState extends State<RegisterPatient> {
     showDialog(
         context: context,
         builder: (_) => new AlertDialog(
-          title: new Text("Material Dialog"),
+          title: new Text("Tarikh Lahir"),
           content: Container(
             height: 200,
             width: 700,
@@ -206,11 +212,56 @@ class _RegisterPatientState extends State<RegisterPatient> {
           ),
         ),
         onPressed: () {
-          Navigator.pushNamed(context, '/HomePage');
+          _getUserIdSharedPreferences().then((id){
+            _savePatientData(
+                id.toString(),
+                _fullNameController.text,
+                _nickNameController.text,
+                _valueGender.toString(),
+                DateFormat('MMM d, yyyy').format(_dateOfBirth),
+                _phoneController.text)
+                .timeout(new Duration(seconds: 15))
+                .then((s){
+              if(s["status"]){
+                Navigator.pushNamed(context, '/HomePage');
+              }else{
+                print(s);
+              }
+            })
+                .catchError((e){
+              print(e);
+            });
+          });
         }
       ),
     );
   }
 
+  Future<Map> _savePatientData(_userId, _fullName,_nickName,_gender,_dateOfBirth,_phone) async {
+    var url = 'http://www.breakvoid.com/DoktorSaya/RegisterPatient.php';
+    http.Response response = await retry(
+      // Make a GET request
+          () => http.post(url, body: {
+            'user_id' : _userId,
+            'role' : 'patient',
+            'fullname' : _fullName,
+            'nickname' : _nickName,
+            'gender' : _gender,
+            'birthday' : _dateOfBirth,
+            'phone' : _phone,
+          }).timeout(Duration(seconds: 5)),
+
+      // Retry on SocketException or TimeoutException
+      retryIf: (e) => e is SocketException || e is TimeoutException,
+    );
+
+    Map data = jsonDecode(response.body);
+    return data;
+  }
+
+  Future<int> _getUserIdSharedPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('user_id');
+  }
 
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'dart:async';
-
+import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:retry/retry.dart';
 
@@ -119,10 +119,12 @@ class _RegisterPage1State extends State<RegisterPage1> {
           _sendVerificationEmail(_emailController.text)
               .timeout(new Duration(seconds: 15))
               .then((s) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context)=>RegisterPage2(email: _emailController.text,)),
-                );
+                if(s["status"]){
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context)=>RegisterPage2(email: _emailController.text,)),
+                  );
+                }
               })
               .catchError((e){
                 print(e);
@@ -235,14 +237,17 @@ class _RegisterPage1State extends State<RegisterPage1> {
     );
   }
 
-  Future _sendVerificationEmail(_email) async {
+  Future<Map> _sendVerificationEmail(_email) async {
     var url = 'http://www.breakvoid.com/DoktorSaya/SendVerificationEmail.php';
-    await retry(
+    http.Response response = await retry(
       // Make a GET request
           () => http.post(url, body: {'email': _email}).timeout(Duration(seconds: 5)),
       // Retry on SocketException or TimeoutException
       retryIf: (e) => e is SocketException || e is TimeoutException,
     );
-  }
 
+    Map data = jsonDecode(response.body);
+
+    return data;
+  }
 }

@@ -1,6 +1,7 @@
 import 'package:doktorsaya/HomePage.dart';
 import 'package:doktorsaya/RolePage.dart';
 import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
 
 import 'RegisterDoctor.dart';
 import 'RegisterPage1.dart';
@@ -30,16 +31,43 @@ class MyApp extends StatelessWidget {
 
       ),
       home: WelcomePage(),
+      onGenerateRoute: (settings) {
+        switch (settings.name) {
+
+          case '/LoginPage':
+            return PageTransition(
+              child: LoginPage(),
+              type: PageTransitionType.fade,
+              settings: settings,
+            );
+            break;
+
+          case '/HomePage':
+            return PageTransition(
+              child: HomePage(),
+              type: PageTransitionType.fade,
+              settings: settings,
+            );
+            break;
+
+          default:
+            return null;
+        }
+      },
       routes: <String, WidgetBuilder>{
         '/WelcomePage': (BuildContext context) => WelcomePage(),
-        '/LoginPage': (BuildContext context) => LoginPage(),
+        //'/LoginPage': (BuildContext context) => LoginPage(),
         '/RegisterPage1': (BuildContext context) => RegisterPage1(),
         '/RolePage': (BuildContext context) => RolePage(),
         '/RegisterPatient': (BuildContext context) => RegisterPatient(),
         '/RegisterDoctor': (BuildContext context) => RegisterDoctor(),
-        '/HomePage': (BuildContext context) => HomePage(),
+       // '/HomePage': (BuildContext context) => HomePage(),
+      },
 
-      }
+
+
+
+
     );
   }
 }
