@@ -218,7 +218,7 @@ class _RegisterPatientState extends State<RegisterPatient> {
                 _fullNameController.text,
                 _nickNameController.text,
                 _valueGender.toString(),
-                DateFormat('MMM d, yyyy').format(_dateOfBirth),
+                DateFormat('yyyy-MM-dd').format(_dateOfBirth),
                 _phoneController.text)
                 .timeout(new Duration(seconds: 15))
                 .then((s){

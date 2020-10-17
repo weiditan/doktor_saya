@@ -39,11 +39,10 @@ class _Page2State extends State<Page2> {
     setState(() {
       _data = jsonDecode(response.body);
       _loadingIconVisible = false;
-
-      Timer(Duration(milliseconds: 500), () {
-        setState(() {
-          _loadingVisible = false;
-        });
+    });
+    Timer(Duration(milliseconds: 500), () {
+      setState(() {
+        _loadingVisible = false;
       });
     });
   }

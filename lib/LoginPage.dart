@@ -247,7 +247,8 @@ class _LoginPageState extends State<LoginPage> {
                 print(s);
               }
             })
-                .catchError((e) {
+                .catchError((e) async {
+              await pr.hide();
               print(e);
             });
           }

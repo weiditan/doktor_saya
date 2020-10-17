@@ -136,9 +136,10 @@ class RolePage extends StatelessWidget {
               Navigator.pushNamed(context, '/RegisterPatient');
             }
           })
-              .catchError((e){
-            print(e);
-          });
+              .catchError((e) async {
+                await pr.hide();
+                print(e);
+              });
         });
       },
       child: Container(
