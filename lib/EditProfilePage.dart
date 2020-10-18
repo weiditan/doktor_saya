@@ -1,15 +1,21 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'dart:io';
+import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:retry/retry.dart';
 
-class RegisterDoctor extends StatefulWidget {
+class EditProfilePage extends StatefulWidget {
   @override
-  _RegisterDoctorState createState() => _RegisterDoctorState();
+  _EditProfilePageState createState() => _EditProfilePageState();
 }
 
-class _RegisterDoctorState extends State<RegisterDoctor> {
-
+class _EditProfilePageState extends State<EditProfilePage> {
   final _formKey = GlobalKey<FormState>();
 
   final _fullNameController = TextEditingController();
@@ -19,11 +25,14 @@ class _RegisterDoctorState extends State<RegisterDoctor> {
   DateTime _selectDate;
   final _dateController = TextEditingController();
   final _mmcController = TextEditingController();
+  String _role;
 
-  String _role = "doctor";
+  File _image;
 
   @override
   Widget build(BuildContext context) {
+    _role = ModalRoute.of(context).settings.arguments;
+
     double _screenHeight = MediaQuery.of(context).size.height;
     double _screenWidth = MediaQuery.of(context).size.width;
     double _maxWidth;
@@ -31,7 +40,7 @@ class _RegisterDoctorState extends State<RegisterDoctor> {
     if (_screenWidth > _screenHeight) {
       _maxWidth = _screenWidth * 0.7;
     } else {
-      _maxWidth = _screenWidth * 0.9;
+      _maxWidth = _screenWidth;
     }
 
     return Scaffold(
@@ -50,6 +59,8 @@ class _RegisterDoctorState extends State<RegisterDoctor> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
+                  _imageBox(_maxWidth),
+                  SizedBox(height: 20),
                   _heading1("PROFIL"),
                   _entryField("Nama Penuh", _fullNameController),
                   _entryField("Nama Panggilan", _nickNameController),
@@ -71,7 +82,9 @@ class _RegisterDoctorState extends State<RegisterDoctor> {
                   Divider(
                     thickness: 1,
                   ),
-                  _submitButton(),
+                  (_role == "doctor")
+                      ? _submitButton("Seterusnya")
+                      : _submitButton("Simpan"),
                   SizedBox(height: 20),
                 ],
               ),
@@ -82,9 +95,70 @@ class _RegisterDoctorState extends State<RegisterDoctor> {
     );
   }
 
+  Widget _imageBox(_maxWidth) {
+    return InkWell(
+      onTap: _getFromGallery,
+      child: Container(
+        width: _maxWidth,
+        height: _maxWidth,
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Colors.grey,
+            width: 2,
+          ),
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Center(
+          child: (_image == null)
+              ? Icon(
+                  Icons.account_circle,
+                  size: _maxWidth,
+                  color: Colors.grey,
+                )
+              : Image.file(
+                  _image,
+                  width: _maxWidth,
+                  height: _maxWidth,
+                  fit: BoxFit.fill,
+                ),
+        ),
+      ),
+    );
+  }
+
+  /// Get from gallery
+  _getFromGallery() async {
+    PickedFile pickedFile = await ImagePicker().getImage(
+      source: ImageSource.gallery,
+    );
+    _cropImage(pickedFile.path);
+  }
+
+  /// Crop Image
+  _cropImage(filePath) async {
+    File croppedImage = await ImageCropper.cropImage(
+        sourcePath: filePath,
+        maxHeight: 1080,
+        maxWidth: 1080,
+        aspectRatioPresets: [CropAspectRatioPreset.square],
+        androidUiSettings: AndroidUiSettings(
+          toolbarTitle: 'Gambar Profil',
+        ),
+        iosUiSettings: IOSUiSettings(
+          minimumAspectRatio: 1.0,
+        ));
+
+    if (croppedImage != null) {
+      setState(() {
+        _image = croppedImage;
+        print(_image.lengthSync());
+      });
+    }
+  }
+
   Widget _entryField(_label, _controller) {
     return Padding(
-      padding: EdgeInsets.only(left: 20, top: 20),
+      padding: EdgeInsets.only(left: 20, top: 20, right: 20),
       child: TextFormField(
         style: TextStyle(
           fontSize: 16,
@@ -105,7 +179,7 @@ class _RegisterDoctorState extends State<RegisterDoctor> {
         controller: _controller,
         validator: (String value) {
           if (value.isEmpty) {
-            return 'Sila Masukkan '+_label;
+            return 'Sila Masukkan ' + _label;
           }
           return null;
         },
@@ -157,7 +231,7 @@ class _RegisterDoctorState extends State<RegisterDoctor> {
 
   Widget _dateField() {
     return Padding(
-      padding: EdgeInsets.only(left: 20, top: 20),
+      padding: EdgeInsets.only(left: 20, top: 20, right: 20),
       child: SizedBox(
         width: 150,
         child: TextFormField(
@@ -264,7 +338,7 @@ class _RegisterDoctorState extends State<RegisterDoctor> {
     );
   }
 
-  Widget _submitButton() {
+  Widget _submitButton(_label) {
     return SizedBox(
       width: double.infinity,
       child: RaisedButton(
@@ -275,7 +349,7 @@ class _RegisterDoctorState extends State<RegisterDoctor> {
           child: Padding(
             padding: EdgeInsets.symmetric(vertical: 10),
             child: Text(
-              "Hantar",
+              _label,
               style: TextStyle(
                 fontFamily: "Montserrat",
                 fontSize: 20,
@@ -331,5 +405,29 @@ class _RegisterDoctorState extends State<RegisterDoctor> {
         ),
       ),
     );
+  }
+
+  Future<Map> _saveData(_userId, _role, _fullName, _nickName, _gender,
+      _dateOfBirth, _phone, _mmc) async {
+    var url = 'http://www.breakvoid.com/DoktorSaya/RegisterPatient.php';
+    http.Response response = await retry(
+      // Make a GET request
+      () => http.post(url, body: {
+        'user_id': _userId,
+        'role': _role,
+        'fullname': _fullName,
+        'nickname': _nickName,
+        'gender': _gender,
+        'birthday': _dateOfBirth,
+        'phone': _phone,
+        'MMC': _mmc,
+      }).timeout(Duration(seconds: 5)),
+
+      // Retry on SocketException or TimeoutException
+      retryIf: (e) => e is SocketException || e is TimeoutException,
+    );
+
+    Map data = jsonDecode(response.body);
+    return data;
   }
 }

@@ -3,7 +3,7 @@ import 'package:doktorsaya/RolePage.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 
-import 'RegisterDoctor.dart';
+import 'EditProfilePage.dart';
 import 'RegisterPage1.dart';
 import 'RegisterPatient.dart';
 import 'WelcomePage.dart';
@@ -50,6 +50,14 @@ class MyApp extends StatelessWidget {
             );
             break;
 
+          case '/EditProfilePage':
+            return PageTransition(
+              child: EditProfilePage(),
+              type: PageTransitionType.fade,
+              settings: settings,
+            );
+            break;
+
           default:
             return null;
         }
@@ -60,7 +68,7 @@ class MyApp extends StatelessWidget {
         '/RegisterPage1': (BuildContext context) => RegisterPage1(),
         '/RolePage': (BuildContext context) => RolePage(),
         '/RegisterPatient': (BuildContext context) => RegisterPatient(),
-        '/RegisterDoctor': (BuildContext context) => RegisterDoctor(),
+        //'/RegisterDoctor': (BuildContext context) => RegisterDoctor(),
        // '/HomePage': (BuildContext context) => HomePage(),
       },
 
