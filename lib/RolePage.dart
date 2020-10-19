@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:retry/retry.dart';
 
-import 'SharedPreferencesFunction.dart';
+import 'SharedPreferencesFunction.dart' as sp;
 
 class RolePage extends StatelessWidget {
   @override
@@ -123,7 +123,6 @@ class RolePage extends StatelessWidget {
 
     await pr.show();
 
-    SharedPreferencesFunction sp = SharedPreferencesFunction();
     sp.saveRole(_role);
     sp.getUserId().then((id) {
       _checkRole(id.toString(), _role)

@@ -5,6 +5,7 @@ import 'package:page_transition/page_transition.dart';
 
 import 'EditProfilePage.dart';
 import 'RegisterPage1.dart';
+import 'RegisterPage2.dart';
 import 'RegisterPatient.dart';
 import 'WelcomePage.dart';
 import 'LoginPage.dart';
@@ -22,21 +23,34 @@ class MyApp extends StatelessWidget {
         //brightness: Brightness.light,
         primarySwatch: Colors.orange,
         scaffoldBackgroundColor: Colors.grey[200],
-
       ),
       darkTheme: ThemeData(
         brightness: Brightness.dark,
         //primaryColor: Colors.black,
         accentColor: Colors.orange,
-
       ),
       home: WelcomePage(),
       onGenerateRoute: (settings) {
         switch (settings.name) {
-
           case '/LoginPage':
             return PageTransition(
               child: LoginPage(),
+              type: PageTransitionType.fade,
+              settings: settings,
+            );
+            break;
+
+          case '/RegisterPage1':
+            return PageTransition(
+              child: RegisterPage1(),
+              type: PageTransitionType.fade,
+              settings: settings,
+            );
+            break;
+
+          case '/RegisterPage2':
+            return PageTransition(
+              child: RegisterPage2(),
               type: PageTransitionType.fade,
               settings: settings,
             );
@@ -64,18 +78,12 @@ class MyApp extends StatelessWidget {
       },
       routes: <String, WidgetBuilder>{
         '/WelcomePage': (BuildContext context) => WelcomePage(),
-        //'/LoginPage': (BuildContext context) => LoginPage(),
-        '/RegisterPage1': (BuildContext context) => RegisterPage1(),
+
         '/RolePage': (BuildContext context) => RolePage(),
         '/RegisterPatient': (BuildContext context) => RegisterPatient(),
         //'/RegisterDoctor': (BuildContext context) => RegisterDoctor(),
-       // '/HomePage': (BuildContext context) => HomePage(),
+        // '/HomePage': (BuildContext context) => HomePage(),
       },
-
-
-
-
-
     );
   }
 }

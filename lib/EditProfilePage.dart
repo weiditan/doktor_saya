@@ -9,6 +9,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:retry/retry.dart';
+import 'package:path/path.dart' as path;
+
+import 'SharedPreferencesFunction.dart' as sp;
 
 class EditProfilePage extends StatefulWidget {
   @override
@@ -24,10 +27,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
   DateTime _dateOfBirth;
   DateTime _selectDate;
   final _dateController = TextEditingController();
+  final _phoneController = TextEditingController();
   final _mmcController = TextEditingController();
   String _role;
 
   File _image;
+  String _imageName = "";
+  String _base64Image = "";
 
   @override
   Widget build(BuildContext context) {
@@ -110,10 +116,24 @@ class _EditProfilePageState extends State<EditProfilePage> {
         ),
         child: Center(
           child: (_image == null)
-              ? Icon(
-                  Icons.account_circle,
-                  size: _maxWidth,
-                  color: Colors.grey,
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    Icon(
+                      Icons.account_circle,
+                      size: _maxWidth * 0.8,
+                      color: Colors.grey,
+                    ),
+                    Text(
+                      "Tukar Gambar Profil",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontFamily: "Montserrat",
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey,
+                      ),
+                    )
+                  ],
                 )
               : Image.file(
                   _image,
@@ -126,16 +146,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
-  /// Get from gallery
-  _getFromGallery() async {
+  Future _getFromGallery() async {
     PickedFile pickedFile = await ImagePicker().getImage(
       source: ImageSource.gallery,
     );
     _cropImage(pickedFile.path);
   }
 
-  /// Crop Image
-  _cropImage(filePath) async {
+  Future _cropImage(filePath) async {
     File croppedImage = await ImageCropper.cropImage(
         sourcePath: filePath,
         maxHeight: 1080,
@@ -151,7 +169,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
     if (croppedImage != null) {
       setState(() {
         _image = croppedImage;
-        print(_image.lengthSync());
       });
     }
   }
@@ -326,12 +343,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
             autovalidate: true,
             validator: (String value) {
               if (value.isNotEmpty && value.length < 9) {
-                return 'Sila masukkan\n nombor telefon\n yang betul';
+                return 'Sila Masukkan\n Nombor Telefon\n Yang Betul';
               }
               return null;
             },
             textInputAction: TextInputAction.done,
-            // controller: ,
+            controller: _phoneController,
           ),
         ),
       ),
@@ -339,29 +356,61 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Widget _submitButton(_label) {
-    return SizedBox(
-      width: double.infinity,
-      child: RaisedButton(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(5)),
-          ),
-          color: Colors.orange,
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 10),
-            child: Text(
-              _label,
-              style: TextStyle(
-                fontFamily: "Montserrat",
-                fontSize: 20,
-                color: Colors.white,
+    return Padding(
+      padding: EdgeInsets.all(10),
+      child: SizedBox(
+        width: double.infinity,
+        child: RaisedButton(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(5)),
+            ),
+            color: Colors.orange,
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 10),
+              child: Text(
+                _label,
+                style: TextStyle(
+                  fontFamily: "Montserrat",
+                  fontSize: 20,
+                  color: Colors.white,
+                ),
               ),
             ),
-          ),
-          onPressed: () {
-            if (_formKey.currentState.validate()) {
-              Navigator.pushNamed(context, '/HomePage');
-            }
-          }),
+            onPressed: () {
+              if (_formKey.currentState.validate()) {
+
+                sp.getUserId().then((id) {
+
+                  if (_image!=null) {
+                    _imageName = id.toString()+"_"+DateTime.now().millisecondsSinceEpoch.toString()+path.extension(_image.path);
+                    _base64Image = base64Encode(_image.readAsBytesSync());
+                  }
+
+                  _saveData(
+                          id.toString(),
+                          _role,
+                          _fullNameController.text,
+                          _nickNameController.text,
+                          _valueGender.toString(),
+                          DateFormat('yyyy-MM-dd').format(_dateOfBirth),
+                          _phoneController.text,
+                          _imageName,
+                          _base64Image,
+                          _mmcController.text)
+                      .timeout(new Duration(seconds: 15))
+                      .then((s) {
+                        if (s["status"]) {
+                          sp.saveRoleId(s["data"]);
+                          Navigator.pushNamedAndRemoveUntil(
+                              context, '/HomePage', (Route<dynamic> route) => false);
+                        } else {
+                          print(s);
+                        }
+                      });
+                });
+              }
+            }),
+      ),
     );
   }
 
@@ -408,8 +457,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Future<Map> _saveData(_userId, _role, _fullName, _nickName, _gender,
-      _dateOfBirth, _phone, _mmc) async {
-    var url = 'http://www.breakvoid.com/DoktorSaya/RegisterPatient.php';
+      _dateOfBirth, _phone, _imageName, _base64image, _mmc) async {
+    var url = 'http://www.breakvoid.com/DoktorSaya/EditProfile.php';
     http.Response response = await retry(
       // Make a GET request
       () => http.post(url, body: {
@@ -420,6 +469,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
         'gender': _gender,
         'birthday': _dateOfBirth,
         'phone': _phone,
+        'image_name': _imageName,
+        'base64image': _base64image,
         'MMC': _mmc,
       }).timeout(Duration(seconds: 5)),
 

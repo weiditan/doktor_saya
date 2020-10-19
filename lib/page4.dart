@@ -5,7 +5,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:retry/retry.dart';
 
-import 'SharedPreferencesFunction.dart';
+import 'SharedPreferencesFunction.dart' as sp;
 
 class Page4 extends StatefulWidget {
   @override
@@ -24,7 +24,6 @@ class _Page4State extends State<Page4> {
     // TODO: implement initState
     super.initState();
 
-    SharedPreferencesFunction sp = SharedPreferencesFunction();
     sp.getUserId().then((id){
       sp.getRole().then((role){
         _getUserDetail(id.toString(), role)
@@ -197,7 +196,6 @@ class _Page4State extends State<Page4> {
           ),
         ),
         onPressed: () {
-          SharedPreferencesFunction sp = SharedPreferencesFunction();
           sp.clear().then((s) {
             Navigator.pushNamedAndRemoveUntil(
                 context, '/WelcomePage', (Route<dynamic> route) => false);

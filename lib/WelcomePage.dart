@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'SharedPreferencesFunction.dart';
+import 'SharedPreferencesFunction.dart' as sp;
 
 class WelcomePage extends StatefulWidget {
   @override
@@ -10,7 +10,7 @@ class WelcomePage extends StatefulWidget {
 }
 
 class _WelcomePageState extends State<WelcomePage> {
-  SharedPreferencesFunction sp = SharedPreferencesFunction();
+
   bool _buttonVisible = true;
   bool _loadingIconVisible = true;
 

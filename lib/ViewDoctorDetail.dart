@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 
 import 'Message.dart';
 
+
 class ViewDoctorDetail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+
     double _screenHeight = MediaQuery.of(context).size.height;
     double _screenWidth = MediaQuery.of(context).size.width;
     double _maxWidth;

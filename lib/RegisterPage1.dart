@@ -1,11 +1,11 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:progress_dialog/progress_dialog.dart';
 import 'package:retry/retry.dart';
-
-import 'RegisterPage2.dart';
 
 class RegisterPage1 extends StatefulWidget {
   @override
@@ -14,6 +14,7 @@ class RegisterPage1 extends StatefulWidget {
 
 class _RegisterPage1State extends State<RegisterPage1> {
 
+  final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
 
   @override
@@ -50,7 +51,10 @@ class _RegisterPage1State extends State<RegisterPage1> {
                       padding: EdgeInsets.only(top:10,bottom: 20),
                       child: _logo(_maxWidth),
                     ),
-                    _emailField(),
+                    Form(
+                      key: _formKey,
+                      child: _emailField(),
+                    ),
                     SizedBox(height: 20),
                     _nextButton(),
                     _divider(),
@@ -73,7 +77,7 @@ class _RegisterPage1State extends State<RegisterPage1> {
     return Container(
       child: Image(
         image: AssetImage("assets/logo.png"),
-        width: _maxWidth*0.6,
+        width: _maxWidth*0.5,
       ),
     );
   }
@@ -94,6 +98,16 @@ class _RegisterPage1State extends State<RegisterPage1> {
       keyboardType: TextInputType.emailAddress,
       obscureText: false,
       controller: _emailController,
+      onChanged: (String value) {
+        _formKey.currentState.validate();
+      },
+      validator: (String value) {
+        if(value.isNotEmpty){
+          return EmailValidator.validate(value) ? null : "Sila Masukkan Email Yang Betul";
+        }else {
+          return 'Sila Masukkan Email';
+        }
+      },
     );
   }
 
@@ -115,20 +129,38 @@ class _RegisterPage1State extends State<RegisterPage1> {
             ),
           ),
         ),
-        onPressed: (){
-          _sendVerificationEmail(_emailController.text)
-              .timeout(new Duration(seconds: 15))
-              .then((s) {
-                if(s["status"]){
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context)=>RegisterPage2(email: _emailController.text,)),
-                  );
-                }
-              })
-              .catchError((e){
-                print(e);
-              });
+        onPressed: () async {
+
+          final ProgressDialog pr = ProgressDialog(
+            context,
+            type: ProgressDialogType.Normal,
+            isDismissible: false,
+          );
+
+          pr.style(
+            message: "Memuatkan",
+          );
+
+          if(_formKey.currentState.validate()) {
+
+            await pr.show();
+
+            _sendVerificationEmail(_emailController.text)
+                .timeout(new Duration(seconds: 15))
+                .then((s) async {
+                  if (s["status"]) {
+                    await pr.hide();
+                    Navigator.pushNamed(context, '/RegisterPage2', arguments: _emailController.text);
+                  }else{
+                    await pr.hide();
+                    print(s);
+                  }
+                })
+                .catchError((e) async {
+                  await pr.hide();
+                  print(e);
+                });
+          }
         },
       ),
     );
