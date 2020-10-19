@@ -112,6 +112,9 @@ class _LoginPageState extends State<LoginPage> {
           _emailAutoValidate = true;
         });
       },
+      onFieldSubmitted: (_) {
+        FocusScope.of(context).nextFocus();
+      },
       validator: (String value) {
         if (value.isNotEmpty) {
           return EmailValidator.validate(value)
@@ -244,7 +247,6 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
           onPressed: () async {
-
             final ProgressDialog pr = ProgressDialog(
               context,
               type: ProgressDialogType.Normal,
@@ -252,6 +254,10 @@ class _LoginPageState extends State<LoginPage> {
             );
 
             pr.style(
+              progressWidget:Image.asset(
+                'assets/double_ring_loading_io.gif',
+                package: 'progress_dialog',
+              ),
               message: "Log Masuk",
             );
 
@@ -267,7 +273,16 @@ class _LoginPageState extends State<LoginPage> {
                   Navigator.pushNamedAndRemoveUntil(
                       context, '/RolePage', (Route<dynamic> route) => false);
                 } else {
-                  await pr.hide();
+                  pr.update(
+                      progressWidget: Icon(
+                        Icons.clear,
+                        size: 50,
+                        color: Colors.red,
+                      ),
+                      message: s["data"]);
+                  Timer(Duration(seconds: 2), () async {
+                    await pr.hide();
+                  });
                   print(s);
                 }
               }).catchError((e) async {
