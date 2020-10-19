@@ -13,7 +13,6 @@ class Page4 extends StatefulWidget {
 }
 
 class _Page4State extends State<Page4> {
-
   bool _loadingVisible = true;
   bool _loadingIconVisible = true;
   double _maxWidth;
@@ -24,22 +23,21 @@ class _Page4State extends State<Page4> {
     // TODO: implement initState
     super.initState();
 
-    sp.getUserId().then((id){
-      sp.getRole().then((role){
+    sp.getUserId().then((id) {
+      sp.getRole().then((role) {
         _getUserDetail(id.toString(), role)
             .timeout(new Duration(seconds: 15))
             .then((s) {
-              setState(() {
-                _userData = s;
-                _loadingIconVisible = false;
-              });
-              Timer(Duration(milliseconds: 500), () {
-                setState(() {
-                  _loadingVisible = false;
-                });
-              });
-            })
-            .catchError((e) {
+          setState(() {
+            _userData = s;
+            _loadingIconVisible = false;
+          });
+          Timer(Duration(milliseconds: 500), () {
+            setState(() {
+              _loadingVisible = false;
+            });
+          });
+        }).catchError((e) {
           print(e);
         });
       });
@@ -48,14 +46,13 @@ class _Page4State extends State<Page4> {
 
   @override
   Widget build(BuildContext context) {
-
     double _screenHeight = MediaQuery.of(context).size.height;
     double _screenWidth = MediaQuery.of(context).size.width;
 
     if (_screenWidth > _screenHeight) {
       _maxWidth = _screenWidth * 0.7;
     } else {
-      _maxWidth = _screenWidth * 0.9;
+      _maxWidth = _screenWidth;
     }
 
     return Scaffold(
@@ -63,7 +60,7 @@ class _Page4State extends State<Page4> {
         // If the widget is visible, animate to 0.0 (invisible).
         // If the widget is hidden, animate to 1.0 (fully visible).
         crossFadeState: _loadingVisible
-        ? CrossFadeState.showFirst
+            ? CrossFadeState.showFirst
             : CrossFadeState.showSecond,
         firstCurve: Curves.easeOut,
         secondCurve: Curves.easeIn,
@@ -74,22 +71,23 @@ class _Page4State extends State<Page4> {
     );
   }
 
-
-
-  Widget _firstScreen(){
+  Widget _firstScreen() {
     return Center(
       child: _loadingIcon(),
     );
   }
 
-  Widget _secondScreen(){
-    if(_userData != null) {
+  Widget _secondScreen() {
+    if (_userData != null) {
       return ListView(
         scrollDirection: Axis.vertical,
         shrinkWrap: true,
         children: <Widget>[
-          _profileImage(_maxWidth),
-          _heading1("PROFIL"),
+          (_userData['image'] == "")
+              ? _noProfileImage(_maxWidth)
+              : _profileImage(_maxWidth),
+          SizedBox(height: 10),
+          _heading1(_userData["nickname"]),
           _heading2("Nama Penuh"),
           _heading3(_userData['fullname']),
           _heading2("Jantina"),
@@ -127,15 +125,45 @@ class _Page4State extends State<Page4> {
     );
   }
 
+  Widget _noProfileImage(_maxWidth) {
+    return Column(
+      children: <Widget>[
+        Padding(
+          padding: EdgeInsets.only(top: 20, bottom: 20),
+          child: Icon(
+            Icons.account_circle,
+            size: _maxWidth * 0.7,
+            color: Colors.grey,
+          ),
+        ),
+        Divider(
+          thickness: 1,
+        ),
+      ],
+    );
+  }
+
   Widget _profileImage(_maxWidth) {
-    return Padding(
-        padding: EdgeInsets.only(top: 10, bottom: 20),
-        child: Icon(
-          Icons.account_circle,
-          size: _maxWidth * 0.7,
-          color: Colors.grey,
-        ) //_logo(_maxWidth),
-        );
+    return Container(
+      width: _maxWidth,
+      height: _maxWidth,
+      decoration: BoxDecoration(
+        shape: BoxShape.rectangle,
+        image: DecorationImage(
+            fit: BoxFit.fill,
+            image: NetworkImage(
+                "http://www.breakvoid.com/DoktorSaya/Images/Profiles/" +
+                    _userData['image'])),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 5,
+            blurRadius: 7,
+            offset: Offset(0, 3), // changes position of shadow
+          ),
+        ],
+      ), //_logo(_maxWidth),
+    );
   }
 
   Widget _heading1(_text) {
@@ -205,27 +233,27 @@ class _Page4State extends State<Page4> {
     );
   }
 
-  String _gender(){
-    if(_userData['gender']=="0"){
+  String _gender() {
+    if (_userData['gender'] == "0") {
       return "Lelaki";
-    }else{
+    } else {
       return "Perempuan";
     }
   }
 
-  String _age(){
-
+  String _age() {
     DateTime birthday = DateTime.parse(_userData['birthday']);
     DateTime today = DateTime.now();
     int differenceYears = today.year - birthday.year;
-    int differenceDays = today.difference(DateTime(today.year,birthday.month,birthday.day)).inDays;
+    int differenceDays = today
+        .difference(DateTime(today.year, birthday.month, birthday.day))
+        .inDays;
 
-    if(differenceDays<0){
+    if (differenceDays < 0) {
       differenceYears = differenceYears - 1;
     }
 
     return differenceYears.toString();
-
   }
 
   Future<Map> _getUserDetail(_userId, _role) async {

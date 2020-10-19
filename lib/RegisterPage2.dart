@@ -4,10 +4,10 @@ import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:progress_dialog/progress_dialog.dart';
 import 'package:retry/retry.dart';
 
 import 'EncryptFunction.dart' as ef;
+import 'ProgressDialogFunction.dart' as pr;
 
 class RegisterPage2 extends StatefulWidget {
   @override
@@ -286,18 +286,9 @@ class _RegisterPage2State extends State<RegisterPage2> {
           ),
         ),
         onPressed: () async {
-          final ProgressDialog pr = ProgressDialog(
-            context,
-            type: ProgressDialogType.Normal,
-            isDismissible: false,
-          );
-
-          pr.style(
-            message: "Memuatkan",
-          );
 
           if (_formKey.currentState.validate()) {
-            await pr.show();
+            await pr.show(context,"Memuatkan");
 
             _checkCode(_email, _codeController.text)
                 .timeout(new Duration(seconds: 15))
@@ -308,8 +299,7 @@ class _RegisterPage2State extends State<RegisterPage2> {
                   _isVisible = false;
                 });
               } else {
-                await pr.hide();
-                print(s);
+                await pr.error(s["data"]);
               }
             }).catchError((e) async {
               await pr.hide();
@@ -341,28 +331,18 @@ class _RegisterPage2State extends State<RegisterPage2> {
           ),
         ),
         onPressed: () async {
-          final ProgressDialog pr = ProgressDialog(
-            context,
-            type: ProgressDialogType.Normal,
-            isDismissible: false,
-          );
-
-          pr.style(
-            message: "Memuatkan",
-          );
 
           if (_formKey2.currentState.validate()) {
-            await pr.show();
+            await pr.show(context,"Memuatkan");
 
             _registerAccount(_email, _password1Controller.text)
                 .timeout(new Duration(seconds: 15))
                 .then((s) async {
               if (s["status"]) {
-                await pr.hide();
+                await pr.success("Akaun telah berjaya didaftarkan.");
                 Navigator.popUntil(context, ModalRoute.withName('/'));
               } else {
-                await pr.hide();
-                print(s);
+                await pr.error(s["data"]);
               }
             }).catchError((e) async {
               await pr.hide();
@@ -394,7 +374,7 @@ class _RegisterPage2State extends State<RegisterPage2> {
     http.Response response = await retry(
       // Make a GET request
       () => http.post(url, body: {
-        'email': ef.encrypt(_email),
+        'email': _email,
         'password': ef.encrypt(_password)
       }).timeout(Duration(seconds: 5)),
       // Retry on SocketException or TimeoutException

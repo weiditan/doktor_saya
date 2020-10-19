@@ -4,8 +4,9 @@ import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:progress_dialog/progress_dialog.dart';
 import 'package:retry/retry.dart';
+
+import 'ProgressDialogFunction.dart' as pr;
 
 class RegisterPage1 extends StatefulWidget {
   @override
@@ -131,19 +132,9 @@ class _RegisterPage1State extends State<RegisterPage1> {
         ),
         onPressed: () async {
 
-          final ProgressDialog pr = ProgressDialog(
-            context,
-            type: ProgressDialogType.Normal,
-            isDismissible: false,
-          );
-
-          pr.style(
-            message: "Memuatkan",
-          );
-
           if(_formKey.currentState.validate()) {
 
-            await pr.show();
+            await pr.show(context,"Memuatkan");
 
             _sendVerificationEmail(_emailController.text)
                 .timeout(new Duration(seconds: 15))
@@ -152,8 +143,7 @@ class _RegisterPage1State extends State<RegisterPage1> {
                     await pr.hide();
                     Navigator.pushNamed(context, '/RegisterPage2', arguments: _emailController.text);
                   }else{
-                    await pr.hide();
-                    print(s);
+                    await pr.error(s["data"]);
                   }
                 })
                 .catchError((e) async {

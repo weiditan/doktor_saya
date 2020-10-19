@@ -3,10 +3,10 @@ import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:progress_dialog/progress_dialog.dart';
 import 'package:retry/retry.dart';
 
 import 'SharedPreferencesFunction.dart' as sp;
+import 'ProgressDialogFunction.dart' as pr;
 
 class RolePage extends StatelessWidget {
   @override
@@ -111,17 +111,8 @@ class RolePage extends StatelessWidget {
   }
 
   void _submit(context, _role) async {
-    final ProgressDialog pr = ProgressDialog(
-      context,
-      type: ProgressDialogType.Normal,
-      isDismissible: true,
-    );
 
-    pr.style(
-      message: "Memuatkan",
-    );
-
-    await pr.show();
+    await pr.show(context,"Memuatkan");
 
     sp.saveRole(_role);
     sp.getUserId().then((id) {
@@ -129,7 +120,7 @@ class RolePage extends StatelessWidget {
           .timeout(new Duration(seconds: 15))
           .then((s) async {
         if (s["status"]) {
-          sp.saveRoleId(int.parse(s["data"]));
+          sp.saveRoleId(s["data"]);
           await pr.hide();
           Navigator.pushNamedAndRemoveUntil(
               context, '/HomePage', (Route<dynamic> route) => false);

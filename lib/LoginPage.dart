@@ -4,11 +4,11 @@ import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:progress_dialog/progress_dialog.dart';
 import 'package:retry/retry.dart';
 
 import 'EncryptFunction.dart' as ef;
 import 'SharedPreferencesFunction.dart' as sp;
+import 'ProgressDialogFunction.dart' as pr;
 
 class LoginPage extends StatefulWidget {
   @override
@@ -42,40 +42,41 @@ class _LoginPageState extends State<LoginPage> {
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
         child: Center(
-            child: ConstrainedBox(
-          constraints: BoxConstraints(
-            minHeight: _screenHeight - 80,
-            maxWidth: _maxWidth,
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Padding(
-                padding: EdgeInsets.only(top: 10, bottom: 10),
-                child: _logo(_maxWidth),
-              ),
-              Form(
-                key: _formKey,
-                child: Column(
-                  children: <Widget>[
-                    _emailField(),
-                    SizedBox(height: 8),
-                    _passwordField(),
-                    _forgotPassword(),
-                    SizedBox(height: 5),
-                    _loginButton(),
-                    _divider(),
-                    _googleButton()
-                  ],
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: _screenHeight - 80,
+              maxWidth: _maxWidth,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.only(top: 10, bottom: 10),
+                  child: _logo(_maxWidth),
                 ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 10, bottom: 10),
-                child: _register(),
-              ),
-            ],
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    children: <Widget>[
+                      _emailField(),
+                      SizedBox(height: 8),
+                      _passwordField(),
+                      _forgotPassword(),
+                      SizedBox(height: 5),
+                      _loginButton(),
+                      _divider(),
+                      _googleButton()
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 10, bottom: 10),
+                  child: _register(),
+                ),
+              ],
+            ),
           ),
-        )),
+        ),
       ),
     );
   }
@@ -247,43 +248,20 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
           onPressed: () async {
-            final ProgressDialog pr = ProgressDialog(
-              context,
-              type: ProgressDialogType.Normal,
-              isDismissible: false,
-            );
-
-            pr.style(
-              progressWidget:Image.asset(
-                'assets/double_ring_loading_io.gif',
-                package: 'progress_dialog',
-              ),
-              message: "Log Masuk",
-            );
-
             if (_formKey.currentState.validate()) {
-              await pr.show();
+              await pr.show(context, "Log Masuk");
 
               _login(_emailController.text, _passwordController.text)
                   .timeout(new Duration(seconds: 15))
                   .then((s) async {
                 if (s["status"]) {
                   sp.saveUserId(int.parse(s["data"]));
+                  sp.saveEmail(_emailController.text);
                   await pr.hide();
                   Navigator.pushNamedAndRemoveUntil(
                       context, '/RolePage', (Route<dynamic> route) => false);
                 } else {
-                  pr.update(
-                      progressWidget: Icon(
-                        Icons.clear,
-                        size: 50,
-                        color: Colors.red,
-                      ),
-                      message: s["data"]);
-                  Timer(Duration(seconds: 2), () async {
-                    await pr.hide();
-                  });
-                  print(s);
+                  await pr.error(s["data"]);
                 }
               }).catchError((e) async {
                 await pr.hide();
@@ -366,7 +344,7 @@ class _LoginPageState extends State<LoginPage> {
     http.Response response = await retry(
       // Make a GET request
       () => http.post(url, body: {
-        'email': ef.encrypt(_email),
+        'email': _email,
         'password': ef.encrypt(_password)
       }).timeout(Duration(seconds: 5)),
       // Retry on SocketException or TimeoutException

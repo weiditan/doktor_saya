@@ -12,6 +12,7 @@ import 'package:retry/retry.dart';
 import 'package:path/path.dart' as path;
 
 import 'SharedPreferencesFunction.dart' as sp;
+import 'ProgressDialogFunction.dart' as pr;
 
 class EditProfilePage extends StatefulWidget {
   @override
@@ -31,9 +32,22 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final _mmcController = TextEditingController();
   String _role;
 
+  String _email = "";
   File _image;
   String _imageName = "";
   String _base64Image = "";
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    sp.getEmail().then((s){
+      setState(() {
+        _email = s;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +97,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   ),
                   _heading1("HUBUNGAN"),
                   _heading2("Email"),
-                  _heading3("weiditan@hotmail.com"),
+                  _heading3(_email),
                   _phoneField(),
                   Divider(
                     thickness: 1,
@@ -376,17 +390,22 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
               ),
             ),
-            onPressed: () {
+            onPressed: () async {
               if (_formKey.currentState.validate()) {
+                await pr.show(context, "Memuatkan");
 
                 sp.getUserId().then((id) {
-
-                  if (_image!=null) {
-                    _imageName = id.toString()+"_"+DateTime.now().millisecondsSinceEpoch.toString()+path.extension(_image.path);
+                  if (_image != null) {
+                    _imageName = _role[0] +
+                        id.toString() +
+                        "_" +
+                        DateTime.now().millisecondsSinceEpoch.toString() +
+                        path.extension(_image.path);
                     _base64Image = base64Encode(_image.readAsBytesSync());
                   }
 
                   _saveData(
+                          _role[0] + id.toString(),
                           id.toString(),
                           _role,
                           _fullNameController.text,
@@ -398,15 +417,20 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           _base64Image,
                           _mmcController.text)
                       .timeout(new Duration(seconds: 15))
-                      .then((s) {
-                        if (s["status"]) {
-                          sp.saveRoleId(s["data"]);
-                          Navigator.pushNamedAndRemoveUntil(
-                              context, '/HomePage', (Route<dynamic> route) => false);
-                        } else {
-                          print(s);
-                        }
-                      });
+                      .then((s) async {
+                    if (s["status"]) {
+                      sp.saveRoleId(s["data"]);
+                      await pr.hide();
+                      Navigator.pushNamedAndRemoveUntil(context, '/HomePage',
+                          (Route<dynamic> route) => false);
+                    } else {
+                      await pr.hide();
+                      print(s);
+                    }
+                  }).catchError((e) async {
+                    await pr.hide();
+                    print(e);
+                  });
                 });
               }
             }),
@@ -456,12 +480,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
-  Future<Map> _saveData(_userId, _role, _fullName, _nickName, _gender,
+  Future<Map> _saveData(_roleId, _userId, _role, _fullName, _nickName, _gender,
       _dateOfBirth, _phone, _imageName, _base64image, _mmc) async {
     var url = 'http://www.breakvoid.com/DoktorSaya/EditProfile.php';
     http.Response response = await retry(
       // Make a GET request
       () => http.post(url, body: {
+        'role_id': _roleId,
         'user_id': _userId,
         'role': _role,
         'fullname': _fullName,
