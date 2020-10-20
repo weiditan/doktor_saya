@@ -11,6 +11,7 @@ String encrypt(String text){
   return encrypted.base64;
 }
 
+
 String decrypt(String text){
   final encrypted = Encrypted.fromBase64(text);
   final decrypted = encrypter.decrypt(encrypted, iv: iv);

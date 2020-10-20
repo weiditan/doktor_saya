@@ -6,7 +6,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:retry/retry.dart';
 
-import 'ProgressDialogFunction.dart' as pr;
+import 'function/ProgressDialog.dart' as pr;
 
 class RegisterPage1 extends StatefulWidget {
   @override

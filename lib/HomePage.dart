@@ -1,3 +1,7 @@
+import 'package:doktorsaya/DoctorPage.dart';
+import 'package:doktorsaya/EditDoctorPage.dart';
+import 'package:doktorsaya/EditProfilePage.dart';
+import 'package:doktorsaya/LoadingScreen.dart';
 import 'package:doktorsaya/page0.dart';
 import 'package:doktorsaya/page1.dart';
 import 'package:doktorsaya/page2.dart';
@@ -29,7 +33,8 @@ class _TestState extends State<HomePage> {
 
   List<Widget> _body = [
     Page0(),
-    Page1(),
+    //Page1(),
+    EditDoctorPage(),
     Page2(),
     Page4(),
   ];

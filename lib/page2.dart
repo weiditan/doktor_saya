@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:doktorsaya/ViewDoctorDetail.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:retry/retry.dart';
@@ -9,6 +8,7 @@ import 'package:retry/retry.dart';
 import 'Call.dart';
 import 'ConfirmCall.dart';
 import 'Message.dart';
+import 'ViewDoctorDetail.dart';
 
 class Page2 extends StatefulWidget {
   @override
@@ -50,128 +50,135 @@ class _Page2State extends State<Page2> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: AnimatedCrossFade(
-      // If the widget is visible, animate to 0.0 (invisible).
-      // If the widget is hidden, animate to 1.0 (fully visible).
-      crossFadeState: _loadingVisible
-          ? CrossFadeState.showFirst
-          : CrossFadeState.showSecond,
-      firstCurve: Curves.easeOut,
-      secondCurve: Curves.easeIn,
-      duration: Duration(milliseconds: 500),
-      firstChild: Center(
-        child: _loadingIcon(),
-      ),
+      body: AnimatedCrossFade(
+        // If the widget is visible, animate to 0.0 (invisible).
+        // If the widget is hidden, animate to 1.0 (fully visible).
+        crossFadeState: _loadingVisible
+            ? CrossFadeState.showFirst
+            : CrossFadeState.showSecond,
+        firstCurve: Curves.easeOut,
+        secondCurve: Curves.easeIn,
+        duration: Duration(milliseconds: 500),
+        firstChild: Center(
+          child: _loadingIcon(),
+        ),
 
-      secondChild: ListView(
-        scrollDirection: Axis.vertical,
-        shrinkWrap: true,
-        children: <Widget>[
-          if (_data != null)
-            for (int i = 0; i < _data.length; i++)
-              InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => ViewDoctorDetail()),
-                  );
-                },
-                child: _row(
-                    "http://www.breakvoid.com/DoktorSaya/Images/profiles/profile" +
-                        (i + 1).toString() +
-                        ".jpg",
-                    "Dr " + _data[i]["nickname"].toString(),
-                    "specialist",
-                    "2"),
-              ),
-          Container(
-            //color: Colors.grey,
-            child: Padding(
-              padding:
-                  EdgeInsets.only(top: 10, bottom: 10, left: 20, right: 20),
-              child: Row(
-                children: <Widget>[
-                  Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.rectangle,
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                      image: DecorationImage(
-                          fit: BoxFit.fill, image: NetworkImage("http://www.breakvoid.com/doktorsaya/images/profiles/profile1.jpg",)),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.5),
-                          spreadRadius: 5,
-                          blurRadius: 7,
-                          offset: Offset(0, 3), // changes position of shadow
-                        ),
-                      ],
-                    ),
+        secondChild: SingleChildScrollView(
+          physics: BouncingScrollPhysics(),
+          child: Column(
+            children: <Widget>[
+              if (_data != null)
+                for (int i = 0; i < _data.length; i++)
+                  InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ViewDoctorDetail()),
+                      );
+                    },
+                    child: _row(
+                        "http://www.breakvoid.com/maje/admin_area/product_images/jubahlaki3.jpg",
+                        "Dr " + _data[i]["nickname"].toString(),
+                        "specialist",
+                        "2"),
                   ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+              Container(
+                //color: Colors.grey,
+                child: Padding(
+                  padding:
+                      EdgeInsets.only(top: 10, bottom: 10, left: 20, right: 20),
+                  child: Row(
                     children: <Widget>[
-                      Text(
-                        "name",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontFamily: "Montserrat",
-                          fontWeight: FontWeight.bold,
+                      Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.rectangle,
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                          image: DecorationImage(
+                              fit: BoxFit.fill,
+                              image: NetworkImage(
+                                "http://www.breakvoid.com/doktorsaya/images/profiles/profile1.jpg",
+                              )),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              spreadRadius: 5,
+                              blurRadius: 7,
+                              offset:
+                                  Offset(0, 3), // changes position of shadow
+                            ),
+                          ],
                         ),
                       ),
-                      Text("specialist"),
-                      Text("5 Tahun Pengalaman"),
-                      Row(
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          SizedBox(
-                            width: 120,
-                            child: RaisedButton(
-                              color: Colors.green,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(5)),
-                              ),
-                              child: Row(
-                                children: <Widget>[
-                                  Icon(Icons.call),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  Text(
-                                    "Panggil",
-                                    style: TextStyle(
-                                      fontFamily: "Montserrat",
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => ConfirmCall()),
-                                );
-                              },
+                          Text(
+                            "name",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontFamily: "Montserrat",
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(
-                            width: 5,
-                          ),
-                          _messageButton()
+                          Text("specialist"),
+                          Text("5 Tahun Pengalaman"),
+                          Row(
+                            children: <Widget>[
+                              SizedBox(
+                                width: 120,
+                                child: RaisedButton(
+                                  color: Colors.green,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(5)),
+                                  ),
+                                  child: Row(
+                                    children: <Widget>[
+                                      Icon(Icons.call),
+                                      SizedBox(
+                                        width: 5,
+                                      ),
+                                      Text(
+                                        "Panggil",
+                                        style: TextStyle(
+                                          fontFamily: "Montserrat",
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => ConfirmCall()),
+                                    );
+                                  },
+                                ),
+                              ),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              _messageButton()
+                            ],
+                          )
                         ],
-                      )
+                      ),
                     ],
                   ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
-    ));
+    );
   }
 
   Widget _loadingIcon() {

@@ -11,8 +11,8 @@ import 'package:http/http.dart' as http;
 import 'package:retry/retry.dart';
 import 'package:path/path.dart' as path;
 
-import 'SharedPreferencesFunction.dart' as sp;
-import 'ProgressDialogFunction.dart' as pr;
+import 'function/SharedPreferences.dart' as sp;
+import 'function/ProgressDialog.dart' as pr;
 
 class EditProfilePage extends StatefulWidget {
   @override
@@ -496,7 +496,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         'phone': _phone,
         'image_name': _imageName,
         'base64image': _base64image,
-        'MMC': _mmc,
+        'mmc': _mmc,
       }).timeout(Duration(seconds: 5)),
 
       // Retry on SocketException or TimeoutException

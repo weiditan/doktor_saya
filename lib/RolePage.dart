@@ -5,8 +5,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:retry/retry.dart';
 
-import 'SharedPreferencesFunction.dart' as sp;
-import 'ProgressDialogFunction.dart' as pr;
+import 'function/SharedPreferences.dart' as sp;
+import 'function/ProgressDialog.dart' as pr;
 
 class RolePage extends StatelessWidget {
   @override
