@@ -19,7 +19,14 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
 
   String _roleId;
   List _arraySpecialist;
+  List _arrayState;
   List _arrayDoctorSpecialist;
+
+  int _valueCountry;
+  int _valueState;
+  final _workplaceController = TextEditingController();
+  final _countryController = TextEditingController();
+  final _stateController = TextEditingController();
 
   @override
   void initState() {
@@ -36,8 +43,6 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
   Future _getData() async {
     _roleId = await sp.getRoleId();
 
-    print(_roleId);
-
     await Future.wait([
       db.getSpecialist().then((onValue) {
         _arraySpecialist = onValue;
@@ -45,11 +50,10 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
       db.getDoctorSpecialist(_roleId).then((onValue) {
         _arrayDoctorSpecialist = onValue;
       }),
+      db.getState().then((onValue) {
+        _arrayState = onValue;
+      }),
     ]);
-
-    print(_arraySpecialist.length);
-
-    print(_arrayDoctorSpecialist);
   }
 
   @override
@@ -138,8 +142,15 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
             thickness: 1,
           ),
           tx.heading1("TEMPAT KERJA"),
-          tx.heading2("Hospital Melaka Eye Specialist Clinic"),
-          tx.heading3("Melaka, Malaysia"),
+          _workplaceField(),
+          Wrap(
+            children: <Widget>[
+              _selectCountry(),
+              if (_arrayState != null && _valueCountry == 0) _selectState(),
+            ],
+          ),
+          if (_valueCountry == 1) _countryField(),
+          if (_valueCountry == 1) _stateField(),
           Divider(
             thickness: 1,
           ),
@@ -158,7 +169,8 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
     );
   }
 
-  Widget _cardSpecialist(String roleId, String title, String subtitle) {
+  Widget _cardSpecialist(
+      String doctorSpecialistId, String title, String subtitle) {
     return Card(
       child: ListTile(
         title: Text(
@@ -182,7 +194,30 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
             color: Colors.red,
             size: 30,
           ),
-          onPressed: () {},
+          onPressed: () async {
+            await pr.show(context, "Memuatkan");
+            db
+                .deleteDoctorSpecialist(doctorSpecialistId)
+                .timeout(new Duration(seconds: 15))
+                .then((s) async {
+              if (s['status']) {
+                db.getDoctorSpecialist(_roleId).then((onValue) async {
+                  setState(() {
+                    _arrayDoctorSpecialist = onValue;
+                  });
+                  await pr.hide();
+                });
+              } else {
+                await pr.warning("Sila cuba lagi !");
+                print(s);
+              }
+            }).catchError(
+              (e) async {
+                await pr.warning("Sila cuba lagi !");
+                print(e);
+              },
+            );
+          },
         ),
       ),
     );
@@ -276,9 +311,12 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
                           keyboardType: TextInputType.text,
                           controller: _subSpecialistController,
                           validator: (String value) {
-                            if (value.isEmpty) {
-                              return 'Sila masukkan nama pakar.';
+                            if (_valueSpecialist != 1) {
+                              if (value.isEmpty) {
+                                return 'Sila masukkan nama pakar.';
+                              }
                             }
+
                             return null;
                           },
                         ),
@@ -294,8 +332,6 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
               child: Text('Tambah'),
               onPressed: () async {
                 if (_specialistFormKey.currentState.validate()) {
-
-
                   await pr.show(context, "Memuatkan");
 
                   db
@@ -316,14 +352,165 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
                       print(e);
                     },
                   );
-
-
                 }
               },
             )
           ],
         );
       },
+    );
+  }
+
+  Widget _workplaceField() {
+    return Padding(
+      padding: EdgeInsets.only(left: 20, top: 10, right: 20),
+      child: TextFormField(
+        style: TextStyle(
+          fontSize: 16,
+        ),
+        decoration: new InputDecoration(
+          border: OutlineInputBorder(),
+          labelText: "Tempat Kerja",
+          labelStyle: TextStyle(
+            fontFamily: "Montserrat",
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        keyboardType: TextInputType.text,
+        textInputAction: TextInputAction.next,
+        onFieldSubmitted: (_) {
+          FocusScope.of(context).nextFocus();
+        },
+        controller: _workplaceController,
+      ),
+    );
+  }
+
+  Widget _countryField() {
+    return Padding(
+      padding: EdgeInsets.only(left: 20, top: 10, right: 20),
+      child: TextFormField(
+        style: TextStyle(
+          fontSize: 16,
+        ),
+        decoration: new InputDecoration(
+          border: OutlineInputBorder(),
+          labelText: "Negara",
+          labelStyle: TextStyle(
+            fontFamily: "Montserrat",
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        keyboardType: TextInputType.text,
+        textInputAction: TextInputAction.next,
+        onFieldSubmitted: (_) {
+          FocusScope.of(context).nextFocus();
+        },
+        controller: _countryController,
+      ),
+    );
+  }
+
+  Widget _stateField() {
+    return Padding(
+      padding: EdgeInsets.only(left: 20, top: 10, right: 20),
+      child: TextFormField(
+        style: TextStyle(
+          fontSize: 16,
+        ),
+        decoration: new InputDecoration(
+          border: OutlineInputBorder(),
+          labelText: "Negeri",
+          labelStyle: TextStyle(
+            fontFamily: "Montserrat",
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        keyboardType: TextInputType.text,
+        textInputAction: TextInputAction.done,
+        controller: _stateController,
+      ),
+    );
+  }
+
+  Widget _selectCountry() {
+    return Padding(
+      padding: EdgeInsets.only(left: 20, top: 10),
+      child: SizedBox(
+        width: 160,
+        child: DropdownButtonFormField(
+          decoration: new InputDecoration(
+            contentPadding: const EdgeInsets.only(left: 10, bottom: 10),
+            border: OutlineInputBorder(),
+            labelText: "Negara",
+            labelStyle: TextStyle(
+              fontFamily: "Montserrat",
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          items: [
+            DropdownMenuItem<int>(
+              child: Text("Malaysia"),
+              value: 0,
+            ),
+            DropdownMenuItem<int>(
+              child: Text("Lain-Lain"),
+              value: 1,
+            ),
+          ],
+          onChanged: (value) {
+            setState(() {
+              _valueCountry = value;
+            });
+          },
+          value: _valueCountry,
+          validator: (value) {
+            if (value == null) {
+              return 'Sila Pilih Negara';
+            }
+            return null;
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _selectState() {
+    return Padding(
+      padding: EdgeInsets.only(left: 20, top: 10),
+      child: SizedBox(
+        width: 160,
+        child: DropdownButtonFormField(
+          decoration: new InputDecoration(
+            contentPadding: const EdgeInsets.only(left: 10, bottom: 10),
+            border: OutlineInputBorder(),
+            labelText: "Negeri",
+            labelStyle: TextStyle(
+              fontFamily: "Montserrat",
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          items: [
+            for (int i = 0; i < _arrayState.length; i++)
+              DropdownMenuItem<int>(
+                child: Text(_arrayState[i]['state']),
+                value: int.parse(_arrayState[i]['state_id']),
+              ),
+          ],
+          onChanged: (value) {
+            setState(() {
+              _valueState = value;
+            });
+          },
+          value: _valueState,
+          validator: (value) {
+            if (value == null) {
+              return 'Sila Pilih Negeri';
+            }
+            return null;
+          },
+        ),
+      ),
     );
   }
 

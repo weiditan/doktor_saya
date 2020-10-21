@@ -8,7 +8,7 @@ Future<List> getSpecialist() async {
   var url = 'http://www.breakvoid.com/DoktorSaya/GetSpecialist.php';
   http.Response response = await retry(
     // Make a GET request
-    () => http.post(url).timeout(Duration(seconds: 5)),
+    () => http.post(url, body: {'action': 'get',}).timeout(Duration(seconds: 5)),
     // Retry on SocketException or TimeoutException
     retryIf: (e) => e is SocketException || e is TimeoutException,
   );
@@ -19,11 +19,11 @@ Future<List> getSpecialist() async {
 }
 
 Future<List> getDoctorSpecialist(String roleId) async {
-  var url = 'http://www.breakvoid.com/DoktorSaya/GetDoctorSpecialist.php';
+  var url = 'http://www.breakvoid.com/DoktorSaya/DoctorSpecialist.php';
   http.Response response = await retry(
     // Make a GET request
-    () =>
-        http.post(url, body: {'role_id': roleId}).timeout(Duration(seconds: 5)),
+    () => http.post(url, body: {'action': 'get', 'role_id': roleId}).timeout(
+        Duration(seconds: 5)),
     // Retry on SocketException or TimeoutException
     retryIf: (e) => e is SocketException || e is TimeoutException,
   );
@@ -35,10 +35,11 @@ Future<List> getDoctorSpecialist(String roleId) async {
 
 Future<Map> addDoctorSpecialist(
     String roleId, int specialistId, String subSpecialist) async {
-  var url = 'http://www.breakvoid.com/DoktorSaya/AddDoctorSpecialist.php';
+  var url = 'http://www.breakvoid.com/DoktorSaya/DoctorSpecialist.php';
   http.Response response = await retry(
     // Make a GET request
     () => http.post(url, body: {
+      'action': 'add',
       'role_id': roleId,
       'specialist_id': specialistId.toString(),
       'sub_specialist': subSpecialist
@@ -52,13 +53,14 @@ Future<Map> addDoctorSpecialist(
   return data;
 }
 
-/*
-Future<Map> _getUserDetail(_userId, _role) async {
-  var url = 'http://www.breakvoid.com/DoktorSaya/ViewUserDetail.php';
+Future<Map> deleteDoctorSpecialist(String doctorSpecialistId) async {
+  var url = 'http://www.breakvoid.com/DoktorSaya/DoctorSpecialist.php';
   http.Response response = await retry(
     // Make a GET request
-    () => http.post(url, body: {'user_id': _userId, 'role': _role}).timeout(
-        Duration(seconds: 5)),
+    () => http.post(url, body: {
+      'action': 'delete',
+      'doctor_spec_id': doctorSpecialistId
+    }).timeout(Duration(seconds: 5)),
     // Retry on SocketException or TimeoutException
     retryIf: (e) => e is SocketException || e is TimeoutException,
   );
@@ -67,4 +69,18 @@ Future<Map> _getUserDetail(_userId, _role) async {
 
   return data;
 }
-*/
+
+Future<List> getState() async {
+  var url = 'http://www.breakvoid.com/DoktorSaya/GetState.php';
+  http.Response response = await retry(
+    // Make a GET request
+        () => http.post(url, body: {'action': 'get'}).timeout(Duration(seconds: 5)),
+    // Retry on SocketException or TimeoutException
+    retryIf: (e) => e is SocketException || e is TimeoutException,
+  );
+
+  List data = jsonDecode(response.body);
+
+  return data;
+}
+

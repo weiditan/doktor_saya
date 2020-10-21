@@ -54,6 +54,21 @@ Future error(message) async {
   });
 }
 
+Future warning(message) async {
+  pr.update(
+      progressWidget: Icon(
+        Icons.error,
+        size: 50,
+        color: Colors.orange,
+      ),
+      message: message
+  );
+
+  await Future.delayed(Duration(seconds: 3)).then((value) async {
+    await pr.hide();
+  });
+}
+
 Future hide() async {
   await pr.hide();
 }
