@@ -35,7 +35,7 @@ class _DoctorPageState extends State<DoctorPage> {
         firstCurve: Curves.easeOut,
         secondCurve: Curves.easeIn,
         duration: Duration(milliseconds: 500),
-        firstChild: ls.loading(_loadingIconVisible),
+        firstChild: ls.loadingScreen(_loadingIconVisible),
         secondChild: _secondScreen(),
       ),
     );

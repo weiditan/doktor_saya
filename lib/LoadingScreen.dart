@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-Widget loading(_loadingIconVisible){
+Widget loadingScreen(_loadingIconVisible){
   return Center(
     child: Padding(
       padding: const EdgeInsets.all(20),
