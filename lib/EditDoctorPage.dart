@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import 'function/ProgressDialog.dart' as pr;
 import 'function/SharedPreferences.dart' as sp;
@@ -12,6 +14,8 @@ class EditDoctorPage extends StatefulWidget {
 }
 
 class _EditDoctorPageState extends State<EditDoctorPage> {
+  final _formKey = GlobalKey<FormState>();
+
   bool _loadingIconVisible = true;
   bool _loadingVisible = true;
 
@@ -21,6 +25,7 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
   List _arraySpecialist;
   List _arrayState;
   List _arrayDoctorSpecialist;
+  List _arrayDoctorExp;
 
   int _valueCountry;
   int _valueState;
@@ -53,7 +58,33 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
       db.getState().then((onValue) {
         _arrayState = onValue;
       }),
+      db.getWorkplace(_roleId).then((array) {
+        if (array["workplace"] != "") {
+          _workplaceController.text = array["workplace"];
+          if (array["state_id"] == null) {
+            _valueCountry = 1;
+          } else {
+            _valueCountry = 0;
+            _valueState = int.parse(array["state_id"]);
+          }
+          _countryController.text = array["country"];
+          _stateController.text = array["state"];
+        }
+      }),
+      db.getDoctorExp(_roleId).then((onValue) {
+        _arrayDoctorExp = onValue;
+      })
     ]);
+  }
+
+  Future _hideLoadingScreen() async {
+    setState(() {
+      _loadingIconVisible = false;
+    });
+    await Future.delayed(Duration(milliseconds: 500));
+    setState(() {
+      _loadingVisible = false;
+    });
   }
 
   @override
@@ -79,16 +110,6 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
     );
   }
 
-  Future _hideLoadingScreen() async {
-    setState(() {
-      _loadingIconVisible = false;
-    });
-    await Future.delayed(Duration(milliseconds: 500));
-    setState(() {
-      _loadingVisible = false;
-    });
-  }
-
   Widget _secondScreen() {
     return SingleChildScrollView(
       physics: BouncingScrollPhysics(),
@@ -105,7 +126,7 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
                   for (int i = 0; i < _arrayDoctorSpecialist.length; i++)
                     _cardSpecialist(
                         _arrayDoctorSpecialist[i]['doctor_spec_id'],
-                        _arrayDoctorSpecialist[i]['specialist_id'],
+                        _arrayDoctorSpecialist[i]['malay'],
                         _arrayDoctorSpecialist[i]['sub_specialist']),
                 Card(
                   child: InkWell(
@@ -142,23 +163,62 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
             thickness: 1,
           ),
           tx.heading1("TEMPAT KERJA"),
-          _workplaceField(),
-          Wrap(
-            children: <Widget>[
-              _selectCountry(),
-              if (_arrayState != null && _valueCountry == 0) _selectState(),
-            ],
+          Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                _workplaceField(),
+                if (_workplaceController.text.isNotEmpty)
+                  Wrap(
+                    children: <Widget>[
+                      _selectCountry(),
+                      if (_arrayState != null && _valueCountry == 0)
+                        _selectState(),
+                    ],
+                  ),
+                if (_workplaceController.text.isNotEmpty && _valueCountry == 1)
+                  _countryField(),
+                if (_workplaceController.text.isNotEmpty && _valueCountry == 1)
+                  _stateField(),
+              ],
+            ),
           ),
-          if (_valueCountry == 1) _countryField(),
-          if (_valueCountry == 1) _stateField(),
           Divider(
             thickness: 1,
           ),
           tx.heading1("PENGALAMAN"),
-          tx.heading2("Hospital Melaka Eye Specialist Clinic"),
-          tx.heading3("2 tahun"),
-          tx.heading2("The Tun Hussein Onn National Eye Hospital"),
-          tx.heading3("3 tahun 8 bulan"),
+          Padding(
+            padding: EdgeInsets.only(left: 10, right: 10),
+            child: Column(children: <Widget>[
+              if (_arrayDoctorExp != null)
+                for (int i = 0; i < _arrayDoctorExp.length; i++)
+                  _cardExp(_arrayDoctorExp[i]['doctor_exp_id'],
+                      _arrayDoctorExp[i]['location'], "3 tahun 8 bulan"),
+              Card(
+                child: InkWell(
+                  onTap: () {
+                    _showExpDialog();
+                  },
+                  child: ListTile(
+                    leading: Icon(
+                      Icons.add_circle,
+                      color: Colors.orange,
+                      size: 30,
+                    ),
+                    title: Text(
+                      "Tambah Pengalaman",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontFamily: "Montserrat",
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ]),
+          ),
           Divider(
             thickness: 1,
           ),
@@ -169,12 +229,37 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
     );
   }
 
+  String _diffDate(DateTime startDate, DateTime endDate) {
+    int years = endDate.year - startDate.year;
+    int months = endDate.month - startDate.month;
+    int days = endDate.day - startDate.day;
+
+    if (days < 0) {
+      months -= 1;
+      days = endDate
+          .difference(DateTime(endDate.year, endDate.month - 1, startDate.day))
+          .inDays;
+    }
+
+    if (months < 0) {
+      years -= 1;
+      months += 12;
+    }
+
+    return years.toString() +
+        " Tahun, " +
+        months.toString() +
+        " Bulan, " +
+        days.toString() +
+        " days";
+  }
+
   Widget _cardSpecialist(
       String doctorSpecialistId, String title, String subtitle) {
     return Card(
       child: ListTile(
         title: Text(
-          _selectedSpecialist(title),
+          title,
           style: TextStyle(
             fontSize: 18,
             fontFamily: "Montserrat",
@@ -223,16 +308,228 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
     );
   }
 
-  String _selectedSpecialist(String specialistId) {
-    String data = "";
-    if (_arraySpecialist != null) {
-      _arraySpecialist.forEach((item) {
-        if (item['specialist_id'] == specialistId) {
-          data = item['malay'];
-        }
-      });
-    }
-    return data;
+  Widget _cardExp(String doctorExpId, String title, String subtitle) {
+    return Card(
+      child: ListTile(
+        title: Text(
+          title,
+          style: TextStyle(
+            fontSize: 18,
+            fontFamily: "Montserrat",
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        subtitle: Padding(
+          padding: EdgeInsets.only(left: 10),
+          child: Text(
+            subtitle,
+            style: TextStyle(fontSize: 16, fontFamily: "Montserrat"),
+          ),
+        ),
+        trailing: IconButton(
+            icon: Icon(
+              Icons.delete,
+              color: Colors.red,
+              size: 30,
+            ),
+            onPressed: () {}),
+      ),
+    );
+  }
+
+  _showExpDialog() {
+    final _expFormKey = GlobalKey<FormState>();
+    final _startDateController = TextEditingController();
+    final _endDateController = TextEditingController();
+    final _expWorkplaceController = TextEditingController();
+    DateTime _startDate;
+    DateTime _endDate;
+    int _valueStatus;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: new Text("Tambah Pengalaman"),
+          content: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return Container(
+                width: _screenWidth,
+                child: SingleChildScrollView(
+                  physics: BouncingScrollPhysics(),
+                  child: Form(
+                    key: _expFormKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        _expWorkplaceField(_expWorkplaceController),
+                        _dateField(
+                            "Tarikh Mula", _startDateController, _startDate),
+                        Padding(
+                          padding: EdgeInsets.only(left: 20, top: 20),
+                          child: SizedBox(
+                            width: 130,
+                            child: DropdownButtonFormField(
+                              decoration: new InputDecoration(
+                                contentPadding:
+                                    const EdgeInsets.only(left: 10, bottom: 10),
+                                border: OutlineInputBorder(),
+                                labelText: "Status",
+                                labelStyle: TextStyle(
+                                  fontFamily: "Montserrat",
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              items: [
+                                DropdownMenuItem<int>(
+                                  child: Text('Sudah Tamat'),
+                                  value: 0,
+                                ),
+                                DropdownMenuItem<int>(
+                                  child: Text('Belum Tamat'),
+                                  value: 1,
+                                ),
+                              ],
+                              onChanged: (onValue) {
+                                setState(() {
+                                  _valueStatus = onValue;
+                                });
+                              },
+                              value: _valueStatus,
+                              validator: (onValue) {
+                                if (onValue == null) {
+                                  return 'Sila Pilih Status';
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                        ),
+                        if (_valueStatus == 0)
+                          _dateField(
+                              "Tarikh Tamat", _endDateController, _endDate),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Simpan'),
+              onPressed: () {
+                if (_expFormKey.currentState.validate()) {
+                  Navigator.of(context).pop();
+                }
+              },
+            )
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _expWorkplaceField(TextEditingController controller) {
+    return Padding(
+      padding: EdgeInsets.only(left: 20, top: 10, right: 20),
+      child: TextFormField(
+        style: TextStyle(
+          fontSize: 16,
+        ),
+        decoration: new InputDecoration(
+          border: OutlineInputBorder(),
+          labelText: "Tempat Kerja",
+          labelStyle: TextStyle(
+            fontFamily: "Montserrat",
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        keyboardType: TextInputType.text,
+        controller: controller,
+        validator: (String value) {
+          if (value.isEmpty) {
+            return 'Sila Masukkan Tempat Kerja';
+          }
+          return null;
+        },
+      ),
+    );
+  }
+
+  Widget _dateField(
+      String label, TextEditingController controller, DateTime date) {
+    return Padding(
+      padding: EdgeInsets.only(left: 20, top: 20, right: 20),
+      child: SizedBox(
+        width: 150,
+        child: TextFormField(
+          style: TextStyle(
+            fontSize: 16,
+          ),
+          decoration: new InputDecoration(
+            border: OutlineInputBorder(),
+            labelText: label,
+            labelStyle: TextStyle(
+              fontFamily: "Montserrat",
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          controller: controller,
+          readOnly: true,
+          focusNode: FocusNode(),
+          onTap: () {
+            _showDateDialog(label, date).then((onValue) {
+              if (onValue != null) {
+                date = onValue;
+                controller.text = DateFormat('MMM d, yyyy').format(date);
+                print(onValue);
+                print(_diffDate(onValue, DateTime.now()));
+              }
+            });
+          },
+          validator: (String value) {
+            if (value.isEmpty) {
+              return 'Sila Pilih ' + label;
+            }
+            return null;
+          },
+        ),
+      ),
+    );
+  }
+
+  Future<DateTime> _showDateDialog(String label, DateTime date) async {
+    DateTime _selectDate;
+
+    await showDialog(
+      context: context,
+      builder: (_) => new AlertDialog(
+        title: new Text(label),
+        content: Container(
+          height: 200,
+          width: 700,
+          child: CupertinoDatePicker(
+              mode: CupertinoDatePickerMode.date,
+              initialDateTime: (date != null) ? date : DateTime.now(),
+              minimumYear: DateTime.now().year - 100,
+              maximumDate: DateTime.now().add(Duration(seconds: 10)),
+              onDateTimeChanged: (_date) {
+                _selectDate = _date;
+              }),
+        ),
+        actions: <Widget>[
+          FlatButton(
+            child: Text('Simpan'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          )
+        ],
+      ),
+    );
+
+    return _selectDate;
   }
 
   Future _showAddSpecialistDialog() {
@@ -289,7 +586,7 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
                               value: _valueSpecialist,
                               validator: (value) {
                                 if (value == null) {
-                                  return 'Sila pilih pakar.';
+                                  return 'Sila Pilih Pakar';
                                 }
                                 return null;
                               },
@@ -313,10 +610,9 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
                           validator: (String value) {
                             if (_valueSpecialist != 1) {
                               if (value.isEmpty) {
-                                return 'Sila masukkan nama pakar.';
+                                return 'Sila Masukkan Nama Pakar';
                               }
                             }
-
                             return null;
                           },
                         ),
@@ -340,15 +636,15 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
                       .timeout(new Duration(seconds: 15))
                       .then((s) async {
                     if (s['status']) {
+                      await pr.hide();
                       Navigator.pop(context);
-                      await pr.hide();
                     } else {
-                      await pr.hide();
+                      await pr.warning("Sila cuba lagi !");
                       print(s);
                     }
                   }).catchError(
                     (e) async {
-                      await pr.hide();
+                      await pr.warning("Sila cuba lagi !");
                       print(e);
                     },
                   );
@@ -377,11 +673,10 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
           ),
         ),
         keyboardType: TextInputType.text,
-        textInputAction: TextInputAction.next,
-        onFieldSubmitted: (_) {
-          FocusScope.of(context).nextFocus();
-        },
         controller: _workplaceController,
+        onChanged: (_) {
+          setState(() {});
+        },
       ),
     );
   }
@@ -407,6 +702,12 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
           FocusScope.of(context).nextFocus();
         },
         controller: _countryController,
+        validator: (value) {
+          if (_workplaceController.text.isNotEmpty && value.isEmpty) {
+            return 'Sila Masukkan Negara';
+          }
+          return null;
+        },
       ),
     );
   }
@@ -429,6 +730,12 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
         keyboardType: TextInputType.text,
         textInputAction: TextInputAction.done,
         controller: _stateController,
+        validator: (value) {
+          if (_workplaceController.text.isNotEmpty && value.isEmpty) {
+            return 'Sila Masukkan Negeri';
+          }
+          return null;
+        },
       ),
     );
   }
@@ -465,7 +772,7 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
           },
           value: _valueCountry,
           validator: (value) {
-            if (value == null) {
+            if (_workplaceController.text.isNotEmpty && value == null) {
               return 'Sila Pilih Negara';
             }
             return null;
@@ -504,7 +811,7 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
           },
           value: _valueState,
           validator: (value) {
-            if (value == null) {
+            if (_workplaceController.text.isNotEmpty && value == null) {
               return 'Sila Pilih Negeri';
             }
             return null;
@@ -535,8 +842,50 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
                 ),
               ),
             ),
-            onPressed: () {}),
+            onPressed: () async {
+              if (_arrayDoctorSpecialist != null) {
+                if (_formKey.currentState.validate()) {
+                  if (_workplaceController.text.isNotEmpty) {
+                    if (_valueCountry == 0) {
+                      _updateWorkplace(_roleId, _workplaceController.text,
+                          _valueState, '', '');
+                    } else if (_valueCountry == 1) {
+                      _updateWorkplace(_roleId, _workplaceController.text, null,
+                          _countryController.text, _stateController.text);
+                    }
+                  } else {
+                    _updateWorkplace(_roleId, '', null, '', '');
+                  }
+                }
+              } else {
+                pr.show(context, "");
+                pr.error("Sila Tambar Pakar");
+              }
+            }),
       ),
+    );
+  }
+
+  Future _updateWorkplace(String roleId, String workplace, int stateId,
+      String country, String state) async {
+    await pr.show(context, "Memuatkan");
+    db
+        .updateWorkplace(roleId, workplace, stateId, country, state)
+        .timeout(new Duration(seconds: 15))
+        .then((s) async {
+      if (s['status']) {
+        await pr.hide();
+        Navigator.pushNamedAndRemoveUntil(
+            context, '/HomePage', (Route<dynamic> route) => false);
+      } else {
+        await pr.warning("Sila cuba lagi !");
+        print(s);
+      }
+    }).catchError(
+      (e) async {
+        await pr.warning("Sila cuba lagi !");
+        print(e);
+      },
     );
   }
 }

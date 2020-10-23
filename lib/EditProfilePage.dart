@@ -421,8 +421,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     if (s["status"]) {
                       sp.saveRoleId(s["data"]);
                       await pr.hide();
-                      Navigator.pushNamedAndRemoveUntil(context, '/HomePage',
-                          (Route<dynamic> route) => false);
+                      if(_role=="patient") {
+                        Navigator.pushNamedAndRemoveUntil(context, '/HomePage',
+                                (Route<dynamic> route) => false);
+                      }else{
+                        Navigator.pushNamedAndRemoveUntil(context, '/EditDoctorPage',
+                                (Route<dynamic> route) => false);
+                      }
                     } else {
                       await pr.hide();
                       print(s);

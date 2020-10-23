@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 
+import 'EditDoctorPage.dart';
 import 'EditProfilePage.dart';
 import 'HomePage.dart';
 import 'RegisterPage1.dart';
@@ -82,6 +83,14 @@ class MyApp extends StatelessWidget {
           case '/EditProfilePage':
             return PageTransition(
               child: EditProfilePage(),
+              type: PageTransitionType.fade,
+              settings: settings,
+            );
+            break;
+
+          case '/EditDoctorPage':
+            return PageTransition(
+              child: EditDoctorPage(),
               type: PageTransitionType.fade,
               settings: settings,
             );

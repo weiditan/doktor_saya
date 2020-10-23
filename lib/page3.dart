@@ -11,7 +11,6 @@ class Page3 extends StatefulWidget {
 }
 
 class _Page3State extends State<Page3> {
-
   var _data;
   bool _loadingVisible = true;
   bool _loadingIconVisible = true;
@@ -27,7 +26,7 @@ class _Page3State extends State<Page3> {
     var url = 'http://www.breakvoid.com/doktorsaya/viewdoctor.php';
     http.Response response = await retry(
       // Make a GET request
-          () => http.get(url).timeout(Duration(seconds: 5)),
+      () => http.get(url).timeout(Duration(seconds: 5)),
       // Retry on SocketException or TimeoutException
       retryIf: (e) => e is SocketException || e is TimeoutException,
     );
@@ -36,7 +35,7 @@ class _Page3State extends State<Page3> {
       _data = jsonDecode(response.body);
       _loadingIconVisible = false;
 
-      Timer(Duration(milliseconds: 1000), (){
+      Timer(Duration(milliseconds: 1000), () {
         setState(() {
           _loadingVisible = false;
         });
@@ -48,42 +47,38 @@ class _Page3State extends State<Page3> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: AnimatedCrossFade(
-          // If the widget is visible, animate to 0.0 (invisible).
-          // If the widget is hidden, animate to 1.0 (fully visible).
-          crossFadeState: _loadingVisible ? CrossFadeState.showFirst : CrossFadeState.showSecond,
-          firstCurve: Curves.easeOut,
-          secondCurve: Curves.easeIn,
-          duration: Duration(milliseconds: 500),
-          firstChild: Center(
-            child: _loadingIcon(),
-          ),
+        // If the widget is visible, animate to 0.0 (invisible).
+        // If the widget is hidden, animate to 1.0 (fully visible).
+        crossFadeState: _loadingVisible
+            ? CrossFadeState.showFirst
+            : CrossFadeState.showSecond,
+        firstCurve: Curves.easeOut,
+        secondCurve: Curves.easeIn,
+        duration: Duration(milliseconds: 500),
+        firstChild: Center(
+          child: _loadingIcon(),
+        ),
 
-          secondChild: ListView(
-            scrollDirection: Axis.vertical,
-            shrinkWrap: true,
-            children: <Widget>[
-              if(_data!=null)
-                for (int i = 0; i < _data.length; i++)
-                  _row(
-                      "http://www.breakvoid.com/maje/admin_area/product_images/jubahlaki3.jpg",
-                      _data[i]["nickname"].toString(),
-                      "specialist",
-                      "2",
-                      "location",
-                      "online"
-                  ),
-
-
-
-
-
-            ],
-          ),
-      )
+        secondChild: ListView(
+          scrollDirection: Axis.vertical,
+          shrinkWrap: true,
+          children: <Widget>[
+            if (_data != null)
+              for (int i = 0; i < _data.length; i++)
+                _row(
+                    "http://www.breakvoid.com/maje/admin_area/product_images/jubahlaki3.jpg",
+                    _data[i]["nickname"].toString(),
+                    "specialist",
+                    "2",
+                    "location",
+                    "online"),
+          ],
+        ),
+      ),
     );
   }
 
-  Widget _loadingIcon(){
+  Widget _loadingIcon() {
     return Padding(
       padding: const EdgeInsets.all(20),
       child: AnimatedOpacity(
@@ -96,7 +91,7 @@ class _Page3State extends State<Page3> {
     );
   }
 
-  Widget _row(_image,_name,_specialist, _exp, _location, _online) {
+  Widget _row(_image, _name, _specialist, _exp, _location, _online) {
     return Container(
       //color: Colors.grey,
       child: Padding(
@@ -110,9 +105,7 @@ class _Page3State extends State<Page3> {
                 shape: BoxShape.rectangle,
                 borderRadius: BorderRadius.all(Radius.circular(10)),
                 image: DecorationImage(
-                    fit: BoxFit.fill,
-                    image: NetworkImage(
-                        _image)),
+                    fit: BoxFit.fill, image: NetworkImage(_image)),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.grey.withOpacity(0.5),
@@ -123,13 +116,15 @@ class _Page3State extends State<Page3> {
                 ],
               ),
             ),
-            SizedBox(width: 10,),
+            SizedBox(
+              width: 10,
+            ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(_name),
                 Text(_specialist),
-                Text(_exp+" Tahun Pengalaman"),
+                Text(_exp + " Tahun Pengalaman"),
                 Text(_location),
                 Text(_online),
               ],
@@ -139,6 +134,4 @@ class _Page3State extends State<Page3> {
       ),
     );
   }
-
-
 }

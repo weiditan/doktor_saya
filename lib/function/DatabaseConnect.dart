@@ -8,7 +8,9 @@ Future<List> getSpecialist() async {
   var url = 'http://www.breakvoid.com/DoktorSaya/GetSpecialist.php';
   http.Response response = await retry(
     // Make a GET request
-    () => http.post(url, body: {'action': 'get',}).timeout(Duration(seconds: 5)),
+    () => http.post(url, body: {
+      'action': 'get',
+    }).timeout(Duration(seconds: 5)),
     // Retry on SocketException or TimeoutException
     retryIf: (e) => e is SocketException || e is TimeoutException,
   );
@@ -74,7 +76,7 @@ Future<List> getState() async {
   var url = 'http://www.breakvoid.com/DoktorSaya/GetState.php';
   http.Response response = await retry(
     // Make a GET request
-        () => http.post(url, body: {'action': 'get'}).timeout(Duration(seconds: 5)),
+    () => http.post(url, body: {'action': 'get'}).timeout(Duration(seconds: 5)),
     // Retry on SocketException or TimeoutException
     retryIf: (e) => e is SocketException || e is TimeoutException,
   );
@@ -84,3 +86,107 @@ Future<List> getState() async {
   return data;
 }
 
+Future<Map> updateWorkplace(String roleId, String workplace, int stateId,
+    String country, String state) async {
+  var url = 'http://www.breakvoid.com/DoktorSaya/Workplace.php';
+  http.Response response = await retry(
+    // Make a GET request
+    () => http.post(url, body: {
+      'action': 'update',
+      'role_id': roleId,
+      'workplace': workplace,
+      'state_id': stateId.toString(),
+      'country': country,
+      'state': state,
+    }).timeout(Duration(seconds: 5)),
+    // Retry on SocketException or TimeoutException
+    retryIf: (e) => e is SocketException || e is TimeoutException,
+  );
+
+  Map data = jsonDecode(response.body);
+
+  return data;
+}
+
+Future<Map> getWorkplace(String roleId) async {
+  var url = 'http://www.breakvoid.com/DoktorSaya/Workplace.php';
+  http.Response response = await retry(
+    // Make a GET request
+    () => http.post(url, body: {'action': 'get', 'role_id': roleId}).timeout(
+        Duration(seconds: 5)),
+    // Retry on SocketException or TimeoutException
+    retryIf: (e) => e is SocketException || e is TimeoutException,
+  );
+
+  Map data = jsonDecode(response.body);
+
+  return data;
+}
+
+Future<Map> getUserDetail(String roleId, String role) async {
+  var url = 'http://www.breakvoid.com/DoktorSaya/ViewUserDetail.php';
+  http.Response response = await retry(
+    // Make a GET request
+    () => http.post(url,
+        body: {'role_id': roleId, 'role': role}).timeout(Duration(seconds: 5)),
+    // Retry on SocketException or TimeoutException
+    retryIf: (e) => e is SocketException || e is TimeoutException,
+  );
+
+  Map data = jsonDecode(response.body);
+
+  return data;
+}
+
+Future<List> getDoctorExp(String roleId) async {
+  var url = 'http://www.breakvoid.com/DoktorSaya/DoctorExperience.php';
+  http.Response response = await retry(
+    // Make a GET request
+    () => http.post(url, body: {'action': 'get', 'role_id': roleId}).timeout(
+        Duration(seconds: 5)),
+    // Retry on SocketException or TimeoutException
+    retryIf: (e) => e is SocketException || e is TimeoutException,
+  );
+
+  List data = jsonDecode(response.body);
+
+  return data;
+}
+
+Future<Map> addDoctorExp(
+    String roleId, String location, String startDate, String endDate) async {
+  var url = 'http://www.breakvoid.com/DoktorSaya/DoctorExperience.php';
+  http.Response response = await retry(
+    // Make a GET request
+    () => http.post(url, body: {
+      'action': 'add',
+      'role_id': roleId,
+      'location': location,
+      'startdate': startDate,
+      'enddate': endDate
+    }).timeout(Duration(seconds: 5)),
+    // Retry on SocketException or TimeoutException
+    retryIf: (e) => e is SocketException || e is TimeoutException,
+  );
+
+  Map data = jsonDecode(response.body);
+
+  return data;
+}
+
+Future<Map> deleteDoctorExp(String doctorExpId) async {
+  var url = 'http://www.breakvoid.com/DoktorSaya/DoctorExperience.php';
+  http.Response response = await retry(
+    // Make a GET request
+    () => http.post(url, body: {
+      'action': 'delete',
+      'doctor_exp_id': doctorExpId
+    }).timeout(Duration(seconds: 5)),
+    // Retry on SocketException or TimeoutException
+    retryIf: (e) => e is SocketException || e is TimeoutException,
+  );
+
+  Map data = jsonDecode(response.body);
+
+  return data;
+}

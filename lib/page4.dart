@@ -1,11 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'dart:io';
 import 'dart:async';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:retry/retry.dart';
 
+import 'function/DatabaseConnect.dart' as db;
 import 'function/SharedPreferences.dart' as sp;
+import 'function/Text.dart' as tx;
+import 'LoadingScreen.dart' as ls;
 
 class Page4 extends StatefulWidget {
   @override
@@ -16,6 +16,10 @@ class _Page4State extends State<Page4> {
   bool _loadingVisible = true;
   bool _loadingIconVisible = true;
   double _maxWidth;
+
+  String _role;
+  String _roleId;
+  List _arrayDoctorSpecialist;
   Map _userData;
 
   @override
@@ -23,24 +27,40 @@ class _Page4State extends State<Page4> {
     // TODO: implement initState
     super.initState();
 
-    sp.getUserId().then((id) {
-      sp.getRole().then((role) {
-        _getUserDetail(id.toString(), role)
-            .timeout(new Duration(seconds: 15))
-            .then((s) {
-          setState(() {
-            _userData = s;
-            _loadingIconVisible = false;
-          });
-          Timer(Duration(milliseconds: 500), () {
-            setState(() {
-              _loadingVisible = false;
-            });
-          });
-        }).catchError((e) {
-          print(e);
-        });
+    _getData().then((onValue) {
+      setState(() {
+        _hideLoadingScreen();
       });
+    });
+  }
+
+  Future _getData() async {
+    await Future.wait([
+      sp.getRole().then((onValue) {
+        _role = onValue;
+      }),
+      sp.getRoleId().then((onValue) {
+        _roleId = onValue;
+      }),
+    ]);
+
+    await Future.wait([
+      db.getUserDetail(_roleId, _role).then((onValue) {
+        _userData = onValue;
+      }),
+      db.getDoctorSpecialist(_roleId).then((onValue) {
+        _arrayDoctorSpecialist = onValue;
+      }),
+    ]);
+  }
+
+  Future _hideLoadingScreen() async {
+    setState(() {
+      _loadingIconVisible = false;
+    });
+    await Future.delayed(Duration(milliseconds: 500));
+    setState(() {
+      _loadingVisible = false;
     });
   }
 
@@ -65,15 +85,9 @@ class _Page4State extends State<Page4> {
         firstCurve: Curves.easeOut,
         secondCurve: Curves.easeIn,
         duration: Duration(milliseconds: 500),
-        firstChild: _firstScreen(),
+        firstChild: ls.loadingScreen(_loadingIconVisible),
         secondChild: _secondScreen(),
       ),
-    );
-  }
-
-  Widget _firstScreen() {
-    return Center(
-      child: _loadingIcon(),
     );
   }
 
@@ -87,42 +101,82 @@ class _Page4State extends State<Page4> {
               ? _noProfileImage(_maxWidth)
               : _profileImage(_maxWidth),
           SizedBox(height: 10),
-          _heading1(_userData["nickname"]),
-          _heading2("Nama Penuh"),
-          _heading3(_userData['fullname']),
-          _heading2("Jantina"),
-          _heading3(_gender()),
-          _heading2("Umur"),
-          _heading3(_age()),
+          tx.heading1(_userData["nickname"]),
+          tx.heading2("Nama Penuh"),
+          tx.heading3(_userData['fullname']),
+          tx.heading2("Jantina"),
+          tx.heading3(_gender()),
+          tx.heading2("Umur"),
+          tx.heading3(_age()),
+          if (_role == "doctor") tx.heading2("Nombor Pendaftaran MMC"),
+          if (_role == "doctor") tx.heading3(_userData['mmc']),
           Divider(
             thickness: 1,
           ),
-          _heading1("HUBUNGAN"),
-          _heading2("Email"),
-          _heading3(_userData['email']),
-          _heading2("No Telefon"),
-          _heading3(_userData['phone']),
+          tx.heading1("HUBUNGAN"),
+          tx.heading2("Email"),
+          tx.heading3(_userData['email']),
+          if (_userData['phone'] != "") tx.heading2("No Telefon"),
+          if (_userData['phone'] != "") tx.heading3(_userData['phone']),
           Divider(
             thickness: 1,
           ),
+          if (_role == "doctor")
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                tx.heading1("PAKAR DOKTOR"),
+                if (_arrayDoctorSpecialist != null)
+                  for (int i = 0; i < _arrayDoctorSpecialist.length; i++)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        tx.heading2(_arrayDoctorSpecialist[i]['malay']),
+                        tx.heading3(
+                            _arrayDoctorSpecialist[i]['sub_specialist']),
+                      ],
+                    ),
+                Divider(
+                  thickness: 1,
+                ),
+              ],
+            ),
+          if (_role == "doctor" && _userData['workplace'] != "")
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                tx.heading1("TEMPAT KERJA"),
+                tx.heading2(_userData['workplace']),
+                (_userData['country'] == "")
+                    ? tx.heading3(_userData['selected_state'] + ", Malaysia")
+                    : tx.heading3(
+                        _userData['state'] + ", " + _userData['country']),
+                Divider(
+                  thickness: 1,
+                ),
+              ],
+            ),
+
+          if (_role == "doctor" && _userData['workplace'] != "")
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                tx.heading1("PENGALAMAN"),
+                tx.heading2("Hospital Melaka Eye Specialist Clinic"),
+                tx.heading3("2 tahun"),
+                tx.heading2("The Tun Hussein Onn National Eye Hospital"),
+                tx.heading3("3 tahun 8 bulan"),
+                Divider(
+                  thickness: 1,
+                ),
+              ],
+            ),
+
           _logoutButton(context),
         ],
       );
     }
     return Container();
-  }
-
-  Widget _loadingIcon() {
-    return Padding(
-      padding: const EdgeInsets.all(20),
-      child: AnimatedOpacity(
-        // If the widget is visible, animate to 0.0 (invisible).
-        // If the widget is hidden, animate to 1.0 (fully visible).
-        opacity: _loadingIconVisible ? 1.0 : 0.0,
-        duration: Duration(milliseconds: 500),
-        child: CircularProgressIndicator(),
-      ),
-    );
   }
 
   Widget _noProfileImage(_maxWidth) {
@@ -163,48 +217,6 @@ class _Page4State extends State<Page4> {
           ),
         ],
       ), //_logo(_maxWidth),
-    );
-  }
-
-  Widget _heading1(_text) {
-    return Padding(
-      padding: EdgeInsets.only(left: 10, top: 5),
-      child: Text(
-        _text,
-        style: TextStyle(
-          fontSize: 22,
-          fontFamily: "Montserrat",
-          fontWeight: FontWeight.bold,
-          color: Colors.orange,
-        ),
-      ),
-    );
-  }
-
-  Widget _heading2(_text) {
-    return Padding(
-      padding: EdgeInsets.only(left: 20, top: 5),
-      child: Text(
-        _text,
-        style: TextStyle(
-          fontSize: 18,
-          fontFamily: "Montserrat",
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
-
-  Widget _heading3(_text) {
-    return Padding(
-      padding: EdgeInsets.only(left: 30, top: 3),
-      child: Text(
-        _text,
-        style: TextStyle(
-          fontSize: 16,
-          fontFamily: "Montserrat",
-        ),
-      ),
     );
   }
 
@@ -254,20 +266,5 @@ class _Page4State extends State<Page4> {
     }
 
     return differenceYears.toString();
-  }
-
-  Future<Map> _getUserDetail(_userId, _role) async {
-    var url = 'http://www.breakvoid.com/DoktorSaya/ViewUserDetail.php';
-    http.Response response = await retry(
-      // Make a GET request
-      () => http.post(url, body: {'user_id': _userId, 'role': _role}).timeout(
-          Duration(seconds: 5)),
-      // Retry on SocketException or TimeoutException
-      retryIf: (e) => e is SocketException || e is TimeoutException,
-    );
-
-    Map data = jsonDecode(response.body);
-
-    return data;
   }
 }

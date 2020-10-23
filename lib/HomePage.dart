@@ -9,6 +9,8 @@ import 'package:doktorsaya/page3.dart';
 import 'package:doktorsaya/page4.dart';
 import 'package:flutter/material.dart';
 
+import 'function/ExitWithDoubleBack.dart';
+
 class HomePage extends StatefulWidget {
   @override
   _TestState createState() => _TestState();
@@ -32,7 +34,7 @@ class _TestState extends State<HomePage> {
   }
 
   List<Widget> _body = [
-    Page0(),
+    DoctorPage(),
     //Page1(),
     EditDoctorPage(),
     Page2(),
@@ -41,6 +43,7 @@ class _TestState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         //leading: IconButton(icon: Icon(Icons.menu),onPressed: () {}),
@@ -52,7 +55,7 @@ class _TestState extends State<HomePage> {
         ],
 
       ),
-      body: _body[_selectedIndex],
+      body: WillPopScope(child: _body[_selectedIndex], onWillPop: onWillPop),
 
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
@@ -80,5 +83,7 @@ class _TestState extends State<HomePage> {
       ),
 
     );
+
+
   }
 }
