@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'LoadingScreen.dart' as ls;
+import 'widget/LoadingScreen.dart' as ls;
 
 class DoctorPage extends StatefulWidget {
   @override

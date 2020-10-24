@@ -6,7 +6,7 @@ import 'function/ProgressDialog.dart' as pr;
 import 'function/SharedPreferences.dart' as sp;
 import 'function/Text.dart' as tx;
 import 'function/DatabaseConnect.dart' as db;
-import 'LoadingScreen.dart' as ls;
+import 'widget/LoadingScreen.dart' as ls;
 
 class EditDoctorPage extends StatefulWidget {
   @override
