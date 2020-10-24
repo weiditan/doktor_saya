@@ -131,13 +131,7 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
                 Card(
                   child: InkWell(
                     onTap: () {
-                      _showAddSpecialistDialog().then((_) {
-                        db.getDoctorSpecialist(_roleId).then((onValue) {
-                          setState(() {
-                            _arrayDoctorSpecialist = onValue;
-                          });
-                        });
-                      });
+                      _showAddSpecialistDialog(setState);
                     },
                     child: ListTile(
                       leading: Icon(
@@ -193,12 +187,23 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
             child: Column(children: <Widget>[
               if (_arrayDoctorExp != null)
                 for (int i = 0; i < _arrayDoctorExp.length; i++)
-                  _cardExp(_arrayDoctorExp[i]['doctor_exp_id'],
-                      _arrayDoctorExp[i]['location'], "3 tahun 8 bulan"),
+                  (_arrayDoctorExp[i]['enddate'] != '0000-00-00')
+                      ? _cardExp(
+                          _arrayDoctorExp[i]['doctor_exp_id'],
+                          _arrayDoctorExp[i]['location'],
+                          _diffDate(
+                              DateTime.parse(_arrayDoctorExp[i]['startdate']),
+                              DateTime.parse(_arrayDoctorExp[i]['enddate'])))
+                      : _cardExp(
+                          _arrayDoctorExp[i]['doctor_exp_id'],
+                          _arrayDoctorExp[i]['location'],
+                          DateFormat('MMM d, yyyy').format(DateTime.parse(
+                                  _arrayDoctorExp[i]['startdate'])) +
+                              " \nSampai Sekarang"),
               Card(
                 child: InkWell(
                   onTap: () {
-                    _showExpDialog();
+                    _showExpDialog(setState);
                   },
                   child: ListTile(
                     leading: Icon(
@@ -230,6 +235,9 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
   }
 
   String _diffDate(DateTime startDate, DateTime endDate) {
+    String _outputYears = "";
+    String _outputMonths = "";
+    String _outputDays = "";
     int years = endDate.year - startDate.year;
     int months = endDate.month - startDate.month;
     int days = endDate.day - startDate.day;
@@ -246,12 +254,27 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
       months += 12;
     }
 
-    return years.toString() +
-        " Tahun, " +
-        months.toString() +
-        " Bulan, " +
-        days.toString() +
-        " days";
+    if (years != 0) {
+      if (months != 0 || days != 0) {
+        _outputYears = years.toString() + " Tahun, ";
+      } else {
+        _outputYears = years.toString() + " Tahun";
+      }
+    }
+
+    if (months != 0) {
+      if (days != 0) {
+        _outputMonths = months.toString() + " Bulan, ";
+      } else {
+        _outputMonths = months.toString() + " Bulan";
+      }
+    }
+
+    if (days != 0) {
+      _outputDays = days.toString() + " Hari";
+    }
+
+    return _outputYears + _outputMonths + _outputDays;
   }
 
   Widget _cardSpecialist(
@@ -332,12 +355,35 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
               color: Colors.red,
               size: 30,
             ),
-            onPressed: () {}),
+            onPressed: () async {
+              await pr.show(context, "Memuatkan");
+              db
+                  .deleteDoctorExp(doctorExpId)
+                  .timeout(new Duration(seconds: 15))
+                  .then((s) async {
+                if (s['status']) {
+                  db.getDoctorExp(_roleId).then((onValue) async {
+                    setState(() {
+                      _arrayDoctorExp = onValue;
+                    });
+                    await pr.hide();
+                  });
+                } else {
+                  await pr.warning("Sila cuba lagi !");
+                  print(s);
+                }
+              }).catchError(
+                (e) async {
+                  await pr.warning("Sila cuba lagi !");
+                  print(e);
+                },
+              );
+            }),
       ),
     );
   }
 
-  _showExpDialog() {
+  _showExpDialog(StateSetter pageSetState) {
     final _expFormKey = GlobalKey<FormState>();
     final _startDateController = TextEditingController();
     final _endDateController = TextEditingController();
@@ -345,6 +391,190 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
     DateTime _startDate;
     DateTime _endDate;
     int _valueStatus;
+
+    Widget _expWorkplaceField() {
+      return Padding(
+        padding: EdgeInsets.only(left: 20, top: 10, right: 20),
+        child: TextFormField(
+          style: TextStyle(
+            fontSize: 16,
+          ),
+          decoration: new InputDecoration(
+            border: OutlineInputBorder(),
+            labelText: "Tempat Kerja",
+            labelStyle: TextStyle(
+              fontFamily: "Montserrat",
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          keyboardType: TextInputType.text,
+          controller: _expWorkplaceController,
+          validator: (String value) {
+            if (value.isEmpty) {
+              return 'Sila Masukkan Tempat Kerja';
+            }
+            return null;
+          },
+        ),
+      );
+    }
+
+    Widget _selectStatus(StateSetter setState) {
+      return Padding(
+        padding: EdgeInsets.only(left: 20, top: 20),
+        child: SizedBox(
+          width: 130,
+          child: DropdownButtonFormField(
+            decoration: new InputDecoration(
+              contentPadding: const EdgeInsets.only(left: 10, bottom: 10),
+              border: OutlineInputBorder(),
+              labelText: "Status",
+              labelStyle: TextStyle(
+                fontFamily: "Montserrat",
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            items: [
+              DropdownMenuItem<int>(
+                child: Text('Sudah Tamat'),
+                value: 0,
+              ),
+              DropdownMenuItem<int>(
+                child: Text('Belum Tamat'),
+                value: 1,
+              ),
+            ],
+            onChanged: (onValue) {
+              setState(() {
+                _valueStatus = onValue;
+              });
+            },
+            value: _valueStatus,
+            validator: (onValue) {
+              if (onValue == null) {
+                return 'Sila Pilih Status';
+              }
+              return null;
+            },
+          ),
+        ),
+      );
+    }
+
+    Future<DateTime> _showDateDialog(
+        String label, DateTime initialDateTime) async {
+      DateTime _selectDate;
+
+      await showDialog(
+        context: context,
+        builder: (_) => new AlertDialog(
+          title: new Text(label),
+          content: Container(
+            height: 200,
+            width: 700,
+            child: CupertinoDatePicker(
+                mode: CupertinoDatePickerMode.date,
+                initialDateTime: (initialDateTime != null)
+                    ? initialDateTime
+                    : DateTime.now(),
+                minimumYear: DateTime.now().year - 100,
+                maximumDate: DateTime.now().add(Duration(seconds: 10)),
+                onDateTimeChanged: (_date) {
+                  _selectDate = _date;
+                }),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Simpan'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            )
+          ],
+        ),
+      );
+      return _selectDate;
+    }
+
+    Widget _startDateField() {
+      return Padding(
+        padding: EdgeInsets.only(left: 20, top: 20, right: 20),
+        child: SizedBox(
+          width: 150,
+          child: TextFormField(
+            style: TextStyle(
+              fontSize: 16,
+            ),
+            decoration: new InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: "Tarikh Mula",
+              labelStyle: TextStyle(
+                fontFamily: "Montserrat",
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            controller: _startDateController,
+            readOnly: true,
+            focusNode: FocusNode(),
+            onTap: () {
+              _showDateDialog("Tarikh Mula", _startDate).then((onValue) {
+                if (onValue != null) {
+                  _startDate = onValue;
+                  _startDateController.text =
+                      DateFormat('MMM d, yyyy').format(onValue);
+                }
+              });
+            },
+            validator: (String value) {
+              if (value.isEmpty) {
+                return 'Sila Pilih Tarikh Mula';
+              }
+              return null;
+            },
+          ),
+        ),
+      );
+    }
+
+    Widget _endDateField() {
+      return Padding(
+        padding: EdgeInsets.only(left: 20, top: 20, right: 20),
+        child: SizedBox(
+          width: 150,
+          child: TextFormField(
+            style: TextStyle(
+              fontSize: 16,
+            ),
+            decoration: new InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: "Tarikh Tamat",
+              labelStyle: TextStyle(
+                fontFamily: "Montserrat",
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            controller: _endDateController,
+            readOnly: true,
+            focusNode: FocusNode(),
+            onTap: () {
+              _showDateDialog("Tarikh Tamat", _endDate).then((onValue) {
+                if (onValue != null) {
+                  _endDate = onValue;
+                  _endDateController.text =
+                      DateFormat('MMM d, yyyy').format(onValue);
+                }
+              });
+            },
+            validator: (String value) {
+              if (value.isEmpty) {
+                return 'Sila Pilih Tarikh Tamat';
+              }
+              return null;
+            },
+          ),
+        ),
+      );
+    }
 
     showDialog(
       context: context,
@@ -362,52 +592,10 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        _expWorkplaceField(_expWorkplaceController),
-                        _dateField(
-                            "Tarikh Mula", _startDateController, _startDate),
-                        Padding(
-                          padding: EdgeInsets.only(left: 20, top: 20),
-                          child: SizedBox(
-                            width: 130,
-                            child: DropdownButtonFormField(
-                              decoration: new InputDecoration(
-                                contentPadding:
-                                    const EdgeInsets.only(left: 10, bottom: 10),
-                                border: OutlineInputBorder(),
-                                labelText: "Status",
-                                labelStyle: TextStyle(
-                                  fontFamily: "Montserrat",
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              items: [
-                                DropdownMenuItem<int>(
-                                  child: Text('Sudah Tamat'),
-                                  value: 0,
-                                ),
-                                DropdownMenuItem<int>(
-                                  child: Text('Belum Tamat'),
-                                  value: 1,
-                                ),
-                              ],
-                              onChanged: (onValue) {
-                                setState(() {
-                                  _valueStatus = onValue;
-                                });
-                              },
-                              value: _valueStatus,
-                              validator: (onValue) {
-                                if (onValue == null) {
-                                  return 'Sila Pilih Status';
-                                }
-                                return null;
-                              },
-                            ),
-                          ),
-                        ),
-                        if (_valueStatus == 0)
-                          _dateField(
-                              "Tarikh Tamat", _endDateController, _endDate),
+                        _expWorkplaceField(),
+                        _startDateField(),
+                        _selectStatus(setState),
+                        if (_valueStatus == 0) _endDateField()
                       ],
                     ),
                   ),
@@ -417,10 +605,73 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
           ),
           actions: <Widget>[
             FlatButton(
-              child: Text('Simpan'),
-              onPressed: () {
+              child: Text('Tambah'),
+              onPressed: () async {
                 if (_expFormKey.currentState.validate()) {
-                  Navigator.of(context).pop();
+                  if (_valueStatus != 1) {
+                    if (_endDate.difference(_startDate).inDays <= 0) {
+                      pr.show(context, "");
+                      pr.error(
+                          "Tarikh tamat tidak boleh sama atau kurang daripada tarikh mula.");
+                    } else {
+                      await pr.show(context, "Memuatkan");
+                      db
+                          .addDoctorExp(
+                              _roleId,
+                              _expWorkplaceController.text,
+                              DateFormat('yyyy-MM-dd').format(_startDate),
+                              DateFormat('yyyy-MM-dd').format(_endDate))
+                          .timeout(new Duration(seconds: 15))
+                          .then(
+                        (s) async {
+                          if (s['status']) {
+                            db.getDoctorExp(_roleId).then((onValue) async {
+                              pageSetState(() {
+                                _arrayDoctorExp = onValue;
+                              });
+                            });
+                            await pr.hide();
+                            Navigator.pop(context);
+                          } else {
+                            await pr.warning("Sila cuba lagi !");
+                            print(s);
+                          }
+                        },
+                      ).catchError(
+                        (e) async {
+                          await pr.warning("Sila cuba lagi !");
+                          print(e);
+                        },
+                      );
+                    }
+                  } else {
+                    await pr.show(context, "Memuatkan");
+                    db
+                        .addDoctorExp(_roleId, _expWorkplaceController.text,
+                            DateFormat('yyyy-MM-dd').format(_startDate), "")
+                        .timeout(new Duration(seconds: 15))
+                        .then(
+                      (s) async {
+                        if (s['status']) {
+                          db.getDoctorExp(_roleId).then((onValue) async {
+                            pageSetState(() {
+                              _arrayDoctorExp = onValue;
+                            });
+                          });
+                          await pr.hide();
+                          Navigator.pop(context);
+                        } else {
+                          await pr.warning("Sila cuba lagi !");
+                          print(s);
+                        }
+                      },
+                    ).catchError(
+                      (e) async {
+                        await pr.warning("Sila cuba lagi !");
+                        print(e);
+                      },
+                    );
+                  }
                 }
               },
             )
@@ -430,116 +681,14 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
     );
   }
 
-  Widget _expWorkplaceField(TextEditingController controller) {
-    return Padding(
-      padding: EdgeInsets.only(left: 20, top: 10, right: 20),
-      child: TextFormField(
-        style: TextStyle(
-          fontSize: 16,
-        ),
-        decoration: new InputDecoration(
-          border: OutlineInputBorder(),
-          labelText: "Tempat Kerja",
-          labelStyle: TextStyle(
-            fontFamily: "Montserrat",
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        keyboardType: TextInputType.text,
-        controller: controller,
-        validator: (String value) {
-          if (value.isEmpty) {
-            return 'Sila Masukkan Tempat Kerja';
-          }
-          return null;
-        },
-      ),
-    );
-  }
+  _showAddSpecialistDialog(StateSetter pageSetState) {
+    final _specialistFormKey = GlobalKey<FormState>();
+    int _valueSpecialist;
+    final _subSpecialistController = TextEditingController();
 
-  Widget _dateField(
-      String label, TextEditingController controller, DateTime date) {
-    return Padding(
-      padding: EdgeInsets.only(left: 20, top: 20, right: 20),
-      child: SizedBox(
-        width: 150,
-        child: TextFormField(
-          style: TextStyle(
-            fontSize: 16,
-          ),
-          decoration: new InputDecoration(
-            border: OutlineInputBorder(),
-            labelText: label,
-            labelStyle: TextStyle(
-              fontFamily: "Montserrat",
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          controller: controller,
-          readOnly: true,
-          focusNode: FocusNode(),
-          onTap: () {
-            _showDateDialog(label, date).then((onValue) {
-              if (onValue != null) {
-                date = onValue;
-                controller.text = DateFormat('MMM d, yyyy').format(date);
-                print(onValue);
-                print(_diffDate(onValue, DateTime.now()));
-              }
-            });
-          },
-          validator: (String value) {
-            if (value.isEmpty) {
-              return 'Sila Pilih ' + label;
-            }
-            return null;
-          },
-        ),
-      ),
-    );
-  }
-
-  Future<DateTime> _showDateDialog(String label, DateTime date) async {
-    DateTime _selectDate;
-
-    await showDialog(
-      context: context,
-      builder: (_) => new AlertDialog(
-        title: new Text(label),
-        content: Container(
-          height: 200,
-          width: 700,
-          child: CupertinoDatePicker(
-              mode: CupertinoDatePickerMode.date,
-              initialDateTime: (date != null) ? date : DateTime.now(),
-              minimumYear: DateTime.now().year - 100,
-              maximumDate: DateTime.now().add(Duration(seconds: 10)),
-              onDateTimeChanged: (_date) {
-                _selectDate = _date;
-              }),
-        ),
-        actions: <Widget>[
-          FlatButton(
-            child: Text('Simpan'),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          )
-        ],
-      ),
-    );
-
-    return _selectDate;
-  }
-
-  Future _showAddSpecialistDialog() {
-    return showDialog(
+    showDialog(
       context: context,
       builder: (BuildContext context) {
-        final _specialistFormKey = GlobalKey<FormState>();
-        int _valueSpecialist;
-        final _subSpecialistController = TextEditingController();
-
         return AlertDialog(
           title: new Text("Tambar Pakar"),
           content: StatefulBuilder(
@@ -636,6 +785,11 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
                       .timeout(new Duration(seconds: 15))
                       .then((s) async {
                     if (s['status']) {
+                      db.getDoctorSpecialist(_roleId).then((onValue) {
+                        pageSetState(() {
+                          _arrayDoctorSpecialist = onValue;
+                        });
+                      });
                       await pr.hide();
                       Navigator.pop(context);
                     } else {
