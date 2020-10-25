@@ -7,6 +7,7 @@ import 'HomePage.dart';
 import 'RegisterPage1.dart';
 import 'RegisterPage2.dart';
 import 'RolePage.dart';
+import 'ViewDoctorDetail.dart';
 import 'WelcomePage.dart';
 import 'LoginPage.dart';
 
@@ -92,6 +93,14 @@ class MyApp extends StatelessWidget {
             return PageTransition(
               child: EditDoctorPage(),
               type: PageTransitionType.fade,
+              settings: settings,
+            );
+            break;
+
+          case '/ViewDoctorDetail':
+            return PageTransition(
+              child: ViewDoctorDetail(settings.arguments),
+              type: PageTransitionType.rightToLeft,
               settings: settings,
             );
             break;

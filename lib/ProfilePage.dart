@@ -1,4 +1,3 @@
-import 'package:doktorsaya/widget/ProfileImage.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -9,6 +8,7 @@ import 'widget/DoctorSpecialist.dart';
 import 'widget/DoctorWorkplace.dart';
 import 'widget/LoadingScreen.dart';
 import 'widget/ProfileDetail.dart';
+import 'widget/ProfileImage.dart';
 
 class ProfilePage extends StatefulWidget {
   @override

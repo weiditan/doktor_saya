@@ -742,6 +742,7 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
                             ),
                           ),
                         SizedBox(height: 10),
+                        if(_valueSpecialist!=null && _valueSpecialist!=1)
                         TextFormField(
                           style: TextStyle(
                             fontSize: 16,

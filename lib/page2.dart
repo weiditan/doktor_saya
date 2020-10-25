@@ -10,7 +10,7 @@ import 'package:retry/retry.dart';
 import 'Call.dart';
 import 'ConfirmCall.dart';
 import 'Message.dart';
-import 'ViewDoctorDetail.dart';
+import 'ViewDoctorDetail2.dart';
 
 class Page2 extends StatefulWidget {
   @override
@@ -77,7 +77,7 @@ class _Page2State extends State<Page2> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => ViewDoctorDetail()),
+                            builder: (context) => ViewDoctorDetail2()),
                       );
                     },
                     child: _row(

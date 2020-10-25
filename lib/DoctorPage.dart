@@ -25,32 +25,53 @@ class _DoctorPageState extends State<DoctorPage> {
     // TODO: implement initState
     super.initState();
 
-    db.getAllDoctor().then((onValue) {
-      _arrayDoctor = onValue;
-      _arrayDoctor.forEach((doctor){
-        db.getDoctorExp(doctor['doctor_id']).then((onValue){
-          if(onValue!=null) {
-            doctor['total_exp'] = dd.outputDiffDate(dd.totalExp(onValue));
-          }
-          _hideLoadingScreen();
-        });
-        db.getDoctorSpecialist(doctor['doctor_id']).then((onValue){
-          if(onValue!=null) {
-            for (int i = 0; i < onValue.length; i++)
-              {
-
-              }
-
-
-
-
-          }
-          _hideLoadingScreen();
-        });
+    _getData().then((onValue) {
+      setState(() {
+        _hideLoadingScreen();
       });
     });
+  }
 
+  Future _getData() async {
+    await db.getAllDoctor().then((onValue) async {
+      _arrayDoctor = onValue;
+      await Future.wait([
+        for (int i = 0; i < _arrayDoctor.length; i++)
+          _getSpecialist(_arrayDoctor[i]),
+        for (int i = 0; i < _arrayDoctor.length; i++)
+          _getTotalExp(_arrayDoctor[i]),
+      ]);
+    });
+  }
 
+  Future _getSpecialist(Map doctor) async {
+    await db.getDoctorSpecialist(doctor['doctor_id']).then((onValue) {
+      if (onValue != null) {
+        String output = "";
+        for (int i = 0; i < onValue.length; i++) {
+          if (i == 0) {
+            output += onValue[i]['malay'];
+          } else if (onValue[i - 1]['malay'] != onValue[i]['malay']) {
+            output += onValue[i]['malay'];
+          }
+          if (onValue[i]['sub_specialist'] != "") {
+            output += (" - " + onValue[i]['sub_specialist']);
+          }
+          if ((i + 1) != onValue.length) {
+            output += ",\n";
+          }
+          doctor['specialist'] = output;
+        }
+      }
+    });
+  }
+
+  Future _getTotalExp(Map doctor) async {
+    await db.getDoctorExp(doctor['doctor_id']).then((onValue) {
+      if (onValue != null) {
+        doctor['total_exp'] = dd.outputDiffDate(dd.totalExp(onValue));
+      }
+    });
   }
 
   Future _hideLoadingScreen() async {
@@ -105,82 +126,80 @@ class _DoctorPageState extends State<DoctorPage> {
   }
 
   Widget _doctorRow(Map doctor) {
-    return Card(
-      margin: EdgeInsets.only(left: 15, right: 15, top: 15),
-      child: Padding(
-        padding: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Row(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    SizedBox(width: 5),
-                    _profileImage(
-                        "http://www.breakvoid.com/DoktorSaya/Images/Profiles/" +
-                            doctor['image']),
-                    SizedBox(width: 10),
-                    SizedBox(
-                      width: _screenWidth - 260,
-                      child: Text(
-                        "Dr " + doctor['nickname'],
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontFamily: "Montserrat",
-                          fontWeight: FontWeight.bold,
+    return InkWell(
+      onTap: () {
+        Navigator.pushNamed(context, '/ViewDoctorDetail', arguments: doctor);
+      },
+      child: Card(
+        margin: EdgeInsets.only(left: 15, right: 15, top: 10),
+        child: Padding(
+          padding: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      SizedBox(width: 5),
+                      _profileImage(
+                          "http://www.breakvoid.com/DoktorSaya/Images/Profiles/" +
+                              doctor['image']),
+                      SizedBox(width: 10),
+                      SizedBox(
+                        width: _screenWidth - 260,
+                        child: Text(
+                          "Dr " + doctor['nickname'],
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontFamily: "Montserrat",
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                Column(
-                  children: <Widget>[
-                    _callButton(),
-                    _messageButton(),
-                  ],
-                ),
-              ],
-            ),
-            Divider(
-              thickness: 1,
-            ),
-            Padding(
-                padding: EdgeInsets.only(left: 10, right: 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      "specialist asdassssssssssssssssssssssssssssssssss",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontFamily: "Montserrat",
-                      ),
-                    ),
-                    if(doctor['total_exp']!=null)
-                    Text(
-                      doctor['total_exp']+" Pengalaman",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontFamily: "Montserrat",
-                      ),
-                    ),
-                  ],
-                )),
-          ],
+                    ],
+                  ),
+                  Column(
+                    children: <Widget>[
+                      _callButton(),
+                      _messageButton(),
+                    ],
+                  ),
+                ],
+              ),
+              Divider(
+                thickness: 1,
+              ),
+              Padding(
+                  padding: EdgeInsets.only(left: 10, right: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      if (doctor['specialist'] != null)
+                        Text(
+                          doctor['specialist'],
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: "Montserrat",
+                          ),
+                        ),
+                      if (doctor['total_exp'] != null)
+                        Text(
+                          doctor['total_exp'] + " Pengalaman",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: "Montserrat",
+                          ),
+                        ),
+                    ],
+                  )),
+            ],
+          ),
         ),
       ),
     );
-  }
-
-
-  Future _totalExp(Map doctor) async {
-    db.getDoctorExp(doctor['doctor_id']).then((onValue){
-      doctor['total_exp'] = dd.outputDiffDate(dd.totalExp(onValue));
-    });
-
   }
 
   Widget _profileImage(String imageUrl) {
@@ -201,8 +220,6 @@ class _DoctorPageState extends State<DoctorPage> {
       ),
     );
   }
-
-
 
   Widget _callButton() {
     return SizedBox(
