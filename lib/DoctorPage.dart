@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 
 import 'widget/LoadingScreen.dart';
 import 'function/DatabaseConnect.dart' as db;
+import 'function/DiffDate.dart' as dd;
 
 class DoctorPage extends StatefulWidget {
   @override
@@ -26,8 +27,30 @@ class _DoctorPageState extends State<DoctorPage> {
 
     db.getAllDoctor().then((onValue) {
       _arrayDoctor = onValue;
-      _hideLoadingScreen();
+      _arrayDoctor.forEach((doctor){
+        db.getDoctorExp(doctor['doctor_id']).then((onValue){
+          if(onValue!=null) {
+            doctor['total_exp'] = dd.outputDiffDate(dd.totalExp(onValue));
+          }
+          _hideLoadingScreen();
+        });
+        db.getDoctorSpecialist(doctor['doctor_id']).then((onValue){
+          if(onValue!=null) {
+            for (int i = 0; i < onValue.length; i++)
+              {
+
+              }
+
+
+
+
+          }
+          _hideLoadingScreen();
+        });
+      });
     });
+
+
   }
 
   Future _hideLoadingScreen() async {
@@ -136,8 +159,9 @@ class _DoctorPageState extends State<DoctorPage> {
                         fontFamily: "Montserrat",
                       ),
                     ),
+                    if(doctor['total_exp']!=null)
                     Text(
-                      "5 Tahun Pengalaman",
+                      doctor['total_exp']+" Pengalaman",
                       style: TextStyle(
                         fontSize: 16,
                         fontFamily: "Montserrat",
@@ -149,6 +173,14 @@ class _DoctorPageState extends State<DoctorPage> {
         ),
       ),
     );
+  }
+
+
+  Future _totalExp(Map doctor) async {
+    db.getDoctorExp(doctor['doctor_id']).then((onValue){
+      doctor['total_exp'] = dd.outputDiffDate(dd.totalExp(onValue));
+    });
+
   }
 
   Widget _profileImage(String imageUrl) {
@@ -170,25 +202,7 @@ class _DoctorPageState extends State<DoctorPage> {
     );
   }
 
-  Widget _divider() {
-    return Container(
-      child: Row(
-        children: <Widget>[
-          SizedBox(
-            width: 100,
-          ),
-          Expanded(
-            child: Divider(
-              thickness: 2,
-            ),
-          ),
-          SizedBox(
-            width: 10,
-          ),
-        ],
-      ),
-    );
-  }
+
 
   Widget _callButton() {
     return SizedBox(
