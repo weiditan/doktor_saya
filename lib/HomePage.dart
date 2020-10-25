@@ -38,7 +38,7 @@ class _TestState extends State<HomePage> {
     //Page1(),
     EditDoctorPage(),
     Page2(),
-    Page4(),
+    ProfilePage(),
   ];
 
   @override

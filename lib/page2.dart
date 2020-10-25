@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:doktorsaya/function/Encrypt.dart';
+import 'package:doktorsaya/function/SharedPreferences.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:retry/retry.dart';
@@ -25,6 +27,7 @@ class _Page2State extends State<Page2> {
     // TODO: implement initState
     super.initState();
     _getData();
+
   }
 
   Future _getData() async {

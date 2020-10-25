@@ -6,7 +6,7 @@ Widget showProfileDetail(String role, Map userData){
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
-      tx.heading1(userData["nickname"]),
+      (role == "doctor") ? tx.heading1("Dr "+userData["nickname"]) : tx.heading1(userData["nickname"]),
       tx.heading2("Nama Penuh"),
       tx.heading3(userData['fullname']),
       tx.heading2("Jantina"),

@@ -13,8 +13,13 @@ Widget showDoctorSpecialist(List arrayDoctorSpecialist) {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  tx.heading2(arrayDoctorSpecialist[i]['malay']),
-                  tx.heading3(arrayDoctorSpecialist[i]['sub_specialist']),
+                  if (i == 0) tx.heading2(arrayDoctorSpecialist[i]['malay']),
+                  if (i != 0 &&
+                      arrayDoctorSpecialist[i - 1]['malay'] !=
+                          arrayDoctorSpecialist[i]['malay'])
+                    tx.heading2(arrayDoctorSpecialist[i]['malay']),
+                  if (arrayDoctorSpecialist[i]['sub_specialist'] != "")
+                    tx.heading3(arrayDoctorSpecialist[i]['sub_specialist']),
                 ],
               ),
             Divider(

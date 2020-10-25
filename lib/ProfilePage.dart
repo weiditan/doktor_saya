@@ -10,12 +10,12 @@ import 'widget/DoctorWorkplace.dart';
 import 'widget/LoadingScreen.dart';
 import 'widget/ProfileDetail.dart';
 
-class Page4 extends StatefulWidget {
+class ProfilePage extends StatefulWidget {
   @override
-  _Page4State createState() => _Page4State();
+  _ProfilePageState createState() => _ProfilePageState();
 }
 
-class _Page4State extends State<Page4> {
+class _ProfilePageState extends State<ProfilePage> {
   bool _loadingVisible = true;
   bool _loadingIconVisible = true;
   double _maxWidth;
@@ -100,24 +100,25 @@ class _Page4State extends State<Page4> {
 
   Widget _secondScreen() {
     if (_userData != null) {
-      return ListView(
-        scrollDirection: Axis.vertical,
-        shrinkWrap: true,
-        children: <Widget>[
-          showProfileImage(_userData['image'], _maxWidth),
-          SizedBox(height: 10),
-          showProfileDetail(_role, _userData),
-          if (_role == "doctor")
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                showDoctorSpecialist(_arrayDoctorSpecialist),
-                showDoctorWorkplace(_userData),
-                showDoctorExperience(_arrayDoctorExp),
-              ],
-            ),
-          _logoutButton(context),
-        ],
+      return SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
+        child: Column(
+          children: <Widget>[
+            showProfileImage(_userData['image'], _maxWidth),
+            SizedBox(height: 10),
+            showProfileDetail(_role, _userData),
+            if (_role == "doctor")
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  showDoctorSpecialist(_arrayDoctorSpecialist),
+                  showDoctorWorkplace(_userData),
+                  showDoctorExperience(_arrayDoctorExp),
+                ],
+              ),
+            _logoutButton(context),
+          ],
+        ),
       );
     }
     return Container();
