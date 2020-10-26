@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'function/DatabaseConnect.dart' as db;
+import 'function/SharedPreferences.dart' as sp;
 import 'widget/DoctorExperience.dart';
 import 'widget/DoctorSpecialist.dart';
 import 'widget/DoctorWorkplace.dart';
@@ -70,7 +71,7 @@ class _ViewDoctorDetailState extends State<ViewDoctorDetail> {
                     children: <Widget>[
                       _callButton(context),
                       SizedBox(width: 10),
-                      _messageButton(context),
+                      _messageButton(),
                       SizedBox(width: 10),
                     ],
                   )
@@ -155,7 +156,7 @@ class _ViewDoctorDetailState extends State<ViewDoctorDetail> {
     );
   }
 
-  Widget _messageButton(context) {
+  Widget _messageButton() {
     return SizedBox(
       width: 120,
       child: RaisedButton(
@@ -178,7 +179,16 @@ class _ViewDoctorDetailState extends State<ViewDoctorDetail> {
             ),
           ],
         ),
-        onPressed: () {},
+        onPressed: () {
+          sp.getRoleId().then((onValue) {
+            Navigator.pushNamed(context, '/Message', arguments: {
+              'sender': onValue,
+              'receiver': widget.doctor['doctor_id'],
+              'doctor_name': widget.doctor['nickname'],
+              'doctor_image': widget.doctor['image']
+            });
+          });
+        },
       ),
     );
   }

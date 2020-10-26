@@ -80,6 +80,7 @@ class _MessageState extends State<Message> {
                 child: Text(widget.data['doctor_name'] +
                     "aaaaaaaaaaaaaaaaaaad aaaaaaaaaaaaaaaad")),
           ),
+          SizedBox(width: 10),
         ],
       ),
     );
