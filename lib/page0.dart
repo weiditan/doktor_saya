@@ -9,10 +9,7 @@ class Page0 extends StatelessWidget {
         children: <Widget>[
           InkWell(
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => Message()),
-              );
+
             },
             child: _row(context),
           ),

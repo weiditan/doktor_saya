@@ -1,3 +1,4 @@
+import 'package:doktorsaya/Message.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 
@@ -100,6 +101,14 @@ class MyApp extends StatelessWidget {
           case '/ViewDoctorDetail':
             return PageTransition(
               child: ViewDoctorDetail(settings.arguments),
+              type: PageTransitionType.rightToLeft,
+              settings: settings,
+            );
+            break;
+
+          case '/Message':
+            return PageTransition(
+              child: Message(settings.arguments),
               type: PageTransitionType.rightToLeft,
               settings: settings,
             );

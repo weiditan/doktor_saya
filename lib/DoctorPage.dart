@@ -7,6 +7,7 @@ import 'package:flutter/widgets.dart';
 import 'widget/LoadingScreen.dart';
 import 'function/DatabaseConnect.dart' as db;
 import 'function/DiffDate.dart' as dd;
+import 'function/SharedPreferences.dart' as sp;
 
 class DoctorPage extends StatefulWidget {
   @override
@@ -18,6 +19,7 @@ class _DoctorPageState extends State<DoctorPage> {
   bool _loadingVisible = true;
   double _screenWidth;
 
+  String _roleId;
   List _arrayDoctor;
 
   @override
@@ -35,7 +37,11 @@ class _DoctorPageState extends State<DoctorPage> {
   Future _getData() async {
     await db.getAllDoctor().then((onValue) async {
       _arrayDoctor = onValue;
+
       await Future.wait([
+        sp.getRoleId().then((onValue) {
+          _roleId = onValue;
+        }),
         for (int i = 0; i < _arrayDoctor.length; i++)
           _getSpecialist(_arrayDoctor[i]),
         for (int i = 0; i < _arrayDoctor.length; i++)
@@ -164,7 +170,7 @@ class _DoctorPageState extends State<DoctorPage> {
                   Column(
                     children: <Widget>[
                       _callButton(),
-                      _messageButton(),
+                      _messageButton(doctor['doctor_id'], doctor['nickname'], doctor['image']),
                     ],
                   ),
                 ],
@@ -249,7 +255,8 @@ class _DoctorPageState extends State<DoctorPage> {
     );
   }
 
-  Widget _messageButton() {
+  Widget _messageButton(
+      String doctorId, String doctorName, String doctorImage) {
     return SizedBox(
       width: 110,
       child: RaisedButton(
@@ -272,7 +279,14 @@ class _DoctorPageState extends State<DoctorPage> {
             ),
           ],
         ),
-        onPressed: () {},
+        onPressed: () {
+          Navigator.pushNamed(context, '/Message', arguments: {
+            'sender': _roleId,
+            'receiver': doctorId,
+            'doctor_name': doctorName,
+            'doctor_image': doctorImage
+          });
+        },
       ),
     );
   }

@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:doktorsaya/function/Encrypt.dart';
-import 'package:doktorsaya/function/SharedPreferences.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:retry/retry.dart';
@@ -312,10 +310,7 @@ class _Page2State extends State<Page2> {
           ],
         ),
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => Message()),
-          );
+
         },
       ),
     );

@@ -1,7 +1,7 @@
 import 'package:doktorsaya/DoctorPage.dart';
 import 'package:doktorsaya/EditDoctorPage.dart';
 import 'package:doktorsaya/EditProfilePage.dart';
-import 'package:doktorsaya/widget/LoadingScreen.dart';
+import 'package:doktorsaya/page.dart';
 import 'package:doktorsaya/page0.dart';
 import 'package:doktorsaya/page1.dart';
 import 'package:doktorsaya/page2.dart';
@@ -17,15 +17,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _TestState extends State<HomePage> {
-
   int _selectedIndex = 2;
 
-  var _arrayTitle = [
-    'Mesej',
-    'Panggilan',
-    'Doktor',
-    'Profil'
-  ];
+  var _arrayTitle = ['Mesej', 'Panggilan', 'Doktor', 'Profil'];
 
   void _onItemTapped(int index) {
     setState(() {
@@ -34,16 +28,19 @@ class _TestState extends State<HomePage> {
   }
 
   List<Widget> _body = [
+Page123({
+  'sender': 'd8',
+  'receiver': 'd10',
+  'doctor_name': 'doctorName',
+  'doctor_image': 'doctorImage'
+}),
+    Page0(),
     DoctorPage(),
-    //Page1(),
-    EditDoctorPage(),
-    Page2(),
     ProfilePage(),
   ];
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         //leading: IconButton(icon: Icon(Icons.menu),onPressed: () {}),
@@ -53,10 +50,8 @@ class _TestState extends State<HomePage> {
         actions: <Widget>[
           //IconButton(icon: Icon(Icons.search),onPressed: (){})
         ],
-
       ),
       body: WillPopScope(child: _body[_selectedIndex], onWillPop: onWillPop),
-
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         items: <BottomNavigationBarItem>[
@@ -81,9 +76,6 @@ class _TestState extends State<HomePage> {
         //selectedItemColor: Colors.amber[800],
         onTap: _onItemTapped,
       ),
-
     );
-
-
   }
 }
