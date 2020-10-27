@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'bubble.dart';
 import 'function/DatabaseConnect.dart' as db;
 import 'widget/LoadingScreen.dart';
+import 'widget/ProfileImage.dart';
 
 class Message extends StatefulWidget {
   @override
@@ -15,6 +18,7 @@ class Message extends StatefulWidget {
 class _MessageState extends State<Message> {
   bool _loadingIconVisible = true;
   bool _loadingVisible = true;
+  bool _loop = true;
   List _arrayMessage;
   final _messageController = TextEditingController();
   final _scrollController = new ScrollController();
@@ -23,18 +27,33 @@ class _MessageState extends State<Message> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    getData();
+    _getData();
   }
 
-  Future getData() async {
-    db
-        .getMessage(widget.data['sender'], widget.data['receiver'])
-        .then((onValue) {
-      setState(() {
-        _arrayMessage = onValue;
-        _hideLoadingScreen();
+  @override
+  void dispose() {
+    super.dispose();
+    _loop = false;
+  }
+
+  Future _getData() async {
+    while (_loop) {
+      await db
+          .getMessage(widget.data['sender'], widget.data['receiver'])
+          .then((onValue) {
+        if (_arrayMessage == null) {
+          setState(() {
+            _arrayMessage = onValue;
+            _hideLoadingScreen();
+          });
+        } else if (_arrayMessage.length != onValue.length) {
+          setState(() {
+            _arrayMessage = onValue;
+          });
+        }
       });
-    });
+      await Future.delayed(Duration(seconds: 5));
+    }
   }
 
   Future _hideLoadingScreen() async {
@@ -72,34 +91,12 @@ class _MessageState extends State<Message> {
     return Container(
       child: Row(
         children: <Widget>[
-          _profileImage("http://www.breakvoid.com/DoktorSaya/Images/Profiles/" +
-              widget.data['doctor_image']),
+          showSmallIconProfileImage(widget.data['doctor_image']),
           SizedBox(width: 10),
           Flexible(
-            child: Container(
-                child: Text(widget.data['doctor_name'] +
-                    "aaaaaaaaaaaaaaaaaaad aaaaaaaaaaaaaaaad")),
+            child: Container(child: Text(widget.data['doctor_name'])),
           ),
           SizedBox(width: 10),
-        ],
-      ),
-    );
-  }
-
-  Widget _profileImage(String imageUrl) {
-    return Container(
-      width: 50,
-      height: 50,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        image: DecorationImage(fit: BoxFit.fill, image: NetworkImage(imageUrl)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 3,
-            blurRadius: 10,
-            offset: Offset(0, 3), // changes position of shadow
-          ),
         ],
       ),
     );
@@ -159,7 +156,7 @@ class _MessageState extends State<Message> {
             child: new Container(
               margin: new EdgeInsets.symmetric(horizontal: 1.0),
               child: new IconButton(
-                icon: new Icon(Icons.face),
+                icon: new Icon(Icons.face,color: Colors.black),
                 onPressed: () {
                   print(_scrollController);
                   _scrollToEnd();
@@ -171,7 +168,7 @@ class _MessageState extends State<Message> {
           Flexible(
             child: Container(
               child: TextFormField(
-                style: TextStyle(fontSize: 15.0),
+                style: TextStyle(fontSize: 15.0,color: Colors.black, ),
                 decoration: InputDecoration.collapsed(
                   hintText: 'Type a message',
                   hintStyle: TextStyle(color: Colors.grey),
@@ -179,13 +176,14 @@ class _MessageState extends State<Message> {
                 controller: _messageController,
                 onTap: _scrollToEnd,
               ),
+              color: Colors.white,
             ),
           ),
           Material(
             child: new Container(
               margin: new EdgeInsets.symmetric(horizontal: 8.0),
               child: new IconButton(
-                icon: new Icon(Icons.send),
+                icon: new Icon(Icons.send,color: Colors.black,),
                 onPressed: () {
                   if (_messageController.text != "") {
                     db

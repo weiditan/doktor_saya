@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 import 'widget/LoadingScreen.dart';
+import 'widget/ProfileImage.dart';
 import 'function/DatabaseConnect.dart' as db;
 import 'function/DiffDate.dart' as dd;
 import 'function/SharedPreferences.dart' as sp;
@@ -119,7 +120,8 @@ class _DoctorPageState extends State<DoctorPage> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 for (int i = 0; i < _arrayDoctor.length; i++)
-                  _doctorRow(_arrayDoctor[i]),
+                  if (_arrayDoctor[i]['doctor_id'] != _roleId)
+                    _doctorRow(_arrayDoctor[i]),
               ],
             ),
           );
@@ -150,9 +152,7 @@ class _DoctorPageState extends State<DoctorPage> {
                   Row(
                     children: <Widget>[
                       SizedBox(width: 5),
-                      _profileImage(
-                          "http://www.breakvoid.com/DoktorSaya/Images/Profiles/" +
-                              doctor['image']),
+                      showIconProfileImage(doctor['image']),
                       SizedBox(width: 10),
                       SizedBox(
                         width: _screenWidth - 260,
@@ -170,7 +170,8 @@ class _DoctorPageState extends State<DoctorPage> {
                   Column(
                     children: <Widget>[
                       _callButton(),
-                      _messageButton(doctor['doctor_id'], doctor['nickname'], doctor['image']),
+                      _messageButton(doctor['doctor_id'], doctor['nickname'],
+                          doctor['image']),
                     ],
                   ),
                 ],
@@ -204,25 +205,6 @@ class _DoctorPageState extends State<DoctorPage> {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _profileImage(String imageUrl) {
-    return Container(
-      width: 80,
-      height: 80,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        image: DecorationImage(fit: BoxFit.fill, image: NetworkImage(imageUrl)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 3,
-            blurRadius: 10,
-            offset: Offset(0, 3), // changes position of shadow
-          ),
-        ],
       ),
     );
   }
