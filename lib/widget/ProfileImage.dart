@@ -18,14 +18,14 @@ Widget showProfileImage(String profileImage, double maxWidth) {
       : _profileImage(maxWidth, profileImage);
 }
 
-Widget _noProfileImage(double maxWidth) {
+Widget _noProfileImage(double width) {
   return Column(
     children: <Widget>[
       Padding(
         padding: EdgeInsets.only(top: 20, bottom: 20),
         child: Icon(
           Icons.account_circle,
-          size: maxWidth * 0.7,
+          size: width * 0.7,
           color: Colors.grey,
         ),
       ),
@@ -36,10 +36,10 @@ Widget _noProfileImage(double maxWidth) {
   );
 }
 
-Widget _profileImage(double maxWidth, String image) {
+Widget _profileImage(double width, String image) {
   return Container(
-    width: maxWidth,
-    height: maxWidth,
+    width: width,
+    height: width,
     decoration: BoxDecoration(
       shape: BoxShape.rectangle,
       image: DecorationImage(
