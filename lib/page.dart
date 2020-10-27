@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'function/DatabaseConnect.dart' as db;
 import 'function/SharedPreferences.dart' as sp;
 import 'widget/LoadingScreen.dart';
+import 'widget/ProfileImage.dart';
 
 class Page123 extends StatefulWidget {
   final Map data;
@@ -25,17 +26,35 @@ class _Page123State extends State<Page123> {
     super.initState();
 
     getData().then((_) {
-      setState(() {
-        _hideLoadingScreen();
-      });
+      _refresh();
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _loop = false;
   }
 
   Future getData() async {
     _roleId = await sp.getRoleId();
     _arrayDoctor = await db.getMessageList(_roleId);
 
-    print(_arrayDoctor);
+    setState(() {
+      _hideLoadingScreen();
+    });
+  }
+
+  Future _refresh() async {
+    while (_loop) {
+      await db.getMessageList(_roleId).then((onValue) {
+        setState(() {
+          _arrayDoctor = onValue;
+        });
+      });
+
+      await Future.delayed(Duration(seconds: 5));
+    }
   }
 
   Future _hideLoadingScreen() async {
@@ -74,81 +93,75 @@ class _Page123State extends State<Page123> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                SizedBox(height: 10,),
+                SizedBox(
+                  height: 10,
+                ),
                 for (int i = 0; i < _arrayDoctor.length; i++)
-                  _messageRow(_arrayDoctor[i]['nickname'],_arrayDoctor[i]['image'],_arrayDoctor[i]['message'])
+                  _messageRow(_arrayDoctor[i]['doctor_id'],_arrayDoctor[i]['nickname'],
+                      _arrayDoctor[i]['image'], _arrayDoctor[i]['message'])
               ],
             ),
           );
   }
 
-  Widget _messageRow(String name, String image, String message) {
-    return Padding(
-      padding: EdgeInsets.only(left: 10, right: 10,top: 5),
-      child: Column(
-        children: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Container(
-                    width: 65,
-                    height: 65,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.rectangle,
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                      image: DecorationImage(
-                          fit: BoxFit.fill,
-                          image: NetworkImage(
-                              "http://www.breakvoid.com/DoktorSaya/Images/Profiles/" + image)),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.5),
-                          spreadRadius: 3,
-                          blurRadius: 10,
-                          offset: Offset(0, 3), // changes position of shadow
+  Widget _messageRow(String doctorId, String name, String image, String message) {
+    return InkWell(
+      onTap: () {
+        Navigator.pushNamed(context, '/Message', arguments: {
+          'sender': _roleId,
+          'receiver': doctorId,
+          'doctor_name': name,
+          'doctor_image': image
+        });
+      },
+      child: Padding(
+        padding: EdgeInsets.only(left: 10, right: 10, top: 5),
+        child: Column(
+          children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    showIconProfileImage(image,65),
+                    SizedBox(
+                      width: 15,
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          name,
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontFamily: "Montserrat",
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Text(
+                          message,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: "Montserrat",
+                          ),
                         ),
                       ],
                     ),
-                  ),
-                  SizedBox(
-                    width: 15,
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        name,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontFamily: "Montserrat",
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Text(
-                        message,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontFamily: "Montserrat",
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ],
-          ),
-          Padding(
-            padding: EdgeInsets.only(left: 80),
-            child:  Divider(
-              thickness: 1,
+                  ],
+                ),
+              ],
             ),
-          )
-        ],
+            Padding(
+              padding: EdgeInsets.only(left: 80),
+              child: Divider(
+                thickness: 1,
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

@@ -6,10 +6,10 @@ Widget showSmallIconProfileImage(String profileImage) {
       : _circleProfileImage(50, profileImage);
 }
 
-Widget showIconProfileImage(String profileImage) {
+Widget showIconProfileImage(String profileImage, double width) {
   return (profileImage == "")
-      ? _noCircleProfileImage(80)
-      : _circleProfileImage(80, profileImage);
+      ? _noCircleProfileImage(width)
+      : _circleProfileImage(width, profileImage);
 }
 
 Widget showProfileImage(String profileImage, double maxWidth) {
@@ -65,6 +65,7 @@ Widget _noCircleProfileImage(double width) {
     height: width,
     decoration: BoxDecoration(
       shape: BoxShape.circle,
+      image: DecorationImage(fit: BoxFit.fill, image: AssetImage("assets/account_circle_grey.png")),
       boxShadow: [
         BoxShadow(
           color: Colors.grey.withOpacity(0.5),
@@ -73,11 +74,6 @@ Widget _noCircleProfileImage(double width) {
           offset: Offset(0, 3), // changes position of shadow
         ),
       ],
-    ),
-    child: Icon(
-      Icons.account_circle,
-      size: width,
-      color: Colors.grey,
     ),
   );
 }
