@@ -23,11 +23,8 @@ class _Page123State extends State<Page123> {
 
   Future getData() async {
     await db
-        .getMessage(widget.data['sender'], widget.data['receiver'])
-        .then((onValue) {
-      setState(() {
-        _arrayMessage = onValue;
-      });
+        .getMessageList("d8").then((onValue){
+          print(onValue);
     });
   }
 

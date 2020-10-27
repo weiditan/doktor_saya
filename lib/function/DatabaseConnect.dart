@@ -243,3 +243,20 @@ Future<Map> addTextMessage(
 
   return data;
 }
+
+Future<List> getMessageList(String roleId) async {
+  var url = 'http://www.breakvoid.com/DoktorSaya/Message.php';
+  http.Response response = await retry(
+    // Make a GET request
+        () => http.post(url, body: {
+      'action': 'getlist',
+      'role_id': roleId,
+    }).timeout(Duration(seconds: 5)),
+    // Retry on SocketException or TimeoutException
+    retryIf: (e) => e is SocketException || e is TimeoutException,
+  );
+
+  List data = jsonDecode(response.body);
+
+  return data;
+}
