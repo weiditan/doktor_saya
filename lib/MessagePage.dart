@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import 'function/DatabaseConnect.dart' as db;
 import 'function/SharedPreferences.dart' as sp;
 import 'widget/LoadingScreen.dart';
 import 'widget/ProfileImage.dart';
 
-class Page123 extends StatefulWidget {
-  final Map data;
-  Page123(this.data);
-
+class MessagePage extends StatefulWidget {
   @override
-  _Page123State createState() => _Page123State();
+  _MessagePageState createState() => _MessagePageState();
 }
 
-class _Page123State extends State<Page123> {
+class _MessagePageState extends State<MessagePage> {
   String _roleId;
   bool _loadingIconVisible = true;
   bool _loadingVisible = true;
@@ -52,7 +50,6 @@ class _Page123State extends State<Page123> {
           _arrayDoctor = onValue;
         });
       });
-
       await Future.delayed(Duration(seconds: 5));
     }
   }
@@ -97,14 +94,20 @@ class _Page123State extends State<Page123> {
                   height: 10,
                 ),
                 for (int i = 0; i < _arrayDoctor.length; i++)
-                  _messageRow(_arrayDoctor[i]['doctor_id'],_arrayDoctor[i]['nickname'],
-                      _arrayDoctor[i]['image'], _arrayDoctor[i]['message'])
+                  _messageRow(
+                      _arrayDoctor[i]['doctor_id'],
+                      _arrayDoctor[i]['nickname'],
+                      _arrayDoctor[i]['image'],
+                      _arrayDoctor[i]['message'],
+                      _arrayDoctor[i]['sendtime'],
+                      _arrayDoctor[i]['unread']),
               ],
             ),
           );
   }
 
-  Widget _messageRow(String doctorId, String name, String image, String message) {
+  Widget _messageRow(String doctorId, String name, String image, String message,
+      String sendTime, String unread) {
     return InkWell(
       onTap: () {
         Navigator.pushNamed(context, '/Message', arguments: {
@@ -119,15 +122,15 @@ class _Page123State extends State<Page123> {
         child: Column(
           children: <Widget>[
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    showIconProfileImage(image,65),
-                    SizedBox(
-                      width: 15,
-                    ),
-                    Column(
+                showIconProfileImage(image, 65),
+                SizedBox(
+                  width: 15,
+                ),
+                Flexible(
+                  child: Container(
+                    width: double.infinity,
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Text(
@@ -143,6 +146,7 @@ class _Page123State extends State<Page123> {
                         ),
                         Text(
                           message,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 16,
                             fontFamily: "Montserrat",
@@ -150,7 +154,33 @@ class _Page123State extends State<Page123> {
                         ),
                       ],
                     ),
-                  ],
+                  ),
+                ),
+                SizedBox(
+                  width: 90,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Text(_outputDate(sendTime)),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      (unread != "0")
+                          ? Container(
+                              width: 25,
+                              height: 25,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.red,
+                              ),
+                              child: Center(
+                                child: (int.parse(unread) < 100)
+                                    ? Text(unread)
+                                    : Text("..."),
+                              ))
+                          : Text(""),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -164,5 +194,18 @@ class _Page123State extends State<Page123> {
         ),
       ),
     );
+  }
+
+  String _outputDate(String sendTime) {
+    DateTime _today = DateTime.now();
+    DateTime _sendTime = DateTime.parse(sendTime);
+
+    return (DateFormat('MMM d, yyyy').format(_today) !=
+            DateFormat('MMM d, yyyy').format(_sendTime))
+        ? (DateFormat('MMM d, yyyy').format(_today.add(Duration(days: -1))) !=
+                DateFormat('MMM d, yyyy').format(_sendTime))
+            ? DateFormat('MMM d, yyyy').format(_sendTime)
+            : "Semalam"
+        : "Hari ini";
   }
 }

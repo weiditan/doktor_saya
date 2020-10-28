@@ -1,11 +1,6 @@
 import 'package:doktorsaya/DoctorPage.dart';
-import 'package:doktorsaya/EditDoctorPage.dart';
-import 'package:doktorsaya/EditProfilePage.dart';
-import 'package:doktorsaya/page.dart';
-import 'package:doktorsaya/page0.dart';
+import 'package:doktorsaya/MessagePage.dart';
 import 'package:doktorsaya/page1.dart';
-import 'package:doktorsaya/page2.dart';
-import 'package:doktorsaya/page3.dart';
 import 'package:doktorsaya/ProfilePage.dart';
 import 'package:flutter/material.dart';
 
@@ -28,13 +23,8 @@ class _TestState extends State<HomePage> {
   }
 
   List<Widget> _body = [
-Page123({
-  'sender': 'd8',
-  'receiver': 'd10',
-  'doctor_name': 'doctorName',
-  'doctor_image': 'doctorImage'
-}),
-    Page0(),
+    MessagePage(),
+    Page1(),
     DoctorPage(),
     ProfilePage(),
   ];
