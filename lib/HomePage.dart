@@ -1,4 +1,5 @@
 import 'package:doktorsaya/DoctorPage.dart';
+import 'package:doktorsaya/page1.dart';
 import 'package:doktorsaya/pages/message/MessagePage.dart';
 import 'package:doktorsaya/ProfilePage.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +9,6 @@ import 'pages/call/ConfirmCallPage.dart';
 import 'databases/OnlineStatusDatabase.dart';
 import 'functions/ExitWithDoubleBack.dart';
 import 'functions/SharedPreferences.dart' as sp;
-
 
 class HomePage extends StatefulWidget {
   @override
@@ -22,7 +22,7 @@ class _TestState extends State<HomePage> {
 
   List<Widget> _body = [
     MessagePage(),
-    ConfirmCall(),
+    Page1(),
     DoctorPage(),
     ProfilePage(),
   ];
@@ -30,7 +30,7 @@ class _TestState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _updateOnlineStatus().then((_){
+    _updateOnlineStatus().then((_) {
       _checkCall();
     });
   }
@@ -46,10 +46,22 @@ class _TestState extends State<HomePage> {
   }
 
   Future _checkCall() async {
+    bool _showConfirmCallPage = false;
+
     if (_role == 'doctor') {
-      while(true){
-        await checkCall(_roleId).then((onValue){
-          print(onValue);
+      while (true) {
+        await checkCall(_roleId).then((s) {
+          if (s['status'] == true) {
+            if (_showConfirmCallPage == false) {
+              _showConfirmCallPage = true;
+              Navigator.pushNamed(context, '/ConfirmCallPage', arguments: s);
+            }
+            print(s);
+          } else {
+            _showConfirmCallPage = false;
+            print(_showConfirmCallPage);
+            print(s);
+          }
         });
         await Future.delayed(Duration(seconds: 5));
       }

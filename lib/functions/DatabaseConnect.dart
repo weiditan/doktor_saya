@@ -123,12 +123,12 @@ Future<Map> getWorkplace(String roleId) async {
   return data;
 }
 
-Future<Map> getUserDetail(String roleId, String role) async {
+Future<Map> getUserDetail(String roleId) async {
   var url = 'http://www.breakvoid.com/DoktorSaya/ViewUserDetail.php';
   http.Response response = await retry(
     // Make a GET request
     () => http.post(url,
-        body: {'role_id': roleId, 'role': role}).timeout(Duration(seconds: 5)),
+        body: {'role_id': roleId}).timeout(Duration(seconds: 5)),
     // Retry on SocketException or TimeoutException
     retryIf: (e) => e is SocketException || e is TimeoutException,
   );

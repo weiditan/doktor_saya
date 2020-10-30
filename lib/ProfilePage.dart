@@ -49,7 +49,7 @@ class _ProfilePageState extends State<ProfilePage> {
     ]);
 
     await Future.wait([
-      db.getUserDetail(_roleId, _role).then((onValue) {
+      db.getUserDetail(_roleId).then((onValue) {
         _userData = onValue;
       }),
       db.getDoctorSpecialist(_roleId).then((onValue) {

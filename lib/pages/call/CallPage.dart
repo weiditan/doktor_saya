@@ -11,7 +11,7 @@ import 'settings.dart';
 
 class CallPage extends StatefulWidget {
   /// non-modifiable channel name of the page
-  final String roleId, doctorId, doctorName, doctorImage, callId;
+  final String channelName, doctorName, doctorImage, callId;
 
   /// non-modifiable client role of the page
   final ClientRole role;
@@ -19,8 +19,7 @@ class CallPage extends StatefulWidget {
   /// Creates a call page with given channel name.
   const CallPage(
       {Key key,
-      this.roleId,
-      this.doctorId,
+      this.channelName,
       this.doctorName,
       this.doctorImage,
       this.callId,
@@ -72,7 +71,7 @@ class _CallPageState extends State<CallPage> {
     VideoEncoderConfiguration configuration = VideoEncoderConfiguration();
     configuration.dimensions = VideoDimensions(1920, 1080);
     await _engine.setVideoEncoderConfiguration(configuration);
-    await _engine.joinChannel(Token, widget.roleId, null, 0);
+    await _engine.joinChannel(Token, widget.channelName, null, 0);
   }
 
   /// Create agora sdk instance and initialize
@@ -153,46 +152,49 @@ class _CallPageState extends State<CallPage> {
         return Stack(
           alignment: Alignment.topRight,
           children: <Widget>[
-            Container(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    showIconProfileImage(widget.doctorImage, 100),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Container(
-                      child: Row(
+            (widget.doctorName == "")
+                ? Container()
+                : Container(
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
+                          showIconProfileImage(widget.doctorImage, 100),
                           SizedBox(
-                            width: 20,
+                            height: 20,
                           ),
-                          Flexible(
-                            child: Container(
-                              width: double.infinity,
-                              child: Text(
-                                "Dr zxcz" +
-                                    widget.doctorName +
-                                    "asdsdahj agdbjhh dgha kdadk adas d",
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                    fontSize: 26, fontWeight: FontWeight.bold),
-                              ),
+                          Container(
+                            child: Row(
+                              children: <Widget>[
+                                SizedBox(
+                                  width: 20,
+                                ),
+                                Flexible(
+                                  child: Container(
+                                    width: double.infinity,
+                                    child: Center(
+                                      child: Text(
+                                        "Dr " + widget.doctorName,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                            fontSize: 26,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 20,
+                                )
+                              ],
                             ),
+                            width: double.infinity,
+                            height: 50.0,
                           ),
-                          SizedBox(
-                            width: 20,
-                          )
                         ],
                       ),
-                      width: double.infinity,
-                      height: 50.0,
                     ),
-                  ],
-                ),
-              ),
-            ),
+                  ),
             Padding(
               padding: EdgeInsets.all(20),
               child: Container(

@@ -1,39 +1,112 @@
-import 'package:doktorsaya/WritePrescription.dart';
+import 'package:doktorsaya/functions/DatabaseConnect.dart';
+import 'package:doktorsaya/pages/call/CallFunction.dart';
+import 'package:doktorsaya/widget/LoadingScreen.dart';
+import 'package:doktorsaya/widget/ProfileImage.dart';
 import 'package:flutter/material.dart';
 
-class ConfirmCall extends StatefulWidget {
+class ConfirmCallPage extends StatefulWidget {
   @override
-  _ConfirmCallState createState() => _ConfirmCallState();
+  _ConfirmCallPageState createState() => _ConfirmCallPageState();
+  final Map arguments;
+  const ConfirmCallPage(this.arguments);
 }
 
-class _ConfirmCallState extends State<ConfirmCall> {
-  bool _isVisible = true;
+class _ConfirmCallPageState extends State<ConfirmCallPage> {
+  bool _loadingVisible = true;
+  bool _loadingIconVisible = true;
+  Map _userData;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _getData().then((_) {
+      setState(() {
+        _hideLoadingScreen();
+      });
+    });
+  }
+
+  Future _getData() async {
+    _userData = await getUserDetail(widget.arguments['caller']);
+  }
+
+  Future _hideLoadingScreen() async {
+    setState(() {
+      _loadingIconVisible = false;
+    });
+    await Future.delayed(Duration(milliseconds: 500));
+    setState(() {
+      _loadingVisible = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: AnimatedCrossFade(
-          // If the widget is visible, animate to 0.0 (invisible).
-          // If the widget is hidden, animate to 1.0 (fully visible).
-          crossFadeState:
-              _isVisible ? CrossFadeState.showFirst : CrossFadeState.showSecond,
-          firstCurve: Curves.easeOut,
-          secondCurve: Curves.easeIn,
-          duration: Duration(milliseconds: 500),
-          firstChild: _waiting(),
-          secondChild: _calling()),
+        // If the widget is visible, animate to 0.0 (invisible).
+        // If the widget is hidden, animate to 1.0 (fully visible).
+        crossFadeState: _loadingVisible
+            ? CrossFadeState.showFirst
+            : CrossFadeState.showSecond,
+        firstCurve: Curves.easeOut,
+        secondCurve: Curves.easeIn,
+        duration: Duration(milliseconds: 500),
+        firstChild: loadingScreen(_loadingIconVisible),
+        secondChild: (_userData != null) ? _secondScreen() : Container(),
+      ),
     );
   }
 
-  Widget _waiting() {
+  Widget _secondScreen() {
     return Container(
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
-            Text(
-              "Aiman",
-              style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold),
+            Container(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    showIconProfileImage(_userData['image'], 100),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Container(
+                      child: Row(
+                        children: <Widget>[
+                          SizedBox(
+                            width: 20,
+                          ),
+                          Flexible(
+                            child: Container(
+                              width: double.infinity,
+                              child: Center(
+                                child: Text(
+                                  (widget.arguments['caller'][0] == "d")
+                                      ? "Dr " + _userData['nickname']
+                                      : _userData['nickname'],
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                      fontSize: 26,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            width: 20,
+                          )
+                        ],
+                      ),
+                      width: double.infinity,
+                      height: 50.0,
+                    ),
+                  ],
+                ),
+              ),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -47,43 +120,6 @@ class _ConfirmCallState extends State<ConfirmCall> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _calling() {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          image: NetworkImage(
-              "http://www.breakvoid.com/doktorsaya/images/call.png"),
-          fit: BoxFit.cover,
-        ),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          SizedBox(
-            width: 60,
-            height: 60,
-            child: RaisedButton(
-              color: Colors.red,
-              shape: CircleBorder(),
-              child: Icon(Icons.call_end),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => WritePrescription()),
-                );
-              },
-            ),
-          ),
-          SizedBox(
-            height: 50,
-          ),
-        ],
       ),
     );
   }
@@ -112,9 +148,7 @@ class _ConfirmCallState extends State<ConfirmCall> {
         shape: CircleBorder(),
         child: Icon(Icons.call),
         onPressed: () {
-          setState(() {
-            _isVisible = false;
-          });
+          acceptCall(context, widget.arguments['call_id'], widget.arguments['caller']);
         },
       ),
     );

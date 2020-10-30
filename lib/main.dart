@@ -1,3 +1,4 @@
+import 'package:doktorsaya/pages/call/ConfirmCallPage.dart';
 import 'package:doktorsaya/pages/message/Message.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
@@ -110,6 +111,14 @@ class MyApp extends StatelessWidget {
             return PageTransition(
               child: Message(settings.arguments),
               type: PageTransitionType.rightToLeft,
+              settings: settings,
+            );
+            break;
+
+          case '/ConfirmCallPage':
+            return PageTransition(
+              child: ConfirmCallPage(settings.arguments),
+              type: PageTransitionType.fade,
               settings: settings,
             );
             break;

@@ -25,8 +25,7 @@ Future<void> callDoctor(BuildContext context, String roleId, String doctorId,
         context,
         MaterialPageRoute(
           builder: (context) => CallPage(
-            roleId: roleId,
-            doctorId: doctorId,
+            channelName: roleId,
             doctorName: doctorName,
             doctorImage: doctorImage,
             callId: _callId,
@@ -39,6 +38,26 @@ Future<void> callDoctor(BuildContext context, String roleId, String doctorId,
       pr.warning("Doktor luar talian !");
     }
   });
+}
+
+Future<void> acceptCall(
+    BuildContext context, String callId, String callerId) async {
+  // await for camera and mic permissions before pushing video page
+  await _handleCameraAndMic();
+
+  // push video page with given channel name
+  await Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(
+      builder: (context) => CallPage(
+        channelName: callerId,
+        doctorName: "",
+        doctorImage: "",
+        callId: callId,
+        role: ClientRole.Broadcaster,
+      ),
+    ),
+  );
 }
 
 Future<void> _handleCameraAndMic() async {
