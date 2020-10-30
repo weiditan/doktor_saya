@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'function/DatabaseConnect.dart' as db;
-import 'function/SharedPreferences.dart' as sp;
+import 'functions/DatabaseConnect.dart' as db;
+import 'functions/SharedPreferences.dart' as sp;
 import 'widget/DoctorExperience.dart';
 import 'widget/DoctorSpecialist.dart';
 import 'widget/DoctorWorkplace.dart';

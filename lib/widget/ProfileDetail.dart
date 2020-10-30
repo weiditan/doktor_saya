@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../function/Text.dart' as tx;
+import '../functions/Text.dart' as tx;
 
 Widget showProfileDetail(String role, Map userData){
   return Column(

@@ -1,5 +1,8 @@
+import 'package:doktorsaya/databases/OnlineStatusDatabase.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'SharedPreferences.dart' as sp;
+
 
 DateTime currentBackPressTime;
 
@@ -15,6 +18,16 @@ Future<bool> onWillPop() {
     );
     return Future.value(false);
   }
+  _updateOfflineStatus();
   return Future.value(true);
 }
 
+Future _updateOfflineStatus() async {
+  String _role = await sp.getRole();
+
+  if (_role == 'doctor') {
+    String _roleId = await sp.getRoleId();
+
+    await updateDoctorStatus(_roleId, "offline");
+  }
+}

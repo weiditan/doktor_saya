@@ -1,10 +1,14 @@
 import 'package:doktorsaya/DoctorPage.dart';
-import 'package:doktorsaya/MessagePage.dart';
-import 'package:doktorsaya/page1.dart';
+import 'package:doktorsaya/pages/message/MessagePage.dart';
 import 'package:doktorsaya/ProfilePage.dart';
 import 'package:flutter/material.dart';
 
-import 'function/ExitWithDoubleBack.dart';
+import 'databases/CallDatabase.dart';
+import 'pages/call/ConfirmCallPage.dart';
+import 'databases/OnlineStatusDatabase.dart';
+import 'functions/ExitWithDoubleBack.dart';
+import 'functions/SharedPreferences.dart' as sp;
+
 
 class HomePage extends StatefulWidget {
   @override
@@ -12,22 +16,45 @@ class HomePage extends StatefulWidget {
 }
 
 class _TestState extends State<HomePage> {
+  String _role, _roleId;
   int _selectedIndex = 2;
-
   var _arrayTitle = ['Mesej', 'Panggilan', 'Doktor', 'Profil'];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
 
   List<Widget> _body = [
     MessagePage(),
-    Page1(),
+    ConfirmCall(),
     DoctorPage(),
     ProfilePage(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _updateOnlineStatus().then((_){
+      _checkCall();
+    });
+  }
+
+  Future _updateOnlineStatus() async {
+    _role = await sp.getRole();
+
+    if (_role == 'doctor') {
+      _roleId = await sp.getRoleId();
+
+      await updateDoctorStatus(_roleId, "online");
+    }
+  }
+
+  Future _checkCall() async {
+    if (_role == 'doctor') {
+      while(true){
+        await checkCall(_roleId).then((onValue){
+          print(onValue);
+        });
+        await Future.delayed(Duration(seconds: 5));
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,5 +94,11 @@ class _TestState extends State<HomePage> {
         onTap: _onItemTapped,
       ),
     );
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
   }
 }

@@ -6,9 +6,9 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:retry/retry.dart';
 
-import 'function/Encrypt.dart' as ef;
-import 'function/SharedPreferences.dart' as sp;
-import 'function/ProgressDialog.dart' as pr;
+import 'functions/Encrypt.dart' as ef;
+import 'functions/SharedPreferences.dart' as sp;
+import 'functions/ProgressDialog.dart' as pr;
 
 class LoginPage extends StatefulWidget {
   @override

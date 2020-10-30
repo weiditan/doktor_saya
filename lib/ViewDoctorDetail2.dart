@@ -1,7 +1,7 @@
-import 'package:doktorsaya/Call.dart';
+
 import 'package:flutter/material.dart';
 
-import 'Message.dart';
+import 'pages/message/Message.dart';
 
 
 class ViewDoctorDetail2 extends StatelessWidget {
@@ -226,10 +226,7 @@ class ViewDoctorDetail2 extends StatelessWidget {
           ],
         ),
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => Call()),
-          );
+
         },
       ),
     );

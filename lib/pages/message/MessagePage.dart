@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import 'function/DatabaseConnect.dart' as db;
-import 'function/SharedPreferences.dart' as sp;
-import 'widget/LoadingScreen.dart';
-import 'widget/ProfileImage.dart';
+import '../../functions/DatabaseConnect.dart' as db;
+import '../../functions/SharedPreferences.dart' as sp;
+import '../../widget/LoadingScreen.dart';
+import '../../widget/ProfileImage.dart';
 
 class MessagePage extends StatefulWidget {
   @override
@@ -20,7 +20,6 @@ class _MessagePageState extends State<MessagePage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     getData().then((_) {
@@ -37,7 +36,6 @@ class _MessagePageState extends State<MessagePage> {
   Future getData() async {
     _roleId = await sp.getRoleId();
     _arrayDoctor = await db.getMessageList(_roleId);
-
     setState(() {
       _hideLoadingScreen();
     });
@@ -96,7 +94,8 @@ class _MessagePageState extends State<MessagePage> {
                 for (int i = 0; i < _arrayDoctor.length; i++)
                   _messageRow(
                       _arrayDoctor[i]['doctor_id'],
-                      _arrayDoctor[i]['nickname'],
+                      (_arrayDoctor[i]['doctor_id'][0]=="d")?
+                      "Dr "+_arrayDoctor[i]['nickname']:_arrayDoctor[i]['nickname'],
                       _arrayDoctor[i]['image'],
                       _arrayDoctor[i]['message'],
                       _arrayDoctor[i]['sendtime'],

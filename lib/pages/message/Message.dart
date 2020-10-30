@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'bubble.dart';
-import 'function/DatabaseConnect.dart' as db;
-import 'widget/LoadingScreen.dart';
-import 'widget/ProfileImage.dart';
+import 'package:doktorsaya/functions/bubble.dart';
+import 'package:doktorsaya/functions/DatabaseConnect.dart' as db;
+import 'package:doktorsaya/widget/LoadingScreen.dart';
+import 'package:doktorsaya/widget/ProfileImage.dart';
 
 class Message extends StatefulWidget {
   @override
@@ -25,7 +25,6 @@ class _MessageState extends State<Message> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _getData();
   }

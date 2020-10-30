@@ -6,8 +6,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:retry/retry.dart';
 
-import 'function/Encrypt.dart' as ef;
-import 'function/ProgressDialog.dart' as pr;
+import 'functions/Encrypt.dart' as ef;
+import 'functions/ProgressDialog.dart' as pr;
 
 class RegisterPage2 extends StatefulWidget {
   @override

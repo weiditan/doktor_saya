@@ -2,10 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import 'function/ProgressDialog.dart' as pr;
-import 'function/SharedPreferences.dart' as sp;
-import 'function/Text.dart' as tx;
-import 'function/DatabaseConnect.dart' as db;
+import 'functions/ProgressDialog.dart' as pr;
+import 'functions/SharedPreferences.dart' as sp;
+import 'functions/Text.dart' as tx;
+import 'functions/DatabaseConnect.dart' as db;
 import 'widget/LoadingScreen.dart' as ls;
 
 class EditDoctorPage extends StatefulWidget {

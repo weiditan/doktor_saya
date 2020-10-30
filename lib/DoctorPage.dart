@@ -1,14 +1,15 @@
 import 'dart:async';
 
+import 'package:doktorsaya/pages/call/CallFunction.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 import 'widget/LoadingScreen.dart';
 import 'widget/ProfileImage.dart';
-import 'function/DatabaseConnect.dart' as db;
-import 'function/DiffDate.dart' as dd;
-import 'function/SharedPreferences.dart' as sp;
+import 'functions/DatabaseConnect.dart' as db;
+import 'functions/DiffDate.dart' as dd;
+import 'functions/SharedPreferences.dart' as sp;
 
 class DoctorPage extends StatefulWidget {
   @override
@@ -152,7 +153,7 @@ class _DoctorPageState extends State<DoctorPage> {
                   Row(
                     children: <Widget>[
                       SizedBox(width: 5),
-                      showIconProfileImage(doctor['image'],80),
+                      showIconProfileImage(doctor['image'], 80),
                       SizedBox(width: 10),
                       SizedBox(
                         width: _screenWidth - 260,
@@ -169,7 +170,8 @@ class _DoctorPageState extends State<DoctorPage> {
                   ),
                   Column(
                     children: <Widget>[
-                      _callButton(),
+                      _callButton(doctor['doctor_id'], doctor['nickname'],
+                          doctor['image']),
                       _messageButton(doctor['doctor_id'], doctor['nickname'],
                           doctor['image']),
                     ],
@@ -209,7 +211,7 @@ class _DoctorPageState extends State<DoctorPage> {
     );
   }
 
-  Widget _callButton() {
+  Widget _callButton(String doctorId, String doctorName, String doctorImage) {
     return SizedBox(
       width: 110,
       child: RaisedButton(
@@ -232,7 +234,9 @@ class _DoctorPageState extends State<DoctorPage> {
             ),
           ],
         ),
-        onPressed: () {},
+        onPressed: () {
+          callDoctor(context, _roleId, doctorId, doctorName, doctorImage);
+        },
       ),
     );
   }

@@ -1,4 +1,4 @@
-import 'package:doktorsaya/Message.dart';
+import 'package:doktorsaya/pages/message/Message.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 
