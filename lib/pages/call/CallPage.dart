@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:agora_rtc_engine/rtc_local_view.dart' as RtcLocalView;
 import 'package:agora_rtc_engine/rtc_remote_view.dart' as RtcRemoteView;
-import 'package:doktorsaya/databases/CallDatabase.dart';
+import 'package:doktorsaya/pages/call/ext/callDatabase.dart';
 import 'package:doktorsaya/widget/ProfileImage.dart';
 import 'package:flutter/material.dart';
 
-import 'settings.dart';
+import 'ext/settings.dart';
 
 class CallPage extends StatefulWidget {
   /// non-modifiable channel name of the page
@@ -34,6 +34,7 @@ class _CallPageState extends State<CallPage> {
   final _users = <int>[];
   final _infoStrings = <String>[];
   bool muted = false;
+  bool _loop = true;
   RtcEngine _engine;
 
   @override
@@ -43,7 +44,7 @@ class _CallPageState extends State<CallPage> {
     // destroy sdk
     _engine.leaveChannel();
     _engine.destroy();
-    endCall(widget.callId);
+    _loop = false;
     super.dispose();
   }
 
@@ -52,7 +53,20 @@ class _CallPageState extends State<CallPage> {
     super.initState();
     // initialize agora sdk
     initialize();
+    _checkEndCall();
   }
+
+  Future _checkEndCall() async {
+    while (_loop) {
+      await checkEndCall(widget.callId).then((s){
+        if(s['status']){
+          Navigator.pop(context);
+        }
+      });
+      await Future.delayed(Duration(seconds: 1));
+    }
+  }
+
 
   Future<void> initialize() async {
     if (APP_ID.isEmpty) {
@@ -355,6 +369,7 @@ class _CallPageState extends State<CallPage> {
   }
 
   void _onCallEnd(BuildContext context) {
+    endCall(widget.callId);
     Navigator.pop(context);
   }
 

@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import 'package:doktorsaya/databases/CallDatabase.dart';
-import 'package:doktorsaya/databases/OnlineStatusDatabase.dart';
+import 'package:doktorsaya/pages/call/ext/callDatabase.dart';
+import 'package:doktorsaya/databases/DoctorOnlineStatusDatabase.dart';
 import 'package:doktorsaya/functions/ProgressDialog.dart' as pr;
 
-import 'CallPage.dart';
+import '../CallPage.dart';
 
 Future<void> callDoctor(BuildContext context, String roleId, String doctorId,
     String doctorName, String doctorImage) async {

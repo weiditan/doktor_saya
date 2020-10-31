@@ -1,5 +1,6 @@
+import 'package:doktorsaya/pages/call/ext/callDatabase.dart';
 import 'package:doktorsaya/functions/DatabaseConnect.dart';
-import 'package:doktorsaya/pages/call/CallFunction.dart';
+import 'package:doktorsaya/pages/call/ext/callFunction.dart';
 import 'package:doktorsaya/widget/LoadingScreen.dart';
 import 'package:doktorsaya/widget/ProfileImage.dart';
 import 'package:flutter/material.dart';
@@ -133,6 +134,7 @@ class _ConfirmCallPageState extends State<ConfirmCallPage> {
         shape: CircleBorder(),
         child: Icon(Icons.call_end),
         onPressed: () {
+          endCall(widget.arguments['call_id']);
           Navigator.pop(context);
         },
       ),

@@ -6,12 +6,12 @@ import 'package:page_transition/page_transition.dart';
 import 'EditDoctorPage.dart';
 import 'EditProfilePage.dart';
 import 'HomePage.dart';
-import 'RegisterPage1.dart';
-import 'RegisterPage2.dart';
+import 'pages/account/RegisterPage1.dart';
+import 'pages/account/RegisterPage2.dart';
 import 'RolePage.dart';
 import 'ViewDoctorDetail.dart';
-import 'WelcomePage.dart';
-import 'LoginPage.dart';
+import 'pages/WelcomePage.dart';
+import 'pages/account/LoginPage.dart';
 
 void main() => runApp(MyApp());
 

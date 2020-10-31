@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'dart:io';
-import 'dart:async';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:retry/retry.dart';
 
-import 'functions/Encrypt.dart' as ef;
-import 'functions/ProgressDialog.dart' as pr;
+import 'ext/accountDatabase.dart';
+import '../../functions/ProgressDialog.dart' as pr;
+import 'ext/verificationEmailDatabase.dart';
 
 class RegisterPage2 extends StatefulWidget {
   @override
@@ -290,7 +286,7 @@ class _RegisterPage2State extends State<RegisterPage2> {
           if (_formKey.currentState.validate()) {
             await pr.show(context,"Memuatkan");
 
-            _checkCode(_email, _codeController.text)
+            checkRegisterCode(_email, _codeController.text)
                 .timeout(new Duration(seconds: 15))
                 .then((s) async {
               if (s["status"]) {
@@ -302,7 +298,7 @@ class _RegisterPage2State extends State<RegisterPage2> {
                 await pr.error(s["data"]);
               }
             }).catchError((e) async {
-              await pr.hide();
+              await pr.warning("Sila cuba lagi !");
               print(e);
             });
           }
@@ -335,7 +331,7 @@ class _RegisterPage2State extends State<RegisterPage2> {
           if (_formKey2.currentState.validate()) {
             await pr.show(context,"Memuatkan");
 
-            _registerAccount(_email, _password1Controller.text)
+            registerAccount(_email, _password1Controller.text)
                 .timeout(new Duration(seconds: 15))
                 .then((s) async {
               if (s["status"]) {
@@ -345,44 +341,12 @@ class _RegisterPage2State extends State<RegisterPage2> {
                 await pr.error(s["data"]);
               }
             }).catchError((e) async {
-              await pr.hide();
+              await pr.warning("Sila cuba lagi !");
               print(e);
             });
           }
         },
       ),
     );
-  }
-
-  Future<Map> _checkCode(_email, _code) async {
-    var url = 'http://www.breakvoid.com/DoktorSaya/CheckCode.php';
-    http.Response response = await retry(
-      // Make a GET request
-      () => http.post(url,
-          body: {'email': _email, 'code': _code}).timeout(Duration(seconds: 5)),
-      // Retry on SocketException or TimeoutException
-      retryIf: (e) => e is SocketException || e is TimeoutException,
-    );
-
-    Map data = jsonDecode(response.body);
-
-    return data;
-  }
-
-  Future<Map> _registerAccount(_email, _password) async {
-    var url = 'http://www.breakvoid.com/DoktorSaya/RegisterAccount.php';
-    http.Response response = await retry(
-      // Make a GET request
-      () => http.post(url, body: {
-        'email': _email,
-        'password': ef.encrypt(_password)
-      }).timeout(Duration(seconds: 5)),
-      // Retry on SocketException or TimeoutException
-      retryIf: (e) => e is SocketException || e is TimeoutException,
-    );
-
-    Map data = jsonDecode(response.body);
-
-    return data;
   }
 }

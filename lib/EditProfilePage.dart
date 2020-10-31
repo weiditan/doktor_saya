@@ -41,12 +41,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-
-    sp.getEmail().then((s){
-      setState(() {
-        _email = s;
-      });
-    });
   }
 
   @override

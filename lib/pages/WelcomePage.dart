@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'functions/SharedPreferences.dart' as sp;
+import '../functions/SharedPreferences.dart' as sp;
 
 class WelcomePage extends StatefulWidget {
   @override

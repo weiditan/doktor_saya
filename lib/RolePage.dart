@@ -111,8 +111,7 @@ class RolePage extends StatelessWidget {
   }
 
   void _submit(context, _role) async {
-
-    await pr.show(context,"Memuatkan");
+    await pr.show(context, "Memuatkan");
 
     sp.saveRole(_role);
     sp.getUserId().then((id) {

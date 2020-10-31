@@ -1,4 +1,4 @@
-import 'package:doktorsaya/databases/OnlineStatusDatabase.dart';
+import 'package:doktorsaya/databases/DoctorOnlineStatusDatabase.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'SharedPreferences.dart' as sp;

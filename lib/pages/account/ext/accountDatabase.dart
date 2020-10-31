@@ -2,18 +2,19 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:doktorsaya/pages/account/ext/encryptData.dart';
 import 'package:http/http.dart' as http;
 import 'package:retry/retry.dart';
 
-var url = 'http://www.breakvoid.com/DoktorSaya/Call.php';
+var url = 'http://www.breakvoid.com/DoktorSaya/Account.php';
 
-Future<Map> checkCall(String roleId) async {
-
+Future<Map> login(String email, String password) async {
   http.Response response = await retry(
     // Make a GET request
-        () => http.post(url, body: {
-      'action': 'get',
-      'role_id': roleId,
+    () => http.post(url, body: {
+      'action': 'login',
+      'email': email,
+      'password': encrypt(password)
     }).timeout(Duration(seconds: 5)),
     // Retry on SocketException or TimeoutException
     retryIf: (e) => e is SocketException || e is TimeoutException,
@@ -24,31 +25,14 @@ Future<Map> checkCall(String roleId) async {
   return data;
 }
 
-Future<Map> addCall(String roleId, String receiver) async {
+Future<Map> registerAccount(String email, String password) async {
 
   http.Response response = await retry(
     // Make a GET request
     () => http.post(url, body: {
-      'action': 'add',
-      'role_id': roleId,
-      'receiver': receiver,
-    }).timeout(Duration(seconds: 5)),
-    // Retry on SocketException or TimeoutException
-    retryIf: (e) => e is SocketException || e is TimeoutException,
-  );
-
-  Map data = jsonDecode(response.body);
-
-  return data;
-}
-
-Future<Map> endCall(String callId) async {
-
-  http.Response response = await retry(
-    // Make a GET request
-    () => http.post(url, body: {
-      'action': 'endcall',
-      'call_id': callId,
+      'action': 'registerAccount',
+      'email': email,
+      'password': encrypt(password)
     }).timeout(Duration(seconds: 5)),
     // Retry on SocketException or TimeoutException
     retryIf: (e) => e is SocketException || e is TimeoutException,

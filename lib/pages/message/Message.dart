@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'package:doktorsaya/functions/bubble.dart';
+import 'package:doktorsaya/pages/message/bubble.dart';
 import 'package:doktorsaya/functions/DatabaseConnect.dart' as db;
 import 'package:doktorsaya/widget/LoadingScreen.dart';
 import 'package:doktorsaya/widget/ProfileImage.dart';

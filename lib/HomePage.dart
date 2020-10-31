@@ -4,9 +4,8 @@ import 'package:doktorsaya/pages/message/MessagePage.dart';
 import 'package:doktorsaya/ProfilePage.dart';
 import 'package:flutter/material.dart';
 
-import 'databases/CallDatabase.dart';
-import 'pages/call/ConfirmCallPage.dart';
-import 'databases/OnlineStatusDatabase.dart';
+import 'pages/call/ext/callDatabase.dart';
+import 'databases/DoctorOnlineStatusDatabase.dart';
 import 'functions/ExitWithDoubleBack.dart';
 import 'functions/SharedPreferences.dart' as sp;
 
@@ -56,14 +55,11 @@ class _TestState extends State<HomePage> {
               _showConfirmCallPage = true;
               Navigator.pushNamed(context, '/ConfirmCallPage', arguments: s);
             }
-            print(s);
           } else {
             _showConfirmCallPage = false;
-            print(_showConfirmCallPage);
-            print(s);
           }
         });
-        await Future.delayed(Duration(seconds: 5));
+        await Future.delayed(Duration(seconds: 3));
       }
     }
   }

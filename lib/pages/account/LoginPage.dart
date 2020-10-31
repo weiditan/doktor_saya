@@ -1,14 +1,11 @@
+import 'package:doktorsaya/pages/account/ext/accountDatabase.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
-import 'dart:io';
-import 'dart:async';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:retry/retry.dart';
 
-import 'functions/Encrypt.dart' as ef;
-import 'functions/SharedPreferences.dart' as sp;
-import 'functions/ProgressDialog.dart' as pr;
+import '../../functions/SharedPreferences.dart' as sp;
+import '../../functions/ProgressDialog.dart' as pr;
+import 'ext/googleButton.dart';
+import 'ext/logo.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -52,7 +49,7 @@ class _LoginPageState extends State<LoginPage> {
               children: <Widget>[
                 Padding(
                   padding: EdgeInsets.only(top: 10, bottom: 10),
-                  child: _logo(_maxWidth),
+                  child: logo(_maxWidth),
                 ),
                 Form(
                   key: _formKey,
@@ -65,7 +62,7 @@ class _LoginPageState extends State<LoginPage> {
                       SizedBox(height: 5),
                       _loginButton(),
                       _divider(),
-                      _googleButton()
+                      googleButton()
                     ],
                   ),
                 ),
@@ -77,15 +74,6 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _logo(double _maxWidth) {
-    return Container(
-      child: Image(
-        image: AssetImage("assets/logo.png"),
-        width: _maxWidth * 0.5,
       ),
     );
   }
@@ -251,12 +239,11 @@ class _LoginPageState extends State<LoginPage> {
             if (_formKey.currentState.validate()) {
               await pr.show(context, "Log Masuk");
 
-              _login(_emailController.text, _passwordController.text)
+              login(_emailController.text, _passwordController.text)
                   .timeout(new Duration(seconds: 15))
                   .then((s) async {
                 if (s["status"]) {
                   sp.saveUserId(int.parse(s["data"]));
-                  sp.saveEmail(_emailController.text);
                   await pr.hide();
                   Navigator.pushNamedAndRemoveUntil(
                       context, '/RolePage', (Route<dynamic> route) => false);
@@ -264,46 +251,11 @@ class _LoginPageState extends State<LoginPage> {
                   await pr.error(s["data"]);
                 }
               }).catchError((e) async {
-                await pr.hide();
+                await pr.warning("Sila cuba lagi !");
                 print(e);
               });
             }
           }),
-    );
-  }
-
-  Widget _googleButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: RaisedButton(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(5)),
-        ),
-        color: Colors.white,
-        splashColor: Colors.grey,
-        highlightColor: Colors.grey[300],
-        child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Image(
-                  image: AssetImage("assets/google.jpg"),
-                  width: 25,
-                  height: 25,
-                ),
-                Text(
-                  "Log masuk dengan Google",
-                  style: TextStyle(
-                    fontFamily: "Montserrat",
-                    fontSize: 20,
-                    color: Colors.black,
-                  ),
-                ),
-              ],
-            )),
-        onPressed: () {},
-      ),
     );
   }
 
@@ -337,22 +289,5 @@ class _LoginPageState extends State<LoginPage> {
         ],
       ),
     );
-  }
-
-  Future<Map> _login(_email, _password) async {
-    var url = 'http://www.breakvoid.com/DoktorSaya/Login.php';
-    http.Response response = await retry(
-      // Make a GET request
-      () => http.post(url, body: {
-        'email': _email,
-        'password': ef.encrypt(_password)
-      }).timeout(Duration(seconds: 5)),
-      // Retry on SocketException or TimeoutException
-      retryIf: (e) => e is SocketException || e is TimeoutException,
-    );
-
-    Map data = jsonDecode(response.body);
-
-    return data;
   }
 }

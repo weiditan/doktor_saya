@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:doktorsaya/pages/call/CallFunction.dart';
+import 'package:doktorsaya/pages/call/ext/callFunction.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -135,12 +135,12 @@ class _DoctorPageState extends State<DoctorPage> {
   }
 
   Widget _doctorRow(Map doctor) {
-    return InkWell(
-      onTap: () {
-        Navigator.pushNamed(context, '/ViewDoctorDetail', arguments: doctor);
-      },
-      child: Card(
-        margin: EdgeInsets.only(left: 15, right: 15, top: 10),
+    return Card(
+      margin: EdgeInsets.only(left: 15, right: 15, top: 10),
+      child: InkWell(
+        onTap: () {
+          Navigator.pushNamed(context, '/ViewDoctorDetail', arguments: doctor);
+        },
         child: Padding(
           padding: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 10),
           child: Column(
