@@ -1,7 +1,7 @@
-import 'package:doktorsaya/databases/DoctorOnlineStatusDatabase.dart';
+import 'package:doktorsaya/pages/profile/ext/doctorOnlineStatusDatabase.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'SharedPreferences.dart' as sp;
+import 'sharedPreferences.dart' as sp;
 
 
 DateTime currentBackPressTime;

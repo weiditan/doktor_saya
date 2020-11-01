@@ -1,22 +1,27 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 
-import '../../functions/ProgressDialog.dart' as pr;
+import '../../functions/progressDialog.dart' as pr;
 import 'ext/googleButton.dart';
 import 'ext/logo.dart';
 import 'ext/verificationEmailDatabase.dart';
 
-class RegisterPage1 extends StatefulWidget {
+class EditUserPage1 extends StatefulWidget {
+  final String type;
+  EditUserPage1(this.type);
+
   @override
-  _RegisterPage1State createState() => _RegisterPage1State();
+  _EditUserPage1State createState() => _EditUserPage1State();
 }
 
-class _RegisterPage1State extends State<RegisterPage1> {
+class _EditUserPage1State extends State<EditUserPage1> {
+
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+
     double _screenHeight = MediaQuery.of(context).size.height;
     double _screenWidth = MediaQuery.of(context).size.width;
     double _maxWidth;
@@ -29,7 +34,7 @@ class _RegisterPage1State extends State<RegisterPage1> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Daftar Akaun'),
+        title: (widget.type=="Forgot Password")?Text('Terlupa kala laluan'):Text('Daftar Akaun'),
       ),
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
@@ -123,13 +128,13 @@ class _RegisterPage1State extends State<RegisterPage1> {
           if (_formKey.currentState.validate()) {
             await pr.show(context, "Memuatkan");
 
-            sendVerificationEmail(_emailController.text)
+            sendVerificationEmail(_emailController.text, widget.type)
                 .timeout(new Duration(seconds: 15))
                 .then((s) async {
               if (s["status"]) {
                 await pr.hide();
-                Navigator.pushNamed(context, '/RegisterPage2',
-                    arguments: _emailController.text);
+                Navigator.pushNamed(context, '/EditUserPage2',
+                    arguments: { 'type': widget.type, 'email' : _emailController.text});
               } else {
                 await pr.error(s["data"]);
               }
@@ -178,32 +183,33 @@ class _RegisterPage1State extends State<RegisterPage1> {
 
   Widget _login() {
     return Container(
-        child: Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Text(
-          "Menpunyai akaun ?",
-          style:
-              TextStyle(fontFamily: "Montserrat", fontWeight: FontWeight.w600),
-        ),
-        SizedBox(
-          width: 10,
-        ),
-        InkWell(
-          child: Text(
-            'Log Masuk',
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            "Menpunyai akaun ?",
             style: TextStyle(
-              fontFamily: "Montserrat",
-              color: Color(0xfff79c4f),
-              fontWeight: FontWeight.bold,
-            ),
+                fontFamily: "Montserrat", fontWeight: FontWeight.w600),
           ),
-          onTap: () {
-            Navigator.pushNamedAndRemoveUntil(
-                context, '/LoginPage', ModalRoute.withName('/'));
-          },
-        ),
-      ],
-    ));
+          SizedBox(
+            width: 10,
+          ),
+          InkWell(
+            child: Text(
+              'Log Masuk',
+              style: TextStyle(
+                fontFamily: "Montserrat",
+                color: Color(0xfff79c4f),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            onTap: () {
+              Navigator.pushNamedAndRemoveUntil(
+                  context, '/LoginPage', ModalRoute.withName('/'));
+            },
+          ),
+        ],
+      ),
+    );
   }
 }

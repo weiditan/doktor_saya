@@ -2,18 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'ext/accountDatabase.dart';
-import '../../functions/ProgressDialog.dart' as pr;
+import '../../functions/progressDialog.dart' as pr;
+import 'ext/logo.dart';
 import 'ext/verificationEmailDatabase.dart';
 
-class RegisterPage2 extends StatefulWidget {
+class EditUserPage2 extends StatefulWidget {
+  final Map arguments;
+  EditUserPage2(this.arguments);
+
   @override
-  _RegisterPage2State createState() => _RegisterPage2State();
+  _EditUserPage2State createState() => _EditUserPage2State();
 }
 
-class _RegisterPage2State extends State<RegisterPage2> {
+class _EditUserPage2State extends State<EditUserPage2> {
   final _formKey = GlobalKey<FormState>();
   final _formKey2 = GlobalKey<FormState>();
-  String _email;
   bool _obscureText = true;
   bool _pass1AutoValidate = false;
   bool _pass2AutoValidate = false;
@@ -25,8 +28,6 @@ class _RegisterPage2State extends State<RegisterPage2> {
 
   @override
   Widget build(BuildContext context) {
-    _email = ModalRoute.of(context).settings.arguments;
-
     double _screenHeight = MediaQuery.of(context).size.height;
     double _screenWidth = MediaQuery.of(context).size.width;
     double _maxWidth;
@@ -39,66 +40,62 @@ class _RegisterPage2State extends State<RegisterPage2> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Daftar Akaun'),
+        title: (widget.arguments['type'] == "Forgot Password")
+            ? Text('Terlupa kala laluan')
+            : Text('Daftar Akaun'),
       ),
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
         child: Center(
-            child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxWidth: _maxWidth,
-          ),
-          child: Column(
-            children: <Widget>[
-              Padding(
-                padding: EdgeInsets.only(top: 10, bottom: 20),
-                child: _logo(_maxWidth),
-              ),
-              _emailField(),
-              AnimatedCrossFade(
-                // If the widget is visible, animate to 0.0 (invisible).
-                // If the widget is hidden, animate to 1.0 (fully visible).
-                crossFadeState: _isVisible
-                    ? CrossFadeState.showFirst
-                    : CrossFadeState.showSecond,
-                firstCurve: Curves.easeOut,
-                secondCurve: Curves.easeIn,
-                duration: Duration(milliseconds: 500),
-                firstChild: Column(
-                  children: <Widget>[
-                    SizedBox(height: 10),
-                    Form(
-                      key: _formKey,
-                      child: _pinField(),
-                    ),
-                    SizedBox(height: 20),
-                    _verifyButton(),
-                  ],
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: _maxWidth,
+            ),
+            child: Column(
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.only(top: 10, bottom: 20),
+                  child: logo(_maxWidth),
                 ),
-                secondChild: Form(
-                  key: _formKey2,
-                  child: Column(
+                _emailField(),
+                AnimatedCrossFade(
+                  // If the widget is visible, animate to 0.0 (invisible).
+                  // If the widget is hidden, animate to 1.0 (fully visible).
+                  crossFadeState: _isVisible
+                      ? CrossFadeState.showFirst
+                      : CrossFadeState.showSecond,
+                  firstCurve: Curves.easeOut,
+                  secondCurve: Curves.easeIn,
+                  duration: Duration(milliseconds: 500),
+                  firstChild: Column(
                     children: <Widget>[
-                      _password1Field(),
-                      _password2Field(),
+                      SizedBox(height: 10),
+                      Form(
+                        key: _formKey,
+                        child: _pinField(),
+                      ),
                       SizedBox(height: 20),
-                      _registerButton(),
+                      _verifyButton(),
                     ],
                   ),
+                  secondChild: Form(
+                    key: _formKey2,
+                    child: Column(
+                      children: <Widget>[
+                        _password1Field(),
+                        _password2Field(),
+                        SizedBox(height: 20),
+                        (widget.arguments['type'] == "Forgot Password")
+                            ? _forgotPasswordButton()
+                            : _registerButton(),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        )),
-      ),
-    );
-  }
-
-  Widget _logo(_maxWidth) {
-    return Container(
-      child: Image(
-        image: AssetImage("assets/logo.png"),
-        width: _maxWidth * 0.6,
+        ),
       ),
     );
   }
@@ -118,7 +115,7 @@ class _RegisterPage2State extends State<RegisterPage2> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        initialValue: _email,
+        initialValue: widget.arguments['email'],
         enabled: false,
       ),
     );
@@ -181,7 +178,7 @@ class _RegisterPage2State extends State<RegisterPage2> {
         ),
         decoration: new InputDecoration(
           border: OutlineInputBorder(),
-          labelText: "Ulang Laluan Baru",
+          labelText: "Ulang Kata Laluan",
           labelStyle: TextStyle(
             fontFamily: "Montserrat",
             fontWeight: FontWeight.bold,
@@ -282,11 +279,11 @@ class _RegisterPage2State extends State<RegisterPage2> {
           ),
         ),
         onPressed: () async {
-
           if (_formKey.currentState.validate()) {
-            await pr.show(context,"Memuatkan");
+            await pr.show(context, "Memuatkan");
 
-            checkRegisterCode(_email, _codeController.text)
+            checkRegisterCode(widget.arguments['email'], _codeController.text,
+                    widget.arguments['type'])
                 .timeout(new Duration(seconds: 15))
                 .then((s) async {
               if (s["status"]) {
@@ -327,15 +324,57 @@ class _RegisterPage2State extends State<RegisterPage2> {
           ),
         ),
         onPressed: () async {
-
           if (_formKey2.currentState.validate()) {
-            await pr.show(context,"Memuatkan");
+            await pr.show(context, "Memuatkan");
 
-            registerAccount(_email, _password1Controller.text)
+            registerAccount(
+                    widget.arguments['email'], _password1Controller.text)
                 .timeout(new Duration(seconds: 15))
                 .then((s) async {
               if (s["status"]) {
                 await pr.success("Akaun telah berjaya didaftarkan.");
+                Navigator.popUntil(context, ModalRoute.withName('/'));
+              } else {
+                await pr.error(s["data"]);
+              }
+            }).catchError((e) async {
+              await pr.warning("Sila cuba lagi !");
+              print(e);
+            });
+          }
+        },
+      ),
+    );
+  }
+
+  Widget _forgotPasswordButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: RaisedButton(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(5)),
+        ),
+        color: Colors.orange,
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 10),
+          child: Text(
+            "Tukar",
+            style: TextStyle(
+              fontFamily: "Montserrat",
+              fontSize: 20,
+              color: Colors.white,
+            ),
+          ),
+        ),
+        onPressed: () async {
+          if (_formKey2.currentState.validate()) {
+            await pr.show(context, "Memuatkan");
+
+            resetPassword(widget.arguments['email'], _password1Controller.text)
+                .timeout(new Duration(seconds: 15))
+                .then((s) async {
+              if (s["status"]) {
+                await pr.success("Kata Laluan telah berjaya diubah.");
                 Navigator.popUntil(context, ModalRoute.withName('/'));
               } else {
                 await pr.error(s["data"]);

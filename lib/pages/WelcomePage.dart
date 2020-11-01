@@ -1,8 +1,9 @@
 import 'dart:async';
 
+import 'package:doktorsaya/functions/exitWithDoubleBack.dart';
 import 'package:flutter/material.dart';
 
-import '../functions/SharedPreferences.dart' as sp;
+import '../functions/sharedPreferences.dart' as sp;
 
 class WelcomePage extends StatefulWidget {
   @override
@@ -10,7 +11,6 @@ class WelcomePage extends StatefulWidget {
 }
 
 class _WelcomePageState extends State<WelcomePage> {
-
   bool _buttonVisible = true;
   bool _loadingIconVisible = true;
 
@@ -67,36 +67,40 @@ class _WelcomePageState extends State<WelcomePage> {
     }
 
     return Scaffold(
-      body: SingleChildScrollView(
-          physics: BouncingScrollPhysics(),
-          child: Container(
-            decoration: _boxDecoration,
-            child: Center(
+      body: WillPopScope(
+          child: SingleChildScrollView(
+            physics: BouncingScrollPhysics(),
+            child: Container(
+              decoration: _boxDecoration,
+              child: Center(
                 child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: _screenHeight,
-                minWidth: 20,
-                maxWidth: _maxWidth,
+                  constraints: BoxConstraints(
+                    minHeight: _screenHeight,
+                    minWidth: 20,
+                    maxWidth: _maxWidth,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      _logo(_maxWidth),
+                      AnimatedCrossFade(
+                          // If the widget is visible, animate to 0.0 (invisible).
+                          // If the widget is hidden, animate to 1.0 (fully visible).
+                          crossFadeState: _buttonVisible
+                              ? CrossFadeState.showFirst
+                              : CrossFadeState.showSecond,
+                          firstCurve: Curves.easeOut,
+                          secondCurve: Curves.easeIn,
+                          duration: Duration(milliseconds: 500),
+                          firstChild: _loadingIcon(),
+                          secondChild: _showButton()),
+                    ],
+                  ),
+                ),
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  _logo(_maxWidth),
-                  AnimatedCrossFade(
-                      // If the widget is visible, animate to 0.0 (invisible).
-                      // If the widget is hidden, animate to 1.0 (fully visible).
-                      crossFadeState: _buttonVisible
-                          ? CrossFadeState.showFirst
-                          : CrossFadeState.showSecond,
-                      firstCurve: Curves.easeOut,
-                      secondCurve: Curves.easeIn,
-                      duration: Duration(milliseconds: 500),
-                      firstChild: _loadingIcon(),
-                      secondChild: _showButton()),
-                ],
-              ),
-            )),
-          )),
+            ),
+          ),
+          onWillPop: onWillPop),
     );
   }
 
@@ -164,7 +168,9 @@ class _WelcomePageState extends State<WelcomePage> {
   Widget _registerButton() {
     return InkWell(
       onTap: () {
-        Navigator.pushNamed(context, '/RegisterPage1');
+        Navigator.pushNamedAndRemoveUntil(
+            context, '/EditUserPage1', ModalRoute.withName('/'),
+            arguments: "Register");
       },
       child: Container(
         width: MediaQuery.of(context).size.width,

@@ -5,11 +5,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-import 'widget/LoadingScreen.dart';
-import 'widget/ProfileImage.dart';
-import 'functions/DatabaseConnect.dart' as db;
-import 'functions/DiffDate.dart' as dd;
-import 'functions/SharedPreferences.dart' as sp;
+import '../../functions/loadingScreen.dart';
+import 'ext/profileImage.dart';
+import '../../functions/DatabaseConnect.dart' as db;
+import 'ext/diffDate.dart' as dd;
+import '../../functions/sharedPreferences.dart' as sp;
 
 class DoctorPage extends StatefulWidget {
   @override

@@ -15,6 +15,11 @@ Future saveRoleId(_roleId) async {
   await prefs.setString('role_id', _roleId );
 }
 
+Future saveEmail(_email) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setString('email', _email );
+}
+
 Future<int> getUserId() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   return prefs.getInt('user_id');
@@ -28,6 +33,11 @@ Future<String> getRole() async {
 Future<String> getRoleId() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   return prefs.getString('role_id');
+}
+
+Future<String> getEmail() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  return prefs.getString('email');
 }
 
 Future clear() async {

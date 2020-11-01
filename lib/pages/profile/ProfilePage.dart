@@ -1,14 +1,16 @@
+import 'package:doktorsaya/pages/account/ext/logout.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
-import 'functions/DatabaseConnect.dart' as db;
-import 'functions/SharedPreferences.dart' as sp;
-import 'widget/DoctorExperience.dart';
-import 'widget/DoctorSpecialist.dart';
-import 'widget/DoctorWorkplace.dart';
-import 'widget/LoadingScreen.dart';
-import 'widget/ProfileDetail.dart';
-import 'widget/ProfileImage.dart';
+import '../../functions/DatabaseConnect.dart' as db;
+import '../../functions/sharedPreferences.dart' as sp;
+import 'ext/doctorExperience.dart';
+import 'ext/doctorSpecialist.dart';
+import 'ext/doctorWorkplace.dart';
+import '../../functions/loadingScreen.dart';
+import 'ext/profileDetail.dart';
+import 'ext/profileImage.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -28,7 +30,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     _getData().then((onValue) {
@@ -116,7 +117,16 @@ class _ProfilePageState extends State<ProfilePage> {
                   showDoctorExperience(_arrayDoctorExp),
                 ],
               ),
-            _logoutButton(context),
+            Padding(
+              padding: EdgeInsets.only(left: 10, right: 10),
+              child: Column(
+                children: <Widget>[
+                  _editProfileButton(),
+                  _changePasswordButton(),
+                  _logoutButton(),
+                ],
+              ),
+            ),
           ],
         ),
       );
@@ -124,26 +134,67 @@ class _ProfilePageState extends State<ProfilePage> {
     return Container();
   }
 
-  Widget _logoutButton(context) {
+  Widget _editProfileButton() {
     return SizedBox(
-      width: 120,
+      width: double.infinity,
       child: RaisedButton(
         color: Colors.green,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(5)),
         ),
         child: Text(
-          "logout",
+          "Kemas Kini Profile",
           style: TextStyle(
             fontFamily: "Montserrat",
             fontSize: 14,
           ),
         ),
         onPressed: () {
-          sp.clear().then((s) {
-            Navigator.pushNamedAndRemoveUntil(
-                context, '/WelcomePage', (Route<dynamic> route) => false);
-          });
+          Navigator.pushNamed(context, '/EditProfilePage', arguments: _role);
+        },
+      ),
+    );
+  }
+
+  Widget _changePasswordButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: RaisedButton(
+        color: Colors.blue,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(5)),
+        ),
+        child: Text(
+          "Tukar Kata Laluan",
+          style: TextStyle(
+            fontFamily: "Montserrat",
+            fontSize: 14,
+          ),
+        ),
+        onPressed: () {
+          Navigator.pushNamed(context, '/ChangePasswordPage');
+        },
+      ),
+    );
+  }
+
+  Widget _logoutButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: RaisedButton(
+        color: Colors.orange,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(5)),
+        ),
+        child: Text(
+          "Logout",
+          style: TextStyle(
+            fontFamily: "Montserrat",
+            fontSize: 14,
+          ),
+        ),
+        onPressed: () {
+          logout(context);
         },
       ),
     );

@@ -2,8 +2,8 @@ import 'package:doktorsaya/pages/account/ext/accountDatabase.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 
-import '../../functions/SharedPreferences.dart' as sp;
-import '../../functions/ProgressDialog.dart' as pr;
+import '../../functions/sharedPreferences.dart' as sp;
+import '../../functions/progressDialog.dart' as pr;
 import 'ext/googleButton.dart';
 import 'ext/logo.dart';
 
@@ -178,7 +178,11 @@ class _LoginPageState extends State<LoginPage> {
             fontWeight: FontWeight.w600,
           ),
         ),
-        onTap: () {},
+        onTap: () {
+          Navigator.pushNamedAndRemoveUntil(
+              context, '/EditUserPage1', ModalRoute.withName('/'),
+              arguments: "Forgot Password");
+        },
       ),
     );
   }
@@ -244,6 +248,7 @@ class _LoginPageState extends State<LoginPage> {
                   .then((s) async {
                 if (s["status"]) {
                   sp.saveUserId(int.parse(s["data"]));
+                  sp.saveEmail(_emailController.text);
                   await pr.hide();
                   Navigator.pushNamedAndRemoveUntil(
                       context, '/RolePage', (Route<dynamic> route) => false);
@@ -283,7 +288,8 @@ class _LoginPageState extends State<LoginPage> {
             ),
             onTap: () {
               Navigator.pushNamedAndRemoveUntil(
-                  context, '/RegisterPage1', ModalRoute.withName('/'));
+                  context, '/EditUserPage1', ModalRoute.withName('/'),
+                  arguments: "Register");
             },
           ),
         ],

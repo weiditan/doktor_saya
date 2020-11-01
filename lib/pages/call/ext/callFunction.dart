@@ -4,8 +4,8 @@ import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'package:doktorsaya/pages/call/ext/callDatabase.dart';
-import 'package:doktorsaya/databases/DoctorOnlineStatusDatabase.dart';
-import 'package:doktorsaya/functions/ProgressDialog.dart' as pr;
+import 'package:doktorsaya/pages/profile/ext/doctorOnlineStatusDatabase.dart';
+import 'package:doktorsaya/functions/progressDialog.dart' as pr;
 
 import '../CallPage.dart';
 

@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../functions/DatabaseConnect.dart' as db;
-import '../../functions/SharedPreferences.dart' as sp;
-import '../../widget/LoadingScreen.dart';
-import '../../widget/ProfileImage.dart';
+import '../../functions/sharedPreferences.dart' as sp;
+import '../../functions/loadingScreen.dart';
+import '../profile/ext/profileImage.dart';
 
 class MessagePage extends StatefulWidget {
   @override

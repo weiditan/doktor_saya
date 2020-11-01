@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../functions/DiffDate.dart' as dd;
-import '../functions/Text.dart' as tx;
+import 'diffDate.dart' as dd;
+import 'text.dart' as tx;
 
 Widget showDoctorExperience(List arrayDoctorExperience) {
   return (arrayDoctorExperience == null)

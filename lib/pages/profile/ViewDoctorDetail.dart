@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 
-import 'functions/DatabaseConnect.dart' as db;
-import 'functions/SharedPreferences.dart' as sp;
-import 'widget/DoctorExperience.dart';
-import 'widget/DoctorSpecialist.dart';
-import 'widget/DoctorWorkplace.dart';
-import 'widget/ProfileDetail.dart';
-import 'widget/ProfileImage.dart';
-import 'widget/LoadingScreen.dart';
+import 'package:doktorsaya/pages/call/ext/callFunction.dart';
+import '../../functions/DatabaseConnect.dart' as db;
+import '../../functions/sharedPreferences.dart' as sp;
+import 'ext/doctorExperience.dart';
+import 'ext/doctorSpecialist.dart';
+import 'ext/doctorWorkplace.dart';
+import 'ext/profileDetail.dart';
+import 'ext/profileImage.dart';
+import '../../functions/loadingScreen.dart';
 
 class ViewDoctorDetail extends StatefulWidget {
   @override
@@ -23,13 +24,16 @@ class _ViewDoctorDetailState extends State<ViewDoctorDetail> {
   List _arrayDoctorExp;
   bool _loadingVisible = true;
   bool _loadingIconVisible = true;
+  String _roleId;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     Future.wait([
+      sp.getRoleId().then((onValue) {
+        _roleId = onValue;
+      }),
       db.getDoctorSpecialist(widget.doctor['doctor_id']).then((onValue) {
         _arrayDoctorSpecialist = onValue;
       }),
@@ -69,7 +73,7 @@ class _ViewDoctorDetailState extends State<ViewDoctorDetail> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: <Widget>[
-                      _callButton(context),
+                      _callButton(),
                       SizedBox(width: 10),
                       _messageButton(),
                       SizedBox(width: 10),
@@ -128,7 +132,7 @@ class _ViewDoctorDetailState extends State<ViewDoctorDetail> {
     );
   }
 
-  Widget _callButton(context) {
+  Widget _callButton() {
     return SizedBox(
       width: 120,
       child: RaisedButton(
@@ -151,7 +155,10 @@ class _ViewDoctorDetailState extends State<ViewDoctorDetail> {
             ),
           ],
         ),
-        onPressed: () {},
+        onPressed: () {
+          callDoctor(context, _roleId, widget.doctor['doctor_id'],
+              widget.doctor['nickname'], widget.doctor['image']);
+        },
       ),
     );
   }

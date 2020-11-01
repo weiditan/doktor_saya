@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../functions/Text.dart' as tx;
+import 'text.dart' as tx;
 
 Widget showDoctorWorkplace(Map userData) {
   return (userData['workplace'] == "")

@@ -1,8 +1,8 @@
 import 'package:doktorsaya/pages/call/ext/callDatabase.dart';
 import 'package:doktorsaya/functions/DatabaseConnect.dart';
 import 'package:doktorsaya/pages/call/ext/callFunction.dart';
-import 'package:doktorsaya/widget/LoadingScreen.dart';
-import 'package:doktorsaya/widget/ProfileImage.dart';
+import 'package:doktorsaya/functions/loadingScreen.dart';
+import 'package:doktorsaya/pages/profile/ext/profileImage.dart';
 import 'package:flutter/material.dart';
 
 class ConfirmCallPage extends StatefulWidget {

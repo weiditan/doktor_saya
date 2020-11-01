@@ -1,13 +1,13 @@
-import 'package:doktorsaya/DoctorPage.dart';
+import 'package:doktorsaya/pages/profile/DoctorPage.dart';
 import 'package:doktorsaya/page1.dart';
 import 'package:doktorsaya/pages/message/MessagePage.dart';
-import 'package:doktorsaya/ProfilePage.dart';
+import 'package:doktorsaya/pages/profile/ProfilePage.dart';
 import 'package:flutter/material.dart';
 
-import 'pages/call/ext/callDatabase.dart';
-import 'databases/DoctorOnlineStatusDatabase.dart';
-import 'functions/ExitWithDoubleBack.dart';
-import 'functions/SharedPreferences.dart' as sp;
+import 'call/ext/callDatabase.dart';
+import 'profile/ext/doctorOnlineStatusDatabase.dart';
+import '../functions/exitWithDoubleBack.dart';
+import '../functions/sharedPreferences.dart' as sp;
 
 class HomePage extends StatefulWidget {
   @override

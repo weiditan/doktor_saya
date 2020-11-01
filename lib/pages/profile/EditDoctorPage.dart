@@ -1,12 +1,13 @@
+import 'package:doktorsaya/pages/profile/ext/diffDate.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import 'functions/ProgressDialog.dart' as pr;
-import 'functions/SharedPreferences.dart' as sp;
-import 'functions/Text.dart' as tx;
-import 'functions/DatabaseConnect.dart' as db;
-import 'widget/LoadingScreen.dart' as ls;
+import '../../functions/progressDialog.dart' as pr;
+import '../../functions/sharedPreferences.dart' as sp;
+import 'ext/text.dart' as tx;
+import '../../functions/DatabaseConnect.dart' as db;
+import '../../functions/loadingScreen.dart' as ls;
 
 class EditDoctorPage extends StatefulWidget {
   @override
@@ -191,9 +192,9 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
                       ? _cardExp(
                           _arrayDoctorExp[i]['doctor_exp_id'],
                           _arrayDoctorExp[i]['location'],
-                          _diffDate(
+                          outputDiffDate(diffDate(
                               DateTime.parse(_arrayDoctorExp[i]['startdate']),
-                              DateTime.parse(_arrayDoctorExp[i]['enddate'])))
+                              DateTime.parse(_arrayDoctorExp[i]['enddate']))))
                       : _cardExp(
                           _arrayDoctorExp[i]['doctor_exp_id'],
                           _arrayDoctorExp[i]['location'],
@@ -232,49 +233,6 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
         ],
       ),
     );
-  }
-
-  String _diffDate(DateTime startDate, DateTime endDate) {
-    String _outputYears = "";
-    String _outputMonths = "";
-    String _outputDays = "";
-    int years = endDate.year - startDate.year;
-    int months = endDate.month - startDate.month;
-    int days = endDate.day - startDate.day;
-
-    if (days < 0) {
-      months -= 1;
-      days = endDate
-          .difference(DateTime(endDate.year, endDate.month - 1, startDate.day))
-          .inDays;
-    }
-
-    if (months < 0) {
-      years -= 1;
-      months += 12;
-    }
-
-    if (years != 0) {
-      if (months != 0 || days != 0) {
-        _outputYears = years.toString() + " Tahun, ";
-      } else {
-        _outputYears = years.toString() + " Tahun";
-      }
-    }
-
-    if (months != 0) {
-      if (days != 0) {
-        _outputMonths = months.toString() + " Bulan, ";
-      } else {
-        _outputMonths = months.toString() + " Bulan";
-      }
-    }
-
-    if (days != 0) {
-      _outputDays = days.toString() + " Hari";
-    }
-
-    return _outputYears + _outputMonths + _outputDays;
   }
 
   Widget _cardSpecialist(
@@ -742,30 +700,30 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
                             ),
                           ),
                         SizedBox(height: 10),
-                        if(_valueSpecialist!=null && _valueSpecialist!=1)
-                        TextFormField(
-                          style: TextStyle(
-                            fontSize: 16,
-                          ),
-                          decoration: new InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: "Nama Pakar",
-                            labelStyle: TextStyle(
-                              fontFamily: "Montserrat",
-                              fontWeight: FontWeight.bold,
+                        if (_valueSpecialist != null && _valueSpecialist != 1)
+                          TextFormField(
+                            style: TextStyle(
+                              fontSize: 16,
                             ),
-                          ),
-                          keyboardType: TextInputType.text,
-                          controller: _subSpecialistController,
-                          validator: (String value) {
-                            if (_valueSpecialist != 1) {
-                              if (value.isEmpty) {
-                                return 'Sila Masukkan Nama Pakar';
+                            decoration: new InputDecoration(
+                              border: OutlineInputBorder(),
+                              labelText: "Nama Pakar",
+                              labelStyle: TextStyle(
+                                fontFamily: "Montserrat",
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            keyboardType: TextInputType.text,
+                            controller: _subSpecialistController,
+                            validator: (String value) {
+                              if (_valueSpecialist != 1) {
+                                if (value.isEmpty) {
+                                  return 'Sila Masukkan Nama Pakar';
+                                }
                               }
-                            }
-                            return null;
-                          },
-                        ),
+                              return null;
+                            },
+                          ),
                       ],
                     ),
                   ),

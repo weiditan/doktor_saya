@@ -1,15 +1,16 @@
+import 'package:doktorsaya/pages/account/ChangePasswordPage.dart';
 import 'package:doktorsaya/pages/call/ConfirmCallPage.dart';
 import 'package:doktorsaya/pages/message/Message.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 
-import 'EditDoctorPage.dart';
-import 'EditProfilePage.dart';
-import 'HomePage.dart';
-import 'pages/account/RegisterPage1.dart';
-import 'pages/account/RegisterPage2.dart';
-import 'RolePage.dart';
-import 'ViewDoctorDetail.dart';
+import 'pages/profile/EditDoctorPage.dart';
+import 'pages/profile/EditProfilePage.dart';
+import 'pages/HomePage.dart';
+import 'pages/account/EditUserPage1.dart';
+import 'pages/account/EditUserPage2.dart';
+import 'pages/RolePage.dart';
+import 'pages/profile/ViewDoctorDetail.dart';
 import 'pages/WelcomePage.dart';
 import 'pages/account/LoginPage.dart';
 
@@ -59,17 +60,25 @@ class MyApp extends StatelessWidget {
             );
             break;
 
-          case '/RegisterPage1':
+          case '/EditUserPage1':
             return PageTransition(
-              child: RegisterPage1(),
+              child: EditUserPage1(settings.arguments),
               type: PageTransitionType.fade,
               settings: settings,
             );
             break;
 
-          case '/RegisterPage2':
+          case '/EditUserPage2':
             return PageTransition(
-              child: RegisterPage2(),
+              child: EditUserPage2(settings.arguments),
+              type: PageTransitionType.fade,
+              settings: settings,
+            );
+            break;
+
+          case '/ChangePasswordPage':
+            return PageTransition(
+              child: ChangePasswordPage(),
               type: PageTransitionType.fade,
               settings: settings,
             );

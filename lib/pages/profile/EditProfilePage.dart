@@ -1,3 +1,7 @@
+import 'package:doktorsaya/functions/DatabaseConnect.dart';
+import 'package:doktorsaya/functions/loadingScreen.dart';
+import 'package:doktorsaya/pages/profile/ext/editProfileDatabase.dart';
+import 'package:doktorsaya/pages/profile/ext/text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,12 +11,10 @@ import 'package:intl/intl.dart';
 import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:retry/retry.dart';
 import 'package:path/path.dart' as path;
 
-import 'functions/SharedPreferences.dart' as sp;
-import 'functions/ProgressDialog.dart' as pr;
+import '../../functions/sharedPreferences.dart' as sp;
+import '../../functions/progressDialog.dart' as pr;
 
 class EditProfilePage extends StatefulWidget {
   @override
@@ -21,6 +23,9 @@ class EditProfilePage extends StatefulWidget {
 
 class _EditProfilePageState extends State<EditProfilePage> {
   final _formKey = GlobalKey<FormState>();
+
+  bool _loadingIconVisible = true;
+  bool _loadingVisible = true;
 
   final _fullNameController = TextEditingController();
   final _nickNameController = TextEditingController();
@@ -36,11 +41,56 @@ class _EditProfilePageState extends State<EditProfilePage> {
   File _image;
   String _imageName = "";
   String _base64Image = "";
+  String _roleId;
+  String _uploadedImage;
+
+  Future _hideLoadingScreen() async {
+    setState(() {
+      _loadingIconVisible = false;
+    });
+    await Future.delayed(Duration(milliseconds: 500));
+    setState(() {
+      _loadingVisible = false;
+    });
+  }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+    _getData().then((_) {
+      _hideLoadingScreen();
+    });
+  }
+
+  Future _getData() async {
+    _roleId = await sp.getRoleId();
+
+    if (_roleId != null) {
+      Map userData = await getUserDetail(_roleId);
+
+      setState(() {
+        _fullNameController.text = userData['fullname'];
+        _nickNameController.text = userData['nickname'];
+
+        _valueGender = int.parse(userData['gender']);
+        _dateOfBirth = DateTime.parse(userData['birthday']);
+        _dateController.text = DateFormat('MMM d, yyyy').format(_dateOfBirth);
+        _email = userData['email'];
+
+        if (_role == "doctor") {
+          _mmcController.text = userData['mmc'];
+        }
+
+        _phoneController.text = userData['phone'];
+        _uploadedImage = userData['image'];
+      });
+    } else {
+      await sp.getEmail().then((email) {
+        setState(() {
+          _email = email;
+        });
+      });
+    }
   }
 
   @override
@@ -61,49 +111,57 @@ class _EditProfilePageState extends State<EditProfilePage> {
       appBar: AppBar(
         title: Text('Profil'),
       ),
-      body: SingleChildScrollView(
-        physics: BouncingScrollPhysics(),
-        child: Center(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth: _maxWidth,
+      body: AnimatedCrossFade(
+        // If the widget is visible, animate to 0.0 (invisible).
+        // If the widget is hidden, animate to 1.0 (fully visible).
+        crossFadeState: _loadingVisible
+            ? CrossFadeState.showFirst
+            : CrossFadeState.showSecond,
+        firstCurve: Curves.easeOut,
+        secondCurve: Curves.easeIn,
+        duration: Duration(milliseconds: 500),
+        firstChild: loadingScreen(_loadingIconVisible),
+        secondChild: _secondScreen(_maxWidth),
+      ),
+    );
+  }
+
+  Widget _secondScreen(_maxWidth) {
+    return SingleChildScrollView(
+      physics: BouncingScrollPhysics(),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            _imageBox(_maxWidth),
+            SizedBox(height: 20),
+            heading1("PROFIL"),
+            _entryField("Nama Penuh", _fullNameController),
+            _entryField("Nama Panggilan", _nickNameController),
+            Wrap(
+              children: <Widget>[
+                _selectGender(),
+                _dateField(),
+              ],
             ),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  _imageBox(_maxWidth),
-                  SizedBox(height: 20),
-                  _heading1("PROFIL"),
-                  _entryField("Nama Penuh", _fullNameController),
-                  _entryField("Nama Panggilan", _nickNameController),
-                  Wrap(
-                    children: <Widget>[
-                      _selectGender(),
-                      _dateField(),
-                    ],
-                  ),
-                  if (_role == "doctor")
-                    _entryField("Nombor Pendaftaran MMC", _mmcController),
-                  Divider(
-                    thickness: 1,
-                  ),
-                  _heading1("HUBUNGAN"),
-                  _heading2("Email"),
-                  _heading3(_email),
-                  _phoneField(),
-                  Divider(
-                    thickness: 1,
-                  ),
-                  (_role == "doctor")
-                      ? _submitButton("Seterusnya")
-                      : _submitButton("Simpan"),
-                  SizedBox(height: 20),
-                ],
-              ),
+            if (_role == "doctor")
+              _entryField("Nombor Pendaftaran MMC", _mmcController),
+            Divider(
+              thickness: 1,
             ),
-          ),
+            heading1("HUBUNGAN"),
+            heading2("Email"),
+            heading3(_email),
+            _phoneField(),
+            Divider(
+              thickness: 1,
+            ),
+            (_role == "doctor")
+                ? _submitButton("Seterusnya")
+                : _submitButton("Simpan"),
+            SizedBox(height: 20),
+          ],
         ),
       ),
     );
@@ -112,45 +170,67 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Widget _imageBox(_maxWidth) {
     return InkWell(
       onTap: _getFromGallery,
-      child: Container(
-        width: _maxWidth,
-        height: _maxWidth,
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: Colors.grey,
-            width: 2,
-          ),
-          borderRadius: BorderRadius.circular(5),
-        ),
-        child: Center(
-          child: (_image == null)
-              ? Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    Icon(
-                      Icons.account_circle,
-                      size: _maxWidth * 0.8,
-                      color: Colors.grey,
-                    ),
-                    Text(
-                      "Tukar Gambar Profil",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontFamily: "Montserrat",
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey,
-                      ),
-                    )
-                  ],
-                )
-              : Image.file(
-                  _image,
-                  width: _maxWidth,
-                  height: _maxWidth,
+      child: (_uploadedImage != null && _image == null)
+          ? Container(
+              width: _maxWidth,
+              height: _maxWidth,
+              decoration: BoxDecoration(
+                shape: BoxShape.rectangle,
+                image: DecorationImage(
                   fit: BoxFit.fill,
+                  image: NetworkImage(
+                      "http://www.breakvoid.com/DoktorSaya/Images/Profiles/" +
+                          _uploadedImage),
                 ),
-        ),
-      ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                    offset: Offset(0, 3), // changes position of shadow
+                  ),
+                ],
+              ), //_logo(_maxWidth),
+            )
+          : Container(
+              width: _maxWidth,
+              height: _maxWidth,
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Colors.grey,
+                  width: 2,
+                ),
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Center(
+                child: (_image == null)
+                    ? Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          Icon(
+                            Icons.account_circle,
+                            size: _maxWidth * 0.8,
+                            color: Colors.grey,
+                          ),
+                          Text(
+                            "Tukar Gambar Profil",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontFamily: "Montserrat",
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey,
+                            ),
+                          )
+                        ],
+                      )
+                    : Image.file(
+                        _image,
+                        width: _maxWidth,
+                        height: _maxWidth,
+                        fit: BoxFit.fill,
+                      ),
+              ),
+            ),
     );
   }
 
@@ -244,7 +324,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           },
           value: _valueGender,
           validator: (value) {
-            if (value == null) {
+            if (_valueGender == null) {
               return 'Sila Pilih Jantina';
             }
             return null;
@@ -398,7 +478,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     _base64Image = base64Encode(_image.readAsBytesSync());
                   }
 
-                  _saveData(
+                  addOrUpdateProfile(
                           _role[0] + id.toString(),
                           id.toString(),
                           _role,
@@ -415,19 +495,19 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     if (s["status"]) {
                       sp.saveRoleId(s["data"]);
                       await pr.hide();
-                      if(_role=="patient") {
+                      if (_role == "patient") {
                         Navigator.pushNamedAndRemoveUntil(context, '/HomePage',
-                                (Route<dynamic> route) => false);
-                      }else{
-                        Navigator.pushNamedAndRemoveUntil(context, '/EditDoctorPage',
-                                (Route<dynamic> route) => false);
+                            (Route<dynamic> route) => false);
+                      } else {
+                        Navigator.pushNamedAndRemoveUntil(context,
+                            '/EditDoctorPage', (Route<dynamic> route) => false);
                       }
                     } else {
-                      await pr.hide();
+                      await pr.warning("Sila cuba lagi !");
                       print(s);
                     }
                   }).catchError((e) async {
-                    await pr.hide();
+                    await pr.warning("Sila cuba lagi !");
                     print(e);
                   });
                 });
@@ -435,74 +515,5 @@ class _EditProfilePageState extends State<EditProfilePage> {
             }),
       ),
     );
-  }
-
-  Widget _heading1(_text) {
-    return Padding(
-      padding: EdgeInsets.only(left: 10, top: 5),
-      child: Text(
-        _text,
-        style: TextStyle(
-          fontSize: 22,
-          fontFamily: "Montserrat",
-          fontWeight: FontWeight.bold,
-          color: Colors.orange,
-        ),
-      ),
-    );
-  }
-
-  Widget _heading2(_text) {
-    return Padding(
-      padding: EdgeInsets.only(left: 20, top: 5),
-      child: Text(
-        _text,
-        style: TextStyle(
-          fontSize: 18,
-          fontFamily: "Montserrat",
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
-
-  Widget _heading3(_text) {
-    return Padding(
-      padding: EdgeInsets.only(left: 30, top: 3),
-      child: Text(
-        _text,
-        style: TextStyle(
-          fontSize: 16,
-          fontFamily: "Montserrat",
-        ),
-      ),
-    );
-  }
-
-  Future<Map> _saveData(_roleId, _userId, _role, _fullName, _nickName, _gender,
-      _dateOfBirth, _phone, _imageName, _base64image, _mmc) async {
-    var url = 'http://www.breakvoid.com/DoktorSaya/EditProfile.php';
-    http.Response response = await retry(
-      // Make a GET request
-      () => http.post(url, body: {
-        'role_id': _roleId,
-        'user_id': _userId,
-        'role': _role,
-        'fullname': _fullName,
-        'nickname': _nickName,
-        'gender': _gender,
-        'birthday': _dateOfBirth,
-        'phone': _phone,
-        'image_name': _imageName,
-        'base64image': _base64image,
-        'mmc': _mmc,
-      }).timeout(Duration(seconds: 5)),
-
-      // Retry on SocketException or TimeoutException
-      retryIf: (e) => e is SocketException || e is TimeoutException,
-    );
-
-    Map data = jsonDecode(response.body);
-    return data;
   }
 }
