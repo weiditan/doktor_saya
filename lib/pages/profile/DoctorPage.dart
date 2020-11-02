@@ -26,7 +26,6 @@ class _DoctorPageState extends State<DoctorPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     _getData().then((onValue) {

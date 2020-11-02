@@ -36,7 +36,6 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     _getData().then((onValue) {

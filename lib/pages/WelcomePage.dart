@@ -16,7 +16,6 @@ class _WelcomePageState extends State<WelcomePage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     sp.getUserId().then((id) {
