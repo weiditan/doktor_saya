@@ -182,8 +182,8 @@ class _CallListPageState extends State<CallListPage> {
   }
 
   String _outputDate(String sendTime) {
-    DateTime _today = DateTime.now().add(Duration(hours: 8));
-    DateTime _sendTime = DateTime.parse(sendTime).add(Duration(hours: 8));
+    DateTime _today = DateTime.now();
+    DateTime _sendTime = DateTime.parse(sendTime);
 
     return (DateFormat('MMM d, yyyy').format(_today) !=
             DateFormat('MMM d, yyyy').format(_sendTime))

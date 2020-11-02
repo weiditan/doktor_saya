@@ -6,10 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../functions/loadingScreen.dart';
+import 'ext/doctorExpDatabase.dart';
+import 'ext/profileDatabase.dart';
 import 'ext/profileImage.dart';
-import '../../functions/DatabaseConnect.dart' as db;
+
 import 'ext/diffDate.dart' as dd;
 import '../../functions/sharedPreferences.dart' as sp;
+import 'ext/specialistDatabase.dart';
 
 class DoctorPage extends StatefulWidget {
   @override
@@ -36,7 +39,7 @@ class _DoctorPageState extends State<DoctorPage> {
   }
 
   Future _getData() async {
-    await db.getAllDoctor().then((onValue) async {
+    await getAllDoctor().then((onValue) async {
       _arrayDoctor = onValue;
 
       await Future.wait([
@@ -52,7 +55,7 @@ class _DoctorPageState extends State<DoctorPage> {
   }
 
   Future _getSpecialist(Map doctor) async {
-    await db.getDoctorSpecialist(doctor['doctor_id']).then((onValue) {
+    await getDoctorSpecialist(doctor['doctor_id']).then((onValue) {
       if (onValue != null) {
         String output = "";
         for (int i = 0; i < onValue.length; i++) {
@@ -74,7 +77,7 @@ class _DoctorPageState extends State<DoctorPage> {
   }
 
   Future _getTotalExp(Map doctor) async {
-    await db.getDoctorExp(doctor['doctor_id']).then((onValue) {
+    await getDoctorExp(doctor['doctor_id']).then((onValue) {
       if (onValue != null) {
         doctor['total_exp'] = dd.outputDiffDate(dd.totalExp(onValue));
       }

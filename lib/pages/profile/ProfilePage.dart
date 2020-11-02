@@ -3,14 +3,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
-import '../../functions/DatabaseConnect.dart' as db;
 import '../../functions/sharedPreferences.dart' as sp;
+import 'ext/doctorExpDatabase.dart';
 import 'ext/doctorExperience.dart';
 import 'ext/doctorSpecialist.dart';
 import 'ext/doctorWorkplace.dart';
 import '../../functions/loadingScreen.dart';
+import 'ext/profileDatabase.dart';
 import 'ext/profileDetail.dart';
 import 'ext/profileImage.dart';
+import 'ext/specialistDatabase.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -50,13 +52,13 @@ class _ProfilePageState extends State<ProfilePage> {
     ]);
 
     await Future.wait([
-      db.getUserDetail(_roleId).then((onValue) {
+      getUserDetail(_roleId).then((onValue) {
         _userData = onValue;
       }),
-      db.getDoctorSpecialist(_roleId).then((onValue) {
+      getDoctorSpecialist(_roleId).then((onValue) {
         _arrayDoctorSpecialist = onValue;
       }),
-      db.getDoctorExp(_roleId).then((onValue) {
+      getDoctorExp(_roleId).then((onValue) {
         _arrayDoctorExp = onValue;
       })
     ]);

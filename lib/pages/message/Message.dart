@@ -3,9 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:doktorsaya/pages/message/bubble.dart';
-import 'package:doktorsaya/functions/DatabaseConnect.dart' as db;
 import 'package:doktorsaya/functions/loadingScreen.dart';
 import 'package:doktorsaya/pages/profile/ext/profileImage.dart';
+
+import 'ext/messageDatabase.dart';
 
 class Message extends StatefulWidget {
   @override
@@ -37,8 +38,7 @@ class _MessageState extends State<Message> {
 
   Future _getData() async {
     while (_loop) {
-      await db
-          .getMessage(widget.data['sender'], widget.data['receiver'])
+      await getMessage(widget.data['sender'], widget.data['receiver'])
           .then((onValue) {
         if (_arrayMessage == null) {
           setState(() {
@@ -155,7 +155,7 @@ class _MessageState extends State<Message> {
             child: new Container(
               margin: new EdgeInsets.symmetric(horizontal: 1.0),
               child: new IconButton(
-                icon: new Icon(Icons.face,color: Colors.black),
+                icon: new Icon(Icons.face, color: Colors.black),
                 onPressed: () {
                   print(_scrollController);
                   _scrollToEnd();
@@ -167,7 +167,10 @@ class _MessageState extends State<Message> {
           Flexible(
             child: Container(
               child: TextFormField(
-                style: TextStyle(fontSize: 15.0,color: Colors.black, ),
+                style: TextStyle(
+                  fontSize: 15.0,
+                  color: Colors.black,
+                ),
                 decoration: InputDecoration.collapsed(
                   hintText: 'Type a message',
                   hintStyle: TextStyle(color: Colors.grey),
@@ -182,16 +185,17 @@ class _MessageState extends State<Message> {
             child: new Container(
               margin: new EdgeInsets.symmetric(horizontal: 8.0),
               child: new IconButton(
-                icon: new Icon(Icons.send,color: Colors.black,),
+                icon: new Icon(
+                  Icons.send,
+                  color: Colors.black,
+                ),
                 onPressed: () {
                   if (_messageController.text != "") {
-                    db
-                        .addTextMessage(widget.data['sender'],
+                    addTextMessage(widget.data['sender'],
                             widget.data['receiver'], _messageController.text)
                         .then((s) {
                       if (s['status']) {
-                        db
-                            .getMessage(
+                        getMessage(
                                 widget.data['sender'], widget.data['receiver'])
                             .then((onValue) {
                           setState(() {

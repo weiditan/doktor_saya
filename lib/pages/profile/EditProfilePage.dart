@@ -1,4 +1,4 @@
-import 'package:doktorsaya/functions/DatabaseConnect.dart';
+
 import 'package:doktorsaya/functions/loadingScreen.dart';
 import 'package:doktorsaya/pages/profile/ext/editProfileDatabase.dart';
 import 'package:doktorsaya/pages/profile/ext/text.dart';
@@ -15,6 +15,7 @@ import 'package:path/path.dart' as path;
 
 import '../../functions/sharedPreferences.dart' as sp;
 import '../../functions/progressDialog.dart' as pr;
+import 'ext/profileDatabase.dart';
 
 class EditProfilePage extends StatefulWidget {
   @override

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../functions/DatabaseConnect.dart' as db;
 import '../../functions/sharedPreferences.dart' as sp;
 import '../../functions/loadingScreen.dart';
 import '../profile/ext/profileImage.dart';
+import 'ext/messageDatabase.dart';
 
 class MessagePage extends StatefulWidget {
   @override
@@ -35,7 +35,7 @@ class _MessagePageState extends State<MessagePage> {
 
   Future getData() async {
     _roleId = await sp.getRoleId();
-    _arrayDoctor = await db.getMessageList(_roleId);
+    _arrayDoctor = await getMessageList(_roleId);
     setState(() {
       _hideLoadingScreen();
     });
@@ -43,7 +43,7 @@ class _MessagePageState extends State<MessagePage> {
 
   Future _refresh() async {
     while (_loop) {
-      await db.getMessageList(_roleId).then((onValue) {
+      await getMessageList(_roleId).then((onValue) {
         setState(() {
           _arrayDoctor = onValue;
         });
@@ -200,8 +200,8 @@ class _MessagePageState extends State<MessagePage> {
   }
 
   String _outputDate(String sendTime) {
-    DateTime _today = DateTime.now().add(Duration(hours: 8));
-    DateTime _sendTime = DateTime.parse(sendTime).add(Duration(hours: 8));
+    DateTime _today = DateTime.now();
+    DateTime _sendTime = DateTime.parse(sendTime);
 
     return (DateFormat('MMM d, yyyy').format(_today) !=
             DateFormat('MMM d, yyyy').format(_sendTime))

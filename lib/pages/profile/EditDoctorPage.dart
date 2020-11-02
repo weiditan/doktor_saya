@@ -5,9 +5,12 @@ import 'package:intl/intl.dart';
 
 import '../../functions/progressDialog.dart' as pr;
 import '../../functions/sharedPreferences.dart' as sp;
+import 'ext/doctorExpDatabase.dart';
+import 'ext/profileDatabase.dart';
+import 'ext/specialistDatabase.dart';
 import 'ext/text.dart' as tx;
-import '../../functions/DatabaseConnect.dart' as db;
 import '../../functions/loadingScreen.dart' as ls;
+import 'ext/workplaceDatabase.dart';
 
 class EditDoctorPage extends StatefulWidget {
   @override
@@ -49,16 +52,16 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
     _roleId = await sp.getRoleId();
 
     await Future.wait([
-      db.getSpecialist().then((onValue) {
+      getSpecialist().then((onValue) {
         _arraySpecialist = onValue;
       }),
-      db.getDoctorSpecialist(_roleId).then((onValue) {
+      getDoctorSpecialist(_roleId).then((onValue) {
         _arrayDoctorSpecialist = onValue;
       }),
-      db.getState().then((onValue) {
+      getState().then((onValue) {
         _arrayState = onValue;
       }),
-      db.getWorkplace(_roleId).then((array) {
+      getWorkplace(_roleId).then((array) {
         if (array["workplace"] != "") {
           _workplaceController.text = array["workplace"];
           if (array["state_id"] == null) {
@@ -71,7 +74,7 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
           _stateController.text = array["state"];
         }
       }),
-      db.getDoctorExp(_roleId).then((onValue) {
+      getDoctorExp(_roleId).then((onValue) {
         _arrayDoctorExp = onValue;
       })
     ]);
@@ -262,12 +265,12 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
           ),
           onPressed: () async {
             await pr.show(context, "Memuatkan");
-            db
-                .deleteDoctorSpecialist(doctorSpecialistId)
+
+            deleteDoctorSpecialist(doctorSpecialistId)
                 .timeout(new Duration(seconds: 15))
                 .then((s) async {
               if (s['status']) {
-                db.getDoctorSpecialist(_roleId).then((onValue) async {
+                getDoctorSpecialist(_roleId).then((onValue) async {
                   setState(() {
                     _arrayDoctorSpecialist = onValue;
                   });
@@ -315,12 +318,12 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
             ),
             onPressed: () async {
               await pr.show(context, "Memuatkan");
-              db
-                  .deleteDoctorExp(doctorExpId)
+
+              deleteDoctorExp(doctorExpId)
                   .timeout(new Duration(seconds: 15))
                   .then((s) async {
                 if (s['status']) {
-                  db.getDoctorExp(_roleId).then((onValue) async {
+                  getDoctorExp(_roleId).then((onValue) async {
                     setState(() {
                       _arrayDoctorExp = onValue;
                     });
@@ -573,8 +576,8 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
                           "Tarikh tamat tidak boleh sama atau kurang daripada tarikh mula.");
                     } else {
                       await pr.show(context, "Memuatkan");
-                      db
-                          .addDoctorExp(
+
+                      addDoctorExp(
                               _roleId,
                               _expWorkplaceController.text,
                               DateFormat('yyyy-MM-dd').format(_startDate),
@@ -583,7 +586,7 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
                           .then(
                         (s) async {
                           if (s['status']) {
-                            db.getDoctorExp(_roleId).then((onValue) async {
+                            getDoctorExp(_roleId).then((onValue) async {
                               pageSetState(() {
                                 _arrayDoctorExp = onValue;
                               });
@@ -604,14 +607,14 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
                     }
                   } else {
                     await pr.show(context, "Memuatkan");
-                    db
-                        .addDoctorExp(_roleId, _expWorkplaceController.text,
+
+                    addDoctorExp(_roleId, _expWorkplaceController.text,
                             DateFormat('yyyy-MM-dd').format(_startDate), "")
                         .timeout(new Duration(seconds: 15))
                         .then(
                       (s) async {
                         if (s['status']) {
-                          db.getDoctorExp(_roleId).then((onValue) async {
+                          getDoctorExp(_roleId).then((onValue) async {
                             pageSetState(() {
                               _arrayDoctorExp = onValue;
                             });
@@ -738,13 +741,12 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
                 if (_specialistFormKey.currentState.validate()) {
                   await pr.show(context, "Memuatkan");
 
-                  db
-                      .addDoctorSpecialist(_roleId, _valueSpecialist,
+                  addDoctorSpecialist(_roleId, _valueSpecialist,
                           _subSpecialistController.text)
                       .timeout(new Duration(seconds: 15))
                       .then((s) async {
                     if (s['status']) {
-                      db.getDoctorSpecialist(_roleId).then((onValue) {
+                      getDoctorSpecialist(_roleId).then((onValue) {
                         pageSetState(() {
                           _arrayDoctorSpecialist = onValue;
                         });
@@ -982,8 +984,8 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
   Future _updateWorkplace(String roleId, String workplace, int stateId,
       String country, String state) async {
     await pr.show(context, "Memuatkan");
-    db
-        .updateWorkplace(roleId, workplace, stateId, country, state)
+
+    updateWorkplace(roleId, workplace, stateId, country, state)
         .timeout(new Duration(seconds: 15))
         .then((s) async {
       if (s['status']) {

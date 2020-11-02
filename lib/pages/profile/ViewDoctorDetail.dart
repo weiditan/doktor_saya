@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 
 import 'package:doktorsaya/pages/call/ext/callFunction.dart';
-import '../../functions/DatabaseConnect.dart' as db;
 import '../../functions/sharedPreferences.dart' as sp;
+import 'ext/doctorExpDatabase.dart';
 import 'ext/doctorExperience.dart';
 import 'ext/doctorSpecialist.dart';
 import 'ext/doctorWorkplace.dart';
 import 'ext/profileDetail.dart';
 import 'ext/profileImage.dart';
 import '../../functions/loadingScreen.dart';
+import 'ext/specialistDatabase.dart';
 
 class ViewDoctorDetail extends StatefulWidget {
   @override
@@ -34,10 +35,10 @@ class _ViewDoctorDetailState extends State<ViewDoctorDetail> {
       sp.getRoleId().then((onValue) {
         _roleId = onValue;
       }),
-      db.getDoctorSpecialist(widget.doctor['doctor_id']).then((onValue) {
+      getDoctorSpecialist(widget.doctor['doctor_id']).then((onValue) {
         _arrayDoctorSpecialist = onValue;
       }),
-      db.getDoctorExp(widget.doctor['doctor_id']).then((onValue) {
+      getDoctorExp(widget.doctor['doctor_id']).then((onValue) {
         _arrayDoctorExp = onValue;
       })
     ]).then((onValue) {
