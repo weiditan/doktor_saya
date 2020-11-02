@@ -56,12 +56,61 @@ Future<Map> endCall(String callId) async {
   return data;
 }
 
+Future<Map> acceptCallDatabase(String callId) async {
+  http.Response response = await retry(
+    // Make a GET request
+        () => http.post(url, body: {
+      'action': 'acceptCall',
+      'call_id': callId,
+    }).timeout(Duration(seconds: 5)),
+    // Retry on SocketException or TimeoutException
+    retryIf: (e) => e is SocketException || e is TimeoutException,
+  );
+
+  Map data = jsonDecode(response.body);
+
+  return data;
+}
+
 Future<Map> checkEndCall(String callId) async {
   http.Response response = await retry(
     // Make a GET request
     () => http.post(url, body: {
       'action': 'checkEndCall',
       'call_id': callId,
+    }).timeout(Duration(seconds: 5)),
+    // Retry on SocketException or TimeoutException
+    retryIf: (e) => e is SocketException || e is TimeoutException,
+  );
+
+  Map data = jsonDecode(response.body);
+
+  return data;
+}
+
+Future<List> getCallList(String roleId) async {
+  http.Response response = await retry(
+    // Make a GET request
+        () => http.post(url, body: {
+      'action': 'getCallList',
+      'role_id': roleId,
+    }).timeout(Duration(seconds: 5)),
+    // Retry on SocketException or TimeoutException
+    retryIf: (e) => e is SocketException || e is TimeoutException,
+  );
+
+  List data = jsonDecode(response.body);
+
+  return data;
+}
+
+Future<Map> addPrescription(String callId,String prescription) async {
+  http.Response response = await retry(
+    // Make a GET request
+        () => http.post(url, body: {
+      'action': 'addPrescription',
+      'call_id': callId,
+      'prescription': prescription,
     }).timeout(Duration(seconds: 5)),
     // Retry on SocketException or TimeoutException
     retryIf: (e) => e is SocketException || e is TimeoutException,

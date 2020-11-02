@@ -1,9 +1,9 @@
 import 'package:doktorsaya/pages/profile/DoctorPage.dart';
-import 'package:doktorsaya/page1.dart';
 import 'package:doktorsaya/pages/message/MessagePage.dart';
 import 'package:doktorsaya/pages/profile/ProfilePage.dart';
 import 'package:flutter/material.dart';
 
+import 'call/CallListPage.dart';
 import 'call/ext/callDatabase.dart';
 import 'profile/ext/doctorOnlineStatusDatabase.dart';
 import '../functions/exitWithDoubleBack.dart';
@@ -21,7 +21,7 @@ class _TestState extends State<HomePage> {
 
   List<Widget> _body = [
     MessagePage(),
-    Page1(),
+    CallListPage(),
     DoctorPage(),
     ProfilePage(),
   ];

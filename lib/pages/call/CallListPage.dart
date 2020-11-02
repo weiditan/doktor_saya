@@ -1,22 +1,24 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../functions/DatabaseConnect.dart' as db;
+import 'ViewPrescription.dart';
 import '../../functions/sharedPreferences.dart' as sp;
 import '../../functions/loadingScreen.dart';
 import '../profile/ext/profileImage.dart';
+import 'ext/callDatabase.dart';
 
-class MessagePage extends StatefulWidget {
+class CallListPage extends StatefulWidget {
   @override
-  _MessagePageState createState() => _MessagePageState();
+  _CallListPageState createState() => _CallListPageState();
 }
 
-class _MessagePageState extends State<MessagePage> {
+class _CallListPageState extends State<CallListPage> {
   String _roleId;
   bool _loadingIconVisible = true;
   bool _loadingVisible = true;
   bool _loop = true;
-  List _arrayDoctor;
+  List _arrayCallList;
 
   @override
   void initState() {
@@ -35,7 +37,7 @@ class _MessagePageState extends State<MessagePage> {
 
   Future getData() async {
     _roleId = await sp.getRoleId();
-    _arrayDoctor = await db.getMessageList(_roleId);
+    _arrayCallList = await getCallList(_roleId);
     setState(() {
       _hideLoadingScreen();
     });
@@ -43,9 +45,9 @@ class _MessagePageState extends State<MessagePage> {
 
   Future _refresh() async {
     while (_loop) {
-      await db.getMessageList(_roleId).then((onValue) {
+      await getCallList(_roleId).then((onValue) {
         setState(() {
-          _arrayDoctor = onValue;
+          _arrayCallList = onValue;
         });
       });
       await Future.delayed(Duration(seconds: 5));
@@ -81,7 +83,7 @@ class _MessagePageState extends State<MessagePage> {
   }
 
   Widget _secondScreen() {
-    return (_arrayDoctor == null)
+    return (_arrayCallList == null)
         ? Container()
         : SingleChildScrollView(
             physics: BouncingScrollPhysics(),
@@ -91,32 +93,24 @@ class _MessagePageState extends State<MessagePage> {
                 SizedBox(
                   height: 10,
                 ),
-                for (int i = 0; i < _arrayDoctor.length; i++)
+                for (int i = 0; i < _arrayCallList.length; i++)
                   _messageRow(
-                      _arrayDoctor[i]['doctor_id'],
-                      (_arrayDoctor[i]['doctor_id'][0] == "d")
-                          ? "Dr " + _arrayDoctor[i]['nickname']
-                          : _arrayDoctor[i]['nickname'],
-                      _arrayDoctor[i]['image'],
-                      _arrayDoctor[i]['message'],
-                      _arrayDoctor[i]['sendtime'],
-                      _arrayDoctor[i]['unread']),
+                      _arrayCallList[i]['call_id'],
+                      _arrayCallList[i]['caller'],
+                      _arrayCallList[i]['accept_call'],
+                      _arrayCallList[i]['nickname'],
+                      _arrayCallList[i]['image'],
+                      _arrayCallList[i]['sendtime'],
+                      _arrayCallList[i]['prescription']),
               ],
             ),
           );
   }
 
-  Widget _messageRow(String doctorId, String name, String image, String message,
-      String sendTime, String unread) {
+  Widget _messageRow(String callId, String callerId, String acceptCall,
+      String name, String image, String sendTime, String prescription) {
     return InkWell(
-      onTap: () {
-        Navigator.pushNamed(context, '/Message', arguments: {
-          'sender': _roleId,
-          'receiver': doctorId,
-          'doctor_name': name,
-          'doctor_image': image
-        });
-      },
+      onTap: () {},
       child: Padding(
         padding: EdgeInsets.only(left: 10, right: 10, top: 5),
         child: Column(
@@ -142,17 +136,8 @@ class _MessagePageState extends State<MessagePage> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Text(
-                          message,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontFamily: "Montserrat",
-                          ),
-                        ),
+                        if (prescription != "")
+                          _prescriptionButton(callId, prescription),
                       ],
                     ),
                   ),
@@ -160,30 +145,27 @@ class _MessagePageState extends State<MessagePage> {
                 SizedBox(
                   width: 90,
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Text(_outputDate(sendTime),textAlign: TextAlign.center,),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      (unread != "0")
-                          ? Container(
-                              width: 25,
-                              height: 25,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        Text(
+                          _outputDate(sendTime),
+                          textAlign: TextAlign.center,
+                        ),
+                        (acceptCall == "1")
+                            ? (_roleId == callerId)
+                                ? Icon(
+                                    Icons.call_made,
+                                    color: Colors.green,
+                                  )
+                                : Icon(
+                                    Icons.call_received,
+                                    color: Colors.green,
+                                  )
+                            : Icon(
+                                Icons.call_missed_outgoing,
                                 color: Colors.red,
                               ),
-                              child: Center(
-                                child: (int.parse(unread) < 100)
-                                    ? Text(unread,
-                                        style: TextStyle(color: Colors.white))
-                                    : Text("...",
-                                        style: TextStyle(color: Colors.white)),
-                              ))
-                          : Text(""),
-                    ],
-                  ),
+                      ]),
                 ),
               ],
             ),
@@ -210,5 +192,43 @@ class _MessagePageState extends State<MessagePage> {
             ? DateFormat('MMM d, yyyy\n').add_jm().format(_sendTime)
             : "Semalam\n" + DateFormat().add_jm().format(_sendTime)
         : DateFormat().add_jm().format(_sendTime);
+  }
+
+  Widget _prescriptionButton(String callId, String prescription) {
+    return SizedBox(
+      width: 120,
+      child: RaisedButton(
+        color: Colors.orange,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(5)),
+        ),
+        child: Row(
+          children: <Widget>[
+            Icon(
+              Icons.message,
+              size: 20,
+            ),
+            SizedBox(
+              width: 5,
+            ),
+            Text(
+              "Preskripsi\nPerubatan",
+              style: TextStyle(
+                fontFamily: "Montserrat",
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ViewPrescription(
+                    callId: callId, prescription: prescription)),
+          );
+        },
+      ),
+    );
   }
 }

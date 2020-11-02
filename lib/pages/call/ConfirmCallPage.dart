@@ -16,6 +16,7 @@ class _ConfirmCallPageState extends State<ConfirmCallPage> {
   bool _loadingVisible = true;
   bool _loadingIconVisible = true;
   Map _userData;
+  bool _loop = true;
 
   @override
   void initState() {
@@ -26,7 +27,16 @@ class _ConfirmCallPageState extends State<ConfirmCallPage> {
         _hideLoadingScreen();
       });
     });
+
+    _checkEndCall();
   }
+
+  @override
+  void dispose() {
+    _loop = false;
+    super.dispose();
+  }
+
 
   Future _getData() async {
     _userData = await getUserDetail(widget.arguments['caller']);
@@ -40,6 +50,17 @@ class _ConfirmCallPageState extends State<ConfirmCallPage> {
     setState(() {
       _loadingVisible = false;
     });
+  }
+
+  Future _checkEndCall() async {
+    while (_loop) {
+      await checkEndCall(widget.arguments['call_id']).then((s){
+        if(s['status']){
+          Navigator.pop(context);
+        }
+      });
+      await Future.delayed(Duration(seconds: 1));
+    }
   }
 
   @override
@@ -150,6 +171,7 @@ class _ConfirmCallPageState extends State<ConfirmCallPage> {
         shape: CircleBorder(),
         child: Icon(Icons.call),
         onPressed: () {
+          _loop = false;
           acceptCall(context, widget.arguments['call_id'], widget.arguments['caller']);
         },
       ),

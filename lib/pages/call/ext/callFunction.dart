@@ -45,6 +45,8 @@ Future<void> acceptCall(
   // await for camera and mic permissions before pushing video page
   await _handleCameraAndMic();
 
+  await acceptCallDatabase(callId);
+
   // push video page with given channel name
   await Navigator.pushReplacement(
     context,

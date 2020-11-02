@@ -7,6 +7,7 @@ import 'package:doktorsaya/pages/call/ext/callDatabase.dart';
 import 'package:doktorsaya/pages/profile/ext/profileImage.dart';
 import 'package:flutter/material.dart';
 
+import 'WritePrescription.dart';
 import 'ext/settings.dart';
 
 class CallPage extends StatefulWidget {
@@ -58,15 +59,14 @@ class _CallPageState extends State<CallPage> {
 
   Future _checkEndCall() async {
     while (_loop) {
-      await checkEndCall(widget.callId).then((s){
-        if(s['status']){
-          Navigator.pop(context);
+      await checkEndCall(widget.callId).then((s) {
+        if (s['status']) {
+          _exit();
         }
       });
       await Future.delayed(Duration(seconds: 1));
     }
   }
-
 
   Future<void> initialize() async {
     if (APP_ID.isEmpty) {
@@ -370,7 +370,17 @@ class _CallPageState extends State<CallPage> {
 
   void _onCallEnd(BuildContext context) {
     endCall(widget.callId);
-    Navigator.pop(context);
+    _exit();
+  }
+
+  void _exit() {
+    _loop = false;
+    (widget.doctorName == "")
+        ? Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => WritePrescription(callId: widget.callId,)),
+          )
+        : Navigator.pop(context);
   }
 
   void _onToggleMute() {
