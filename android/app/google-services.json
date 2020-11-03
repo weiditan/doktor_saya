@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1053862065399",
+    "firebase_url": "https://doctorsaya-ee87b.firebaseio.com",
+    "project_id": "doctorsaya-ee87b",
+    "storage_bucket": "doctorsaya-ee87b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1053862065399:android:e83f8756d383ef26344ff2",
+        "android_client_info": {
+          "package_name": "com.example.doktorsaya"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1053862065399-mnu2kocu1u4b84o3d19e7u24uneagq7e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAbJ1DvU4IGTK1AvmRt1uBbSzV-rzyiBhI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1053862065399-mnu2kocu1u4b84o3d19e7u24uneagq7e.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

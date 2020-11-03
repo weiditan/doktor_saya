@@ -500,8 +500,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         Navigator.pushNamedAndRemoveUntil(context, '/HomePage',
                             (Route<dynamic> route) => false);
                       } else {
-                        Navigator.pushNamedAndRemoveUntil(context,
-                            '/EditDoctorPage', (Route<dynamic> route) => false);
+                        Navigator.pushReplacementNamed(context,
+                            '/EditDoctorPage');
                       }
                     } else {
                       await pr.warning("Sila cuba lagi !");

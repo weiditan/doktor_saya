@@ -94,6 +94,7 @@ class _CallListPageState extends State<CallListPage> {
                   height: 10,
                 ),
                 for (int i = 0; i < _arrayCallList.length; i++)
+                  if(!(_roleId != _arrayCallList[i]['caller'] && _arrayCallList[i]['accept_call'] == "0"))
                   _messageRow(
                       _arrayCallList[i]['call_id'],
                       _arrayCallList[i]['caller'],

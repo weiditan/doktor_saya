@@ -191,6 +191,7 @@ class _CallPageState extends State<CallPage> {
                                         "Dr " + widget.doctorName,
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
+                                            color: Colors.white,
                                             fontSize: 26,
                                             fontWeight: FontWeight.bold),
                                       ),
@@ -378,7 +379,10 @@ class _CallPageState extends State<CallPage> {
     (widget.doctorName == "")
         ? Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => WritePrescription(callId: widget.callId,)),
+            MaterialPageRoute(
+                builder: (context) => WritePrescription(
+                      callId: widget.callId,
+                    )),
           )
         : Navigator.pop(context);
   }
