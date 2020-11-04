@@ -6,12 +6,12 @@ import '../../functions/loadingScreen.dart';
 import '../profile/ext/profileImage.dart';
 import 'ext/messageDatabase.dart';
 
-class MessagePage extends StatefulWidget {
+class MessageListPage extends StatefulWidget {
   @override
-  _MessagePageState createState() => _MessagePageState();
+  _MessageListPageState createState() => _MessageListPageState();
 }
 
-class _MessagePageState extends State<MessagePage> {
+class _MessageListPageState extends State<MessageListPage> {
   String _roleId;
   bool _loadingIconVisible = true;
   bool _loadingVisible = true;
@@ -110,7 +110,7 @@ class _MessagePageState extends State<MessagePage> {
       String sendTime, String unread) {
     return InkWell(
       onTap: () {
-        Navigator.pushNamed(context, '/Message', arguments: {
+       Navigator.pushNamed(context, '/Message', arguments: {
           'sender': _roleId,
           'receiver': doctorId,
           'doctor_name': name,
@@ -162,7 +162,10 @@ class _MessagePageState extends State<MessagePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
-                      Text(_outputDate(sendTime),textAlign: TextAlign.center,),
+                      Text(
+                        _outputDate(sendTime),
+                        textAlign: TextAlign.center,
+                      ),
                       SizedBox(
                         height: 10,
                       ),
@@ -200,8 +203,9 @@ class _MessagePageState extends State<MessagePage> {
   }
 
   String _outputDate(String sendTime) {
-    DateTime _today = DateTime.now();
-    DateTime _sendTime = DateTime.parse(sendTime);
+    Duration _timeZone = DateTime.now().timeZoneOffset;
+    DateTime _today = DateTime.now().add(_timeZone);
+    DateTime _sendTime = DateTime.parse(sendTime).add(_timeZone);
 
     return (DateFormat('MMM d, yyyy').format(_today) !=
             DateFormat('MMM d, yyyy').format(_sendTime))

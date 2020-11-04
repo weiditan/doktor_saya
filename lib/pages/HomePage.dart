@@ -1,6 +1,8 @@
 import 'package:doktorsaya/pages/profile/DoctorPage.dart';
-import 'package:doktorsaya/pages/message/MessagePage.dart';
+import 'package:doktorsaya/pages/message/MessageListPage.dart';
 import 'package:doktorsaya/pages/profile/ProfilePage.dart';
+import 'package:doktorsaya/pages/profile/ext/profileDatabase.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 import 'call/CallListPage.dart';
@@ -15,12 +17,14 @@ class HomePage extends StatefulWidget {
 }
 
 class _TestState extends State<HomePage> {
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+
   String _role, _roleId;
   int _selectedIndex = 2;
   var _arrayTitle = ['Mesej', 'Panggilan', 'Doktor', 'Profil'];
 
   List<Widget> _body = [
-    MessagePage(),
+    MessageListPage(),
     CallListPage(),
     DoctorPage(),
     ProfilePage(),
@@ -29,6 +33,43 @@ class _TestState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+
+    updateToken();
+    
+    _firebaseMessaging.configure(
+      onMessage: (Map<String, dynamic> message) async {
+        print("onMessage: $message");
+
+        /* final notification = message['notification'];
+        setState(() {
+          messages.add(Message(
+            title: notification['title'],
+            body: notification['body'],
+          ));
+        });*/
+      },
+      onLaunch: (Map<String, dynamic> message) async {
+        print("onLaunch: $message");
+/*
+        final notification = message['data'];
+        setState(() {
+          messages.add(Message(
+            title: '${notification['title']}',
+            body: '${notification['body']}',
+          ));
+        });*/
+      },
+      onResume: (Map<String, dynamic> message) async {
+        Navigator.popUntil(context, ModalRoute.withName('/HomePage'));
+        setState(() {
+          _selectedIndex = 0;
+        });
+        print("onResume: $message");
+      },
+    );
+    _firebaseMessaging.requestNotificationPermissions(
+        const IosNotificationSettings(sound: true, badge: true, alert: true));
+
     _updateOnlineStatus().then((_) {
       _checkCall();
     });

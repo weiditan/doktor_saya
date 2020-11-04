@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:doktorsaya/functions/sharedPreferences.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 import 'package:retry/retry.dart';
 
@@ -43,6 +45,25 @@ Future<List> getAllDoctor() async {
   );
 
   List data = jsonDecode(response.body);
+
+  return data;
+}
+
+Future<Map> updateToken() async {
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+  String _token = await _firebaseMessaging.getToken();
+  String _roleId = await getRoleId();
+
+  var url = 'http://www.breakvoid.com/DoktorSaya/UpdateToken.php';
+  http.Response response = await retry(
+    // Make a GET request
+    () => http.post(url, body: {'role_id': _roleId, 'token': _token}).timeout(
+        Duration(seconds: 5)),
+    // Retry on SocketException or TimeoutException
+    retryIf: (e) => e is SocketException || e is TimeoutException,
+  );
+
+  Map data = jsonDecode(response.body);
 
   return data;
 }

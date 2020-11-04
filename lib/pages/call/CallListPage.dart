@@ -99,7 +99,9 @@ class _CallListPageState extends State<CallListPage> {
                       _arrayCallList[i]['call_id'],
                       _arrayCallList[i]['caller'],
                       _arrayCallList[i]['accept_call'],
-                      _arrayCallList[i]['nickname'],
+                      (_arrayCallList[i]['doctor_id'] != "")
+                          ? "Dr " + _arrayCallList[i]['nickname']
+                          : _arrayCallList[i]['nickname'],
                       _arrayCallList[i]['image'],
                       _arrayCallList[i]['sendtime'],
                       _arrayCallList[i]['prescription']),
@@ -183,8 +185,9 @@ class _CallListPageState extends State<CallListPage> {
   }
 
   String _outputDate(String sendTime) {
-    DateTime _today = DateTime.now();
-    DateTime _sendTime = DateTime.parse(sendTime);
+    Duration _timeZone = DateTime.now().timeZoneOffset;
+    DateTime _today = DateTime.now().add(_timeZone);
+    DateTime _sendTime = DateTime.parse(sendTime).add(_timeZone);
 
     return (DateFormat('MMM d, yyyy').format(_today) !=
             DateFormat('MMM d, yyyy').format(_sendTime))
