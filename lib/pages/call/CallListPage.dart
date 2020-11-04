@@ -83,8 +83,12 @@ class _CallListPageState extends State<CallListPage> {
   }
 
   Widget _secondScreen() {
-    return (_arrayCallList == null)
-        ? Container()
+    return (_arrayCallList == null || _arrayCallList.length == 0)
+        ? Container(
+            child: Center(
+              child: Text("Tiada Panggilan"),
+            ),
+          )
         : SingleChildScrollView(
             physics: BouncingScrollPhysics(),
             child: Column(
@@ -94,17 +98,16 @@ class _CallListPageState extends State<CallListPage> {
                   height: 10,
                 ),
                 for (int i = 0; i < _arrayCallList.length; i++)
-                  if(!(_roleId != _arrayCallList[i]['caller'] && _arrayCallList[i]['accept_call'] == "0"))
-                  _messageRow(
-                      _arrayCallList[i]['call_id'],
-                      _arrayCallList[i]['caller'],
-                      _arrayCallList[i]['accept_call'],
-                      (_arrayCallList[i]['doctor_id'] != "")
-                          ? "Dr " + _arrayCallList[i]['nickname']
-                          : _arrayCallList[i]['nickname'],
-                      _arrayCallList[i]['image'],
-                      _arrayCallList[i]['sendtime'],
-                      _arrayCallList[i]['prescription']),
+                    _messageRow(
+                        _arrayCallList[i]['call_id'],
+                        _arrayCallList[i]['caller'],
+                        _arrayCallList[i]['accept_call'],
+                        (_arrayCallList[i]['id'][0] == "d")
+                            ? "Dr " + _arrayCallList[i]['nickname']
+                            : _arrayCallList[i]['nickname'],
+                        _arrayCallList[i]['image'],
+                        _arrayCallList[i]['sendtime'],
+                        _arrayCallList[i]['prescription']),
               ],
             ),
           );
@@ -164,10 +167,15 @@ class _CallListPageState extends State<CallListPage> {
                                     Icons.call_received,
                                     color: Colors.green,
                                   )
-                            : Icon(
-                                Icons.call_missed_outgoing,
-                                color: Colors.red,
-                              ),
+                            : (_roleId == callerId)
+                                ? Icon(
+                                    Icons.call_missed_outgoing,
+                                    color: Colors.red,
+                                  )
+                                : Icon(
+                                    Icons.call_missed,
+                                    color: Colors.red,
+                                  ),
                       ]),
                 ),
               ],
@@ -186,7 +194,7 @@ class _CallListPageState extends State<CallListPage> {
 
   String _outputDate(String sendTime) {
     Duration _timeZone = DateTime.now().timeZoneOffset;
-    DateTime _today = DateTime.now().add(_timeZone);
+    DateTime _today = DateTime.now();
     DateTime _sendTime = DateTime.parse(sendTime).add(_timeZone);
 
     return (DateFormat('MMM d, yyyy').format(_today) !=

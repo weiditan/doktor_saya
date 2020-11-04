@@ -94,7 +94,7 @@ class MyApp extends StatelessWidget {
 
           case '/EditProfilePage':
             return PageTransition(
-              child: EditProfilePage(),
+              child: EditProfilePage(settings.arguments),
               type: PageTransitionType.fade,
               settings: settings,
             );

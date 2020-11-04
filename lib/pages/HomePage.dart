@@ -35,11 +35,10 @@ class _TestState extends State<HomePage> {
     super.initState();
 
     updateToken();
-    
+
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
         print("onMessage: $message");
-
         /* final notification = message['notification'];
         setState(() {
           messages.add(Message(
@@ -50,14 +49,6 @@ class _TestState extends State<HomePage> {
       },
       onLaunch: (Map<String, dynamic> message) async {
         print("onLaunch: $message");
-/*
-        final notification = message['data'];
-        setState(() {
-          messages.add(Message(
-            title: '${notification['title']}',
-            body: '${notification['body']}',
-          ));
-        });*/
       },
       onResume: (Map<String, dynamic> message) async {
         Navigator.popUntil(context, ModalRoute.withName('/HomePage'));

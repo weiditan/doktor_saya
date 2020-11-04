@@ -8,12 +8,20 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1053862065399:android:e83f8756d383ef26344ff2",
+        "mobilesdk_app_id": "1:1053862065399:android:d029b84569b50a3e344ff2",
         "android_client_info": {
           "package_name": "com.example.doktorsaya"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "1053862065399-k7it66sf7m11aptmsburn979chjh1mhf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.doktorsaya",
+            "certificate_hash": "c5b1897facf3a2639fe4b824e63e16c217b5423f"
+          }
+        },
         {
           "client_id": "1053862065399-mnu2kocu1u4b84o3d19e7u24uneagq7e.apps.googleusercontent.com",
           "client_type": 3

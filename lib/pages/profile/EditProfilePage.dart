@@ -1,4 +1,3 @@
-
 import 'package:doktorsaya/functions/loadingScreen.dart';
 import 'package:doktorsaya/pages/profile/ext/editProfileDatabase.dart';
 import 'package:doktorsaya/pages/profile/ext/text.dart';
@@ -20,6 +19,9 @@ import 'ext/profileDatabase.dart';
 class EditProfilePage extends StatefulWidget {
   @override
   _EditProfilePageState createState() => _EditProfilePageState();
+
+  final String role;
+  EditProfilePage(this.role);
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
@@ -36,14 +38,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final _dateController = TextEditingController();
   final _phoneController = TextEditingController();
   final _mmcController = TextEditingController();
-  String _role;
 
   String _email = "";
   File _image;
   String _imageName = "";
   String _base64Image = "";
   String _roleId;
-  String _uploadedImage;
+  String _uploadedImage = "";
 
   Future _hideLoadingScreen() async {
     setState(() {
@@ -78,7 +79,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         _dateController.text = DateFormat('MMM d, yyyy').format(_dateOfBirth);
         _email = userData['email'];
 
-        if (_role == "doctor") {
+        if (widget.role == "doctor") {
           _mmcController.text = userData['mmc'];
         }
 
@@ -96,8 +97,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    _role = ModalRoute.of(context).settings.arguments;
-
     double _screenHeight = MediaQuery.of(context).size.height;
     double _screenWidth = MediaQuery.of(context).size.width;
     double _maxWidth;
@@ -146,7 +145,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 _dateField(),
               ],
             ),
-            if (_role == "doctor")
+            if (widget.role == "doctor")
               _entryField("Nombor Pendaftaran MMC", _mmcController),
             Divider(
               thickness: 1,
@@ -158,7 +157,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             Divider(
               thickness: 1,
             ),
-            (_role == "doctor")
+            (widget.role == "doctor")
                 ? _submitButton("Seterusnya")
                 : _submitButton("Simpan"),
             SizedBox(height: 20),
@@ -171,7 +170,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Widget _imageBox(_maxWidth) {
     return InkWell(
       onTap: _getFromGallery,
-      child: (_uploadedImage != null && _image == null)
+      child: (_uploadedImage != "" && _image == null)
           ? Container(
               width: _maxWidth,
               height: _maxWidth,
@@ -471,7 +470,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
                 sp.getUserId().then((id) {
                   if (_image != null) {
-                    _imageName = _role[0] +
+                    _imageName = widget.role[0] +
                         id.toString() +
                         "_" +
                         DateTime.now().millisecondsSinceEpoch.toString() +
@@ -480,9 +479,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   }
 
                   addOrUpdateProfile(
-                          _role[0] + id.toString(),
+                          widget.role[0] + id.toString(),
                           id.toString(),
-                          _role,
+                          widget.role,
                           _fullNameController.text,
                           _nickNameController.text,
                           _valueGender.toString(),
@@ -496,12 +495,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     if (s["status"]) {
                       sp.saveRoleId(s["data"]);
                       await pr.hide();
-                      if (_role == "patient") {
+                      if (widget.role == "patient") {
                         Navigator.pushNamedAndRemoveUntil(context, '/HomePage',
                             (Route<dynamic> route) => false);
                       } else {
-                        Navigator.pushReplacementNamed(context,
-                            '/EditDoctorPage');
+                        Navigator.pushReplacementNamed(
+                            context, '/EditDoctorPage');
                       }
                     } else {
                       await pr.warning("Sila cuba lagi !");

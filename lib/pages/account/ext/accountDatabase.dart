@@ -26,6 +26,22 @@ Future<Map> login(String email, String password) async {
   return data;
 }
 
+Future<Map> googleLogin(String email) async {
+  http.Response response = await retry(
+    // Make a GET request
+        () => http.post(url, body: {
+      'action': 'googleLogin',
+      'email': email,
+    }).timeout(Duration(seconds: 5)),
+    // Retry on SocketException or TimeoutException
+    retryIf: (e) => e is SocketException || e is TimeoutException,
+  );
+
+  Map data = jsonDecode(response.body);
+
+  return data;
+}
+
 Future<Map> registerAccount(String email, String password) async {
 
   http.Response response = await retry(

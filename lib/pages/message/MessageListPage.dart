@@ -81,8 +81,12 @@ class _MessageListPageState extends State<MessageListPage> {
   }
 
   Widget _secondScreen() {
-    return (_arrayDoctor == null)
-        ? Container()
+    return (_arrayDoctor == null || _arrayDoctor.length == 0)
+        ? Container(
+            child: Center(
+              child: Text("Tiada Mesaj"),
+            ),
+          )
         : SingleChildScrollView(
             physics: BouncingScrollPhysics(),
             child: Column(
@@ -101,6 +105,9 @@ class _MessageListPageState extends State<MessageListPage> {
                       _arrayDoctor[i]['message'],
                       _arrayDoctor[i]['sendtime'],
                       _arrayDoctor[i]['unread']),
+                Center(
+                  child: Text("Tiada Mesaj"),
+                )
               ],
             ),
           );
@@ -110,7 +117,7 @@ class _MessageListPageState extends State<MessageListPage> {
       String sendTime, String unread) {
     return InkWell(
       onTap: () {
-       Navigator.pushNamed(context, '/Message', arguments: {
+        Navigator.pushNamed(context, '/Message', arguments: {
           'sender': _roleId,
           'receiver': doctorId,
           'doctor_name': name,
@@ -204,7 +211,7 @@ class _MessageListPageState extends State<MessageListPage> {
 
   String _outputDate(String sendTime) {
     Duration _timeZone = DateTime.now().timeZoneOffset;
-    DateTime _today = DateTime.now().add(_timeZone);
+    DateTime _today = DateTime.now();
     DateTime _sendTime = DateTime.parse(sendTime).add(_timeZone);
 
     return (DateFormat('MMM d, yyyy').format(_today) !=

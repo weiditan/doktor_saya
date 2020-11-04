@@ -2,7 +2,7 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 
 import '../../functions/progressDialog.dart' as pr;
-import 'ext/googleButton.dart';
+import 'ext/googleLogin.dart';
 import 'ext/logo.dart';
 import 'ext/verificationEmailDatabase.dart';
 
@@ -15,13 +15,17 @@ class EditUserPage1 extends StatefulWidget {
 }
 
 class _EditUserPage1State extends State<EditUserPage1> {
-
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
+    checkGoogleLogin(context);
+  }
 
+  @override
+  Widget build(BuildContext context) {
     double _screenHeight = MediaQuery.of(context).size.height;
     double _screenWidth = MediaQuery.of(context).size.width;
     double _maxWidth;
@@ -34,7 +38,9 @@ class _EditUserPage1State extends State<EditUserPage1> {
 
     return Scaffold(
       appBar: AppBar(
-        title: (widget.type=="Forgot Password")?Text('Terlupa kala laluan'):Text('Daftar Akaun'),
+        title: (widget.type == "Forgot Password")
+            ? Text('Terlupa kala laluan')
+            : Text('Daftar Akaun'),
       ),
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
@@ -133,8 +139,10 @@ class _EditUserPage1State extends State<EditUserPage1> {
                 .then((s) async {
               if (s["status"]) {
                 await pr.hide();
-                Navigator.pushNamed(context, '/EditUserPage2',
-                    arguments: { 'type': widget.type, 'email' : _emailController.text});
+                Navigator.pushNamed(context, '/EditUserPage2', arguments: {
+                  'type': widget.type,
+                  'email': _emailController.text
+                });
               } else {
                 await pr.error(s["data"]);
               }

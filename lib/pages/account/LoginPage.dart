@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../functions/sharedPreferences.dart' as sp;
 import '../../functions/progressDialog.dart' as pr;
-import 'ext/googleButton.dart';
+import 'ext/googleLogin.dart';
 import 'ext/logo.dart';
 
 class LoginPage extends StatefulWidget {
@@ -19,6 +19,12 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    checkGoogleLogin(context);
+  }
 
   @override
   Widget build(BuildContext context) {
