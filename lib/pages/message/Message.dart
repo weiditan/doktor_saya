@@ -6,6 +6,7 @@ import 'package:doktorsaya/pages/message/bubble.dart';
 import 'package:doktorsaya/functions/loadingScreen.dart';
 import 'package:doktorsaya/pages/profile/ext/profileImage.dart';
 
+import 'ext/attachment.dart';
 import 'ext/messageDatabase.dart';
 
 class Message extends StatefulWidget {
@@ -67,7 +68,10 @@ class _MessageState extends State<Message> {
 
   @override
   Widget build(BuildContext context) {
-    _scrollToEnd();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToEnd();
+    });
+
     return Scaffold(
       appBar: AppBar(title: _title()),
       body: AnimatedCrossFade(
@@ -114,7 +118,7 @@ class _MessageState extends State<Message> {
             for (int i = 0; i < _arrayMessage.length; i++)
               (_arrayMessage[i]['sender'] == widget.data['sender'])
                   ? Bubble(
-                      margin: BubbleEdges.only(top: 10),
+                      margin: BubbleEdges.only(top: 10, left: 50),
                       nipRadius: 2,
                       alignment: Alignment.topRight,
                       nipWidth: 10,
@@ -128,7 +132,7 @@ class _MessageState extends State<Message> {
                       ),
                     )
                   : Bubble(
-                      margin: BubbleEdges.only(top: 10),
+                      margin: BubbleEdges.only(top: 10, right: 50),
                       nipRadius: 2,
                       alignment: Alignment.topLeft,
                       nipWidth: 20,
@@ -139,6 +143,17 @@ class _MessageState extends State<Message> {
                         style: TextStyle(fontSize: 16, color: Colors.black),
                       ),
                     ),
+          Bubble(
+              margin: BubbleEdges.only(top: 10, right: 50),
+              nipRadius: 2,
+              alignment: Alignment.topLeft,
+              nipWidth: 20,
+              nipHeight: 8,
+              nip: BubbleNip.leftTop,
+              child: Image(
+                image: NetworkImage(
+                    'https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg'),
+              )),
           SizedBox(
             height: 60,
           ),
@@ -151,21 +166,9 @@ class _MessageState extends State<Message> {
     return Container(
       child: Row(
         children: <Widget>[
-          Material(
-            child: new Container(
-              margin: new EdgeInsets.symmetric(horizontal: 1.0),
-              child: new IconButton(
-                icon: new Icon(Icons.face, color: Colors.black),
-                onPressed: () {
-                  print(_scrollController);
-                  _scrollToEnd();
-                },
-              ),
-            ),
-            color: Colors.white,
-          ),
           Flexible(
             child: Container(
+              margin: EdgeInsets.only(left: 20),
               child: TextFormField(
                 style: TextStyle(
                   fontSize: 15.0,
@@ -182,34 +185,49 @@ class _MessageState extends State<Message> {
             ),
           ),
           Material(
-            child: new Container(
-              margin: new EdgeInsets.symmetric(horizontal: 8.0),
-              child: new IconButton(
-                icon: new Icon(
-                  Icons.send,
-                  color: Colors.black,
-                ),
-                onPressed: () {
-                  if (_messageController.text != "") {
-                    addTextMessage(widget.data['sender'],
-                            widget.data['receiver'], _messageController.text)
-                        .then((s) {
-                      if (s['status']) {
-                        getMessage(
-                                widget.data['sender'], widget.data['receiver'])
-                            .then((onValue) {
-                          setState(() {
-                            _arrayMessage = onValue;
-                            _messageController.text = "";
-                          });
+            child: Container(
+              margin: EdgeInsets.symmetric(horizontal: 8.0),
+              child: Row(
+                children: <Widget>[
+                  IconButton(
+                    icon: Icon(
+                      Icons.attach_file,
+                      color: Colors.black,
+                    ),
+                    onPressed: () {
+                      showAttachmentBottomSheet(context);
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      Icons.send,
+                      color: Colors.black,
+                    ),
+                    onPressed: () {
+                      if (_messageController.text != "") {
+                        addTextMessage(
+                                widget.data['sender'],
+                                widget.data['receiver'],
+                                _messageController.text)
+                            .then((s) {
+                          if (s['status']) {
+                            getMessage(widget.data['sender'],
+                                    widget.data['receiver'])
+                                .then((onValue) {
+                              setState(() {
+                                _arrayMessage = onValue;
+                                _messageController.text = "";
+                              });
+                            });
+                          }
                         });
                       }
-                    });
-                  }
-                },
+                    },
+                  ),
+                ],
               ),
+              color: Colors.white,
             ),
-            color: Colors.white,
           ),
         ],
       ),
