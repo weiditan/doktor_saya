@@ -17,11 +17,11 @@ class ViewImage extends StatelessWidget {
         backgroundColor: Colors.transparent,
       ),
       backgroundColor: Colors.black,
-      body: //Image.file(File("data/user/0/com.example.doktorsaya/cache/file_picker/call.png"))
+      body: Image.file(File("data/user/0/com.example.doktorsaya/cache/file_picker/call.png"))
       
-      PhotoView(
+      /*PhotoView(
         imageProvider: NetworkImage('https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg'),
-      ),
+      ),*/
     );
   }
 }

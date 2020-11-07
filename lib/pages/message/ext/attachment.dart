@@ -1,9 +1,11 @@
 import 'dart:io';
 
+import 'package:doktorsaya/functions/progressDialog.dart' as pr;
+import 'package:doktorsaya/pages/message/ext/attachmentPage.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
-showAttachmentBottomSheet(context) {
+showAttachmentBottomSheet(BuildContext context) {
   showModalBottomSheet(
       context: context,
       builder: (BuildContext bc) {
@@ -12,18 +14,17 @@ showAttachmentBottomSheet(context) {
             children: <Widget>[
               ListTile(
                 leading: Icon(Icons.image),
-                title: Text('Image'),
-                onTap: () => _showFilePicker(FileType.image),
+                title: Text('Gambar'),
+                onTap: () => _showFilePicker(context, FileType.image, "Gambar"),
               ),
               ListTile(
-                leading: Icon(Icons.videocam),
-                title: Text('Video'),
-                onTap: () => _showFilePicker(FileType.video)
-              ),
+                  leading: Icon(Icons.videocam),
+                  title: Text('Video'),
+                  onTap: () => _showFilePicker(context, FileType.video, "Video")),
               ListTile(
                 leading: Icon(Icons.insert_drive_file),
-                title: Text('File'),
-                onTap: () => _showFilePicker(FileType.any),
+                title: Text('Dokumen'),
+                onTap: () => _showFilePicker(context, FileType.any, "Dokumen"),
               ),
             ],
           ),
@@ -31,16 +32,22 @@ showAttachmentBottomSheet(context) {
       });
 }
 
-_showFilePicker(FileType fileType) async {
+_showFilePicker(BuildContext context, FileType fileType, String type) async {
   FilePickerResult result = await FilePicker.platform.pickFiles(
-    type: fileType
+    type: fileType,
+    onFileLoading: (s) async {
+      if (s == FilePickerStatus.picking) {
+        Navigator.pop(context);
+        await pr.show(context, "Memuatkan");
+      }
+    },
   );
 
-  if(result != null) {
+  if (result != null) {
     File file = File(result.files.single.path);
-    print(file);
-    print(file.path);
+    await pr.hide();
+    Navigator.push(context, MaterialPageRoute(builder: (context) => AttachmentPage(type, file)));
   } else {
-    // User canceled the picker
+    Navigator.pop(context);
   }
 }

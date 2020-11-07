@@ -237,7 +237,7 @@ class _MessageState extends State<Message> {
   }
 
   Future _scrollToEnd() async {
-    await Future.delayed(Duration(milliseconds: 300)).then((value) async {
+    await Future.delayed(Duration(milliseconds: 500)).then((value) async {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent,
