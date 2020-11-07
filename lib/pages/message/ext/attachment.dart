@@ -13,17 +13,17 @@ showAttachmentBottomSheet(context) {
               ListTile(
                 leading: Icon(Icons.image),
                 title: Text('Image'),
-                onTap: () => _showFilePicker(),
+                onTap: () => _showFilePicker(FileType.image),
               ),
               ListTile(
                 leading: Icon(Icons.videocam),
                 title: Text('Video'),
-                //onTap: () => showFilePicker(FileType.VIDEO)
+                onTap: () => _showFilePicker(FileType.video)
               ),
               ListTile(
                 leading: Icon(Icons.insert_drive_file),
                 title: Text('File'),
-                //onTap: () => showFilePicker(FileType.ANY),
+                onTap: () => _showFilePicker(FileType.any),
               ),
             ],
           ),
@@ -31,14 +31,15 @@ showAttachmentBottomSheet(context) {
       });
 }
 
-_showFilePicker() async {
+_showFilePicker(FileType fileType) async {
   FilePickerResult result = await FilePicker.platform.pickFiles(
-    type: FileType.image
+    type: fileType
   );
 
   if(result != null) {
     File file = File(result.files.single.path);
     print(file);
+    print(file.path);
   } else {
     // User canceled the picker
   }

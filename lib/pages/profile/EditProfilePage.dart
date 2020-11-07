@@ -1,11 +1,11 @@
 import 'package:doktorsaya/functions/loadingScreen.dart';
 import 'package:doktorsaya/pages/profile/ext/editProfileDatabase.dart';
 import 'package:doktorsaya/pages/profile/ext/text.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_cropper/image_cropper.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
 import 'dart:async';
@@ -235,10 +235,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Future _getFromGallery() async {
-    PickedFile pickedFile = await ImagePicker().getImage(
-      source: ImageSource.gallery,
+    FilePickerResult result = await FilePicker.platform.pickFiles(
+        type: FileType.image
     );
-    _cropImage(pickedFile.path);
+
+    if(result != null) {
+      File file = File(result.files.single.path);
+      _cropImage(file.path);
+    }
+
   }
 
   Future _cropImage(filePath) async {
