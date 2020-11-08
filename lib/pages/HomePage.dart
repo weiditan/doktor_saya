@@ -4,8 +4,7 @@ import 'package:doktorsaya/pages/profile/ProfilePage.dart';
 import 'package:doktorsaya/pages/profile/ext/profileDatabase.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:get_mac/get_mac.dart';
-import 'package:flutter/services.dart';
+
 
 import 'call/CallListPage.dart';
 import 'call/ext/callDatabase.dart';
@@ -35,12 +34,6 @@ class _TestState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-
-    _getMac().then((onValue){
-      if(onValue!="Error"){
-        print(onValue);
-      }
-    });
 
     updateToken();
 
@@ -72,19 +65,6 @@ class _TestState extends State<HomePage> {
     _updateOnlineStatus().then((_) {
       _checkCall();
     });
-  }
-
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<String> _getMac() async {
-    String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    try {
-      platformVersion = await GetMac.macAddress;
-      return platformVersion;
-    } on PlatformException {
-      print('Failed to get Device MAC Address.');
-      return "Error";
-    }
   }
 
   Future _updateOnlineStatus() async {

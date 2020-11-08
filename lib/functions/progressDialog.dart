@@ -72,3 +72,29 @@ Future warning(message) async {
 Future hide() async {
   await pr.hide();
 }
+
+
+Future showWithPercentage(context, message) async {
+  pr = ProgressDialog(
+    context,
+    type: ProgressDialogType.Download,
+    isDismissible: false,
+  );
+
+  pr.style(
+    progressWidget: Image.asset(
+      'assets/double_ring_loading_io.gif',
+      package: 'progress_dialog',
+    ),
+    message: message,
+    progress: 0
+  );
+
+  await pr.show();
+}
+
+Future updatePercentage(double percentage) async {
+  pr.update(
+      progress: percentage
+  );
+}

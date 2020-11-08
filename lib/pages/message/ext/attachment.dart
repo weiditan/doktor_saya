@@ -20,7 +20,8 @@ showAttachmentBottomSheet(BuildContext context) {
               ListTile(
                   leading: Icon(Icons.videocam),
                   title: Text('Video'),
-                  onTap: () => _showFilePicker(context, FileType.video, "Video")),
+                  onTap: () =>
+                      _showFilePicker(context, FileType.video, "Video")),
               ListTile(
                 leading: Icon(Icons.insert_drive_file),
                 title: Text('Dokumen'),
@@ -33,21 +34,23 @@ showAttachmentBottomSheet(BuildContext context) {
 }
 
 _showFilePicker(BuildContext context, FileType fileType, String type) async {
+  await FilePicker.platform.clearTemporaryFiles();
   FilePickerResult result = await FilePicker.platform.pickFiles(
     type: fileType,
     onFileLoading: (s) async {
       if (s == FilePickerStatus.picking) {
-        Navigator.pop(context);
         await pr.show(context, "Memuatkan");
+      }
+
+      if (s == FilePickerStatus.done) {
+        await pr.hide();
       }
     },
   );
 
   if (result != null) {
     File file = File(result.files.single.path);
-    await pr.hide();
-    Navigator.push(context, MaterialPageRoute(builder: (context) => AttachmentPage(type, file)));
-  } else {
-    Navigator.pop(context);
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => AttachmentPage(type, file)));
   }
 }
