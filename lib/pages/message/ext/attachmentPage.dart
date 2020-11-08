@@ -24,8 +24,8 @@ class _AttachmentPageState extends State<AttachmentPage> {
 
     if (widget.type == "Video") {
       flickManager = FlickManager(
-        videoPlayerController: VideoPlayerController.file(widget.file),autoPlay: false
-      );
+          videoPlayerController: VideoPlayerController.file(widget.file),
+          autoPlay: false);
     }
   }
 
@@ -110,25 +110,28 @@ class _AttachmentPageState extends State<AttachmentPage> {
       child: SizedBox(
         width: double.infinity,
         child: RaisedButton(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(5)),
-            ),
-            color: Colors.orange,
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 10),
-              child: Text(
-                "Hantar",
-                style: TextStyle(
-                  fontFamily: "Montserrat",
-                  fontSize: 20,
-                  color: Colors.white,
-                ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(5)),
+          ),
+          color: Colors.orange,
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 10),
+            child: Text(
+              "Hantar",
+              style: TextStyle(
+                fontFamily: "Montserrat",
+                fontSize: 20,
+                color: Colors.white,
               ),
             ),
-            onPressed: () {
+          ),
+          onPressed: () {
+            if (widget.type == "Video") {
               flickManager.flickControlManager.pause();
-              uploadAttachment(context, widget.file.path);
-            }),
+            }
+            uploadAttachment(context, widget.file.path);
+          },
+        ),
       ),
     );
   }
