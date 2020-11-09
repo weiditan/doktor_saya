@@ -23,5 +23,4 @@ uploadAttachment(context, filePath) async {
 
   await pr.hide();
   Navigator.popUntil(context, ModalRoute.withName('/Message'));
-  print("done");
 }
