@@ -1,9 +1,11 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 
 class ViewImage extends StatelessWidget {
+
+  final String title,url;
+  ViewImage(this.title,this.url);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -12,16 +14,14 @@ class ViewImage extends StatelessWidget {
           color: Colors.white,
         ),
         title: Text(
-          "image",style: TextStyle(color: Colors.white),
+          title,style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.transparent,
       ),
       backgroundColor: Colors.black,
-      body: Image.file(File("data/user/0/com.example.doktorsaya/cache/file_picker/call.png"))
-      
-      /*PhotoView(
-        imageProvider: NetworkImage('https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg'),
-      ),*/
+      body: PhotoView(
+        imageProvider: NetworkImage(url),
+      ),
     );
   }
 }

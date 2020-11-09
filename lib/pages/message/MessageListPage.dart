@@ -1,4 +1,3 @@
-
 import 'package:doktorsaya/functions/viewImage.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -20,12 +19,9 @@ class _MessageListPageState extends State<MessageListPage> {
   bool _loop = true;
   List _arrayDoctor;
 
-
   @override
   void initState() {
     super.initState();
-
-
 
     getData().then((_) {
       _refresh();
@@ -110,12 +106,6 @@ class _MessageListPageState extends State<MessageListPage> {
                       _arrayDoctor[i]['message'],
                       _arrayDoctor[i]['sendtime'],
                       _arrayDoctor[i]['unread']),
-                InkWell(
-                  onTap: (){
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => ViewImage()));
-                  },
-                  child: Text("test"),
-                )
               ],
             ),
           );

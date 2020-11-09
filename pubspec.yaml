@@ -42,6 +42,7 @@ dependencies:
   flick_video_player: ^0.1.1
   video_player: ^0.10.8+1
   dio: ^3.0.10
+  #cached_network_image: ^2.3.3
 
 dev_dependencies:
   flutter_test:

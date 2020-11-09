@@ -5,7 +5,7 @@ import 'package:doktorsaya/pages/message/ext/attachmentPage.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
-showAttachmentBottomSheet(BuildContext context) {
+showAttachmentBottomSheet(BuildContext context, String sender, String receiver) {
   showModalBottomSheet(
       context: context,
       builder: (BuildContext bc) {
@@ -15,17 +15,17 @@ showAttachmentBottomSheet(BuildContext context) {
               ListTile(
                 leading: Icon(Icons.image),
                 title: Text('Gambar'),
-                onTap: () => _showFilePicker(context, FileType.image, "Gambar"),
+                onTap: () => _showFilePicker(context, FileType.image, "Gambar",sender,receiver),
               ),
               ListTile(
                   leading: Icon(Icons.videocam),
                   title: Text('Video'),
                   onTap: () =>
-                      _showFilePicker(context, FileType.video, "Video")),
+                      _showFilePicker(context, FileType.video, "Video",sender,receiver)),
               ListTile(
                 leading: Icon(Icons.insert_drive_file),
                 title: Text('Dokumen'),
-                onTap: () => _showFilePicker(context, FileType.any, "Dokumen"),
+                onTap: () => _showFilePicker(context, FileType.any, "Dokumen",sender,receiver),
               ),
             ],
           ),
@@ -33,7 +33,7 @@ showAttachmentBottomSheet(BuildContext context) {
       });
 }
 
-_showFilePicker(BuildContext context, FileType fileType, String type) async {
+_showFilePicker(BuildContext context, FileType fileType, String type, String sender, String receiver) async {
   await pr.show(context, "Memuatkan");
 
   FilePickerResult result = await FilePicker.platform.pickFiles(type: fileType);
@@ -43,6 +43,6 @@ _showFilePicker(BuildContext context, FileType fileType, String type) async {
   if (result != null) {
     File file = File(result.files.single.path);
     Navigator.push(context,
-        MaterialPageRoute(builder: (context) => AttachmentPage(type, file)));
+        MaterialPageRoute(builder: (context) => AttachmentPage(sender, receiver, type, file)));
   }
 }

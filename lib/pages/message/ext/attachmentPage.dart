@@ -10,12 +10,13 @@ class AttachmentPage extends StatefulWidget {
   @override
   _AttachmentPageState createState() => _AttachmentPageState();
 
-  final String type;
+  final String type, sender, receiver;
   final File file;
-  AttachmentPage(this.type, this.file);
+  AttachmentPage(this.sender, this.receiver, this.type, this.file);
 }
 
 class _AttachmentPageState extends State<AttachmentPage> {
+
   FlickManager flickManager;
 
   @override
@@ -124,7 +125,7 @@ class _AttachmentPageState extends State<AttachmentPage> {
             if (widget.type == "Video") {
               flickManager.flickControlManager.pause();
             }
-            uploadAttachment(context, widget.file.path);
+            uploadAttachment(context, widget.file.path, widget.type ,widget.sender, widget.receiver);
           },
         ),
       ),

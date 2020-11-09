@@ -15,11 +15,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "1053862065399-k7it66sf7m11aptmsburn979chjh1mhf.apps.googleusercontent.com",
+          "client_id": "1053862065399-1kob3g6p2p4vlk4ratllusc4e3k0ksob.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.doktorsaya",
-            "certificate_hash": "c5b1897facf3a2639fe4b824e63e16c217b5423f"
+            "certificate_hash": "cc269878aaf42140682c120fb74ffe0f97a66cf4"
           }
         },
         {
