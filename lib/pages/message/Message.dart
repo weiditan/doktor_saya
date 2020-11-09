@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doktorsaya/functions/viewImage.dart';
 import 'package:flutter/material.dart';
 
@@ -159,10 +160,17 @@ class _MessageState extends State<Message> {
                     ),
                   );
                 },
-                child: Image.network(
-                    "http://www.breakvoid.com/DoktorSaya/Files/Attachments/" +
-                        message["filepath"],
-                    fit: BoxFit.contain),
+                child: CachedNetworkImage(
+                  imageUrl:
+                      "http://www.breakvoid.com/DoktorSaya/Files/Attachments/" +
+                          message["filepath"],
+                  progressIndicatorBuilder: (context, url, downloadProgress) => Container(
+                    margin: EdgeInsets.all(15),
+                    child: CircularProgressIndicator(
+                        value: downloadProgress.progress),
+                  ),
+                  errorWidget: (context, url, error) => Icon(Icons.error),
+                ),
               ),
             ),
           );

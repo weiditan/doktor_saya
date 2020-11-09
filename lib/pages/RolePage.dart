@@ -1,4 +1,3 @@
-import 'package:doktorsaya/pages/account/ext/logout.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'dart:async';
@@ -112,7 +111,6 @@ class RolePage extends StatelessWidget {
   }
 
   void _submit(context, _role) async {
-
     await pr.show(context, "Memuatkan");
 
     sp.saveRole(_role);

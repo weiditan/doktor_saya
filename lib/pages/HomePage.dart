@@ -115,19 +115,19 @@ class _TestState extends State<HomePage> {
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.message),
-            title: Text(_arrayTitle[0]),
+            label: _arrayTitle[0],
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.call),
-            title: Text(_arrayTitle[1]),
+            label: _arrayTitle[1],
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.group),
-            title: Text(_arrayTitle[2]),
+            label: _arrayTitle[2],
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.info),
-            title: Text(_arrayTitle[3]),
+            label: _arrayTitle[3],
           ),
         ],
         currentIndex: _selectedIndex,
