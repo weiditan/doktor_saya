@@ -91,16 +91,11 @@ class _AttachmentPageState extends State<AttachmentPage> {
         }
         break;
 
-      case "Dokumen":
+      default:
         {
           return Text(widget.type);
         }
         break;
-
-      default:
-        {
-          return Container();
-        }
     }
   }
 

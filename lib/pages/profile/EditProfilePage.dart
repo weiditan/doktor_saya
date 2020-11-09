@@ -235,15 +235,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Future _getFromGallery() async {
-    FilePickerResult result = await FilePicker.platform.pickFiles(
-        type: FileType.image
-    );
+    await pr.show(context, "Memuatkan");
 
-    if(result != null) {
+    FilePickerResult result =
+        await FilePicker.platform.pickFiles(type: FileType.image);
+
+    await pr.hide();
+
+    if (result != null) {
       File file = File(result.files.single.path);
       _cropImage(file.path);
     }
-
   }
 
   Future _cropImage(filePath) async {

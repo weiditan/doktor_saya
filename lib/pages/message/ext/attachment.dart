@@ -34,19 +34,11 @@ showAttachmentBottomSheet(BuildContext context) {
 }
 
 _showFilePicker(BuildContext context, FileType fileType, String type) async {
-  await FilePicker.platform.clearTemporaryFiles();
-  FilePickerResult result = await FilePicker.platform.pickFiles(
-    type: fileType,
-    onFileLoading: (s) async {
-      if (s == FilePickerStatus.picking) {
-        await pr.show(context, "Memuatkan");
-      }
+  await pr.show(context, "Memuatkan");
 
-      if (s == FilePickerStatus.done) {
-        await pr.hide();
-      }
-    },
-  );
+  FilePickerResult result = await FilePicker.platform.pickFiles(type: fileType);
+
+  await pr.hide();
 
   if (result != null) {
     File file = File(result.files.single.path);
