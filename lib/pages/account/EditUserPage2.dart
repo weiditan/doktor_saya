@@ -18,8 +18,6 @@ class _EditUserPage2State extends State<EditUserPage2> {
   final _formKey = GlobalKey<FormState>();
   final _formKey2 = GlobalKey<FormState>();
   bool _obscureText = true;
-  bool _pass1AutoValidate = false;
-  bool _pass2AutoValidate = false;
   bool _isVisible = true;
   final _codeController = TextEditingController();
   final _password1Controller = TextEditingController();
@@ -147,16 +145,12 @@ class _EditUserPage2State extends State<EditUserPage2> {
         keyboardType: TextInputType.text,
         obscureText: _obscureText,
         controller: _password1Controller,
-        autovalidate: _pass1AutoValidate,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
         textInputAction: TextInputAction.next,
         onFieldSubmitted: (_) {
           FocusScope.of(context).requestFocus(focus);
         },
-        onChanged: (String value) {
-          setState(() {
-            _pass1AutoValidate = true;
-          });
-        },
+
         validator: (String value) {
           if (value.isNotEmpty && value.length < 8) {
             return 'Kata Laluan Tidak Boleh Kurang Daripada 8 Perkataan';
@@ -195,13 +189,8 @@ class _EditUserPage2State extends State<EditUserPage2> {
         keyboardType: TextInputType.text,
         obscureText: _obscureText,
         controller: _password2Controller,
-        autovalidate: _pass2AutoValidate,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
         focusNode: focus,
-        onChanged: (String value) {
-          setState(() {
-            _pass2AutoValidate = true;
-          });
-        },
         validator: (String value) {
           if (value.isNotEmpty && value != _password1Controller.text) {
             return 'Kata Laluan Tidak Sama';
@@ -240,7 +229,7 @@ class _EditUserPage2State extends State<EditUserPage2> {
             obscureText: false,
             keyboardType: TextInputType.number,
             inputFormatters: <TextInputFormatter>[
-              WhitelistingTextInputFormatter.digitsOnly
+              FilteringTextInputFormatter.digitsOnly,
             ],
             maxLength: 6,
             controller: _codeController,

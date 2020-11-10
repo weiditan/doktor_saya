@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doktorsaya/functions/viewImage.dart';
+import 'package:doktorsaya/functions/viewVideo.dart';
 import 'package:flutter/material.dart';
 
 import 'package:doktorsaya/pages/message/bubble.dart';
@@ -147,30 +148,29 @@ class _MessageState extends State<Message> {
             color: (message['sender'] == widget.data['sender'])
                 ? Color.fromRGBO(225, 255, 199, 1.0)
                 : Colors.white,
-            child: Container(
-              child: InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ViewImage(
-                          message['context'],
-                          "http://www.breakvoid.com/DoktorSaya/Files/Attachments/" +
-                              message["filepath"]),
-                    ),
-                  );
-                },
-                child: CachedNetworkImage(
-                  imageUrl:
-                      "http://www.breakvoid.com/DoktorSaya/Files/Attachments/" +
-                          message["filepath"],
-                  progressIndicatorBuilder: (context, url, downloadProgress) => Container(
-                    margin: EdgeInsets.all(15),
-                    child: CircularProgressIndicator(
-                        value: downloadProgress.progress),
+            child: InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ViewImage(
+                        message['context'],
+                        "http://www.breakvoid.com/DoktorSaya/Files/Attachments/" +
+                            message["filepath"]),
                   ),
-                  errorWidget: (context, url, error) => Icon(Icons.error),
+                );
+              },
+              child: CachedNetworkImage(
+                imageUrl:
+                    "http://www.breakvoid.com/DoktorSaya/Files/Attachments/" +
+                        message["filepath"],
+                progressIndicatorBuilder: (context, url, downloadProgress) =>
+                    Container(
+                  margin: EdgeInsets.all(15),
+                  child: CircularProgressIndicator(
+                      value: downloadProgress.progress),
                 ),
+                errorWidget: (context, url, error) => Icon(Icons.error),
               ),
             ),
           );
@@ -240,7 +240,17 @@ class _MessageState extends State<Message> {
                         Icons.play_arrow,
                         color: Colors.white,
                       ),
-                      onPressed: () {}),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ViewVideo(
+                                message['context'],
+                                "http://www.breakvoid.com/DoktorSaya/Files/Attachments/" +
+                                    message["filepath"]),
+                          ),
+                        );
+                      }),
                 ),
               ],
             ),

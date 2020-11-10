@@ -14,8 +14,6 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool _obscureText = true;
-  bool _emailAutoValidate = false;
-  bool _passAutoValidate = false;
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
@@ -101,12 +99,7 @@ class _LoginPageState extends State<LoginPage> {
       obscureText: false,
       controller: _emailController,
       textInputAction: TextInputAction.next,
-      autovalidate: _emailAutoValidate,
-      onChanged: (String value) {
-        setState(() {
-          _emailAutoValidate = true;
-        });
-      },
+      autovalidateMode: AutovalidateMode.onUserInteraction,
       onFieldSubmitted: (_) {
         FocusScope.of(context).nextFocus();
       },
@@ -148,12 +141,7 @@ class _LoginPageState extends State<LoginPage> {
         keyboardType: TextInputType.text,
         obscureText: _obscureText,
         controller: _passwordController,
-        autovalidate: _passAutoValidate,
-        onChanged: (String value) {
-          setState(() {
-            _passAutoValidate = true;
-          });
-        },
+        autovalidateMode: AutovalidateMode.onUserInteraction,
         validator: (String value) {
           if (value.isNotEmpty && value.length < 8) {
             return 'Kata Laluan Tidak Boleh Kurang Daripada 8 Perkataan';

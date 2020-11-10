@@ -1,8 +1,6 @@
 
 import 'package:flutter/material.dart';
 
-import 'pages/message/Message.dart';
-
 
 class ViewDoctorDetail2 extends StatelessWidget {
   @override

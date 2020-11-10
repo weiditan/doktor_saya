@@ -432,10 +432,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
             obscureText: false,
             keyboardType: TextInputType.number,
             inputFormatters: <TextInputFormatter>[
-              WhitelistingTextInputFormatter.digitsOnly
+              FilteringTextInputFormatter.digitsOnly,
             ],
             maxLength: 11,
-            autovalidate: true,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
             validator: (String value) {
               if (value.isNotEmpty && value.length < 9) {
                 return 'Sila Masukkan\n Nombor Telefon\n Yang Betul';

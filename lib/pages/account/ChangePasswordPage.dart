@@ -11,9 +11,6 @@ class ChangePasswordPage extends StatefulWidget {
 class _ChangePasswordPageState extends State<ChangePasswordPage> {
   final _formKey = GlobalKey<FormState>();
   bool _obscureText = true;
-  bool _passAutoValidate = false;
-  bool _pass1AutoValidate = false;
-  bool _pass2AutoValidate = false;
   final _focus1 = FocusNode();
   final _focus2 = FocusNode();
 
@@ -76,15 +73,10 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
         keyboardType: TextInputType.text,
         obscureText: _obscureText,
         controller: _passwordController,
-        autovalidate: _passAutoValidate,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
         textInputAction: TextInputAction.next,
         onFieldSubmitted: (_) {
           FocusScope.of(context).requestFocus(_focus1);
-        },
-        onChanged: (String value) {
-          setState(() {
-            _passAutoValidate = true;
-          });
         },
         validator: (String value) {
           if (value.isNotEmpty && value.length < 8) {
@@ -124,17 +116,12 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
         keyboardType: TextInputType.text,
         obscureText: _obscureText,
         controller: _password1Controller,
-        autovalidate: _pass1AutoValidate,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
         textInputAction: TextInputAction.next,
         onFieldSubmitted: (_) {
           FocusScope.of(context).requestFocus(_focus2);
         },
         focusNode: _focus1,
-        onChanged: (String value) {
-          setState(() {
-            _pass1AutoValidate = true;
-          });
-        },
         validator: (String value) {
           if (value.isNotEmpty && value.length < 8) {
             return 'Kata Laluan Tidak Boleh Kurang Daripada 8 Perkataan';
@@ -173,13 +160,8 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
         keyboardType: TextInputType.text,
         obscureText: _obscureText,
         controller: _password2Controller,
-        autovalidate: _pass2AutoValidate,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
         focusNode: _focus2,
-        onChanged: (String value) {
-          setState(() {
-            _pass2AutoValidate = true;
-          });
-        },
         validator: (String value) {
           if (value.isNotEmpty && value != _password1Controller.text) {
             return 'Kata Laluan Tidak Sama';
