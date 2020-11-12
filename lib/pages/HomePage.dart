@@ -5,7 +5,6 @@ import 'package:doktorsaya/pages/profile/ext/profileDatabase.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
-
 import 'call/CallListPage.dart';
 import 'call/ext/callDatabase.dart';
 import 'profile/ext/doctorOnlineStatusDatabase.dart';
@@ -73,7 +72,10 @@ class _TestState extends State<HomePage> {
     if (_role == 'doctor') {
       _roleId = await sp.getRoleId();
 
-      await updateDoctorStatus(_roleId, "online");
+      while (true) {
+        await updateDoctorStatus(_roleId, "online");
+        await Future.delayed(Duration(minutes: 1));
+      }
     }
   }
 
