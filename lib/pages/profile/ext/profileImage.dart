@@ -1,21 +1,56 @@
 import 'package:flutter/material.dart';
 
-Widget showSmallIconProfileImage(String profileImage) {
-  return (profileImage == "")
-      ? _noCircleProfileImage(50)
-      : _circleProfileImage(50, profileImage);
+Widget showSmallIconProfileImage(String profileImage, String online) {
+  return Stack(
+    children: [
+      (profileImage == "")
+          ? _noCircleProfileImage(50)
+          : _circleProfileImage(50, profileImage),
+      if(online=="1")
+      Positioned(
+        bottom: 0,
+        right: 0,
+        child: Container(
+          width: 13,
+          height: 13,
+          decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.green,
+              border: Border.all(width: 0.5, color: Colors.white)),
+        ),
+      ),
+    ],
+  );
 }
 
-Widget showIconProfileImage(String profileImage, double width) {
-  return (profileImage == "")
+Widget showIconProfileImage(String profileImage, double width, String online) {
+  return Stack(
+    children: [
+      (profileImage == "")
       ? _noCircleProfileImage(width)
-      : _circleProfileImage(width, profileImage);
+      : _circleProfileImage(width, profileImage),
+      if(online=="1")
+      Positioned(
+        bottom: 0,
+        right: 0,
+        child: Container(
+          width: 16,
+          height: 16,
+          decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.green,
+              border: Border.all(width: 0.5, color: Colors.white)),
+        ),
+      ),
+    ],
+  );
 }
 
 Widget showProfileImage(String profileImage, double maxWidth) {
-  return (profileImage == "")
-      ? _noProfileImage(maxWidth)
-      : _profileImage(maxWidth, profileImage);
+  return
+      (profileImage == "")
+          ? _noProfileImage(maxWidth)
+          : _profileImage(maxWidth, profileImage);
 }
 
 Widget _noProfileImage(double width) {
@@ -65,7 +100,9 @@ Widget _noCircleProfileImage(double width) {
     height: width,
     decoration: BoxDecoration(
       shape: BoxShape.circle,
-      image: DecorationImage(fit: BoxFit.fill, image: AssetImage("assets/account_circle_grey.png")),
+      image: DecorationImage(
+          fit: BoxFit.fill,
+          image: AssetImage("assets/account_circle_grey.png")),
       boxShadow: [
         BoxShadow(
           color: Colors.grey.withOpacity(0.5),
@@ -84,7 +121,10 @@ Widget _circleProfileImage(double width, String image) {
     height: width,
     decoration: BoxDecoration(
       shape: BoxShape.circle,
-      image: DecorationImage(fit: BoxFit.fill, image: NetworkImage("http://www.breakvoid.com/DoktorSaya/Images/Profiles/" + image)),
+      image: DecorationImage(
+          fit: BoxFit.fill,
+          image: NetworkImage(
+              "http://www.breakvoid.com/DoktorSaya/Images/Profiles/" + image)),
       boxShadow: [
         BoxShadow(
           color: Colors.grey.withOpacity(0.5),

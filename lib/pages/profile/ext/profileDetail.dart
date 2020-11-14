@@ -15,6 +15,8 @@ Widget showProfileDetail(String role, Map userData){
       tx.heading3(_age(userData['birthday'])),
       if (role == "doctor") tx.heading2("Nombor Pendaftaran MMC"),
       if (role == "doctor") tx.heading3(userData['mmc']),
+      if (role == "doctor") tx.heading2("Kadar Tindakbalas"),
+      if (role == "doctor") tx.heading3("100%"),
       Divider(
         thickness: 1,
       ),

@@ -104,21 +104,23 @@ class _MessageListPageState extends State<MessageListPage> {
                       _arrayDoctor[i]['image'],
                       _arrayDoctor[i]['message'],
                       _arrayDoctor[i]['sendtime'],
-                      _arrayDoctor[i]['unread']),
+                      _arrayDoctor[i]['unread'],
+                      _arrayDoctor[i]['online']),
               ],
             ),
           );
   }
 
   Widget _messageRow(String doctorId, String name, String image, String message,
-      String sendTime, String unread) {
+      String sendTime, String unread, String online) {
     return InkWell(
       onTap: () {
         Navigator.pushNamed(context, '/Message', arguments: {
           'sender': _roleId,
           'receiver': doctorId,
           'doctor_name': name,
-          'doctor_image': image
+          'doctor_image': image,
+          'doctor_online': online
         });
       },
       child: Padding(
@@ -127,7 +129,7 @@ class _MessageListPageState extends State<MessageListPage> {
           children: <Widget>[
             Row(
               children: <Widget>[
-                showIconProfileImage(image, 65),
+                showIconProfileImage(image, 65, "0"),
                 SizedBox(
                   width: 15,
                 ),

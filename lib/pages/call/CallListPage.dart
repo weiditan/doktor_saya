@@ -98,23 +98,32 @@ class _CallListPageState extends State<CallListPage> {
                   height: 10,
                 ),
                 for (int i = 0; i < _arrayCallList.length; i++)
-                    _messageRow(
-                        _arrayCallList[i]['call_id'],
-                        _arrayCallList[i]['caller'],
-                        _arrayCallList[i]['accept_call'],
-                        (_arrayCallList[i]['id'][0] == "d")
-                            ? "Dr " + _arrayCallList[i]['nickname']
-                            : _arrayCallList[i]['nickname'],
-                        _arrayCallList[i]['image'],
-                        _arrayCallList[i]['sendtime'],
-                        _arrayCallList[i]['prescription']),
+                  _messageRow(
+                    _arrayCallList[i]['call_id'],
+                    _arrayCallList[i]['caller'],
+                    _arrayCallList[i]['accept_call'],
+                    (_arrayCallList[i]['id'][0] == "d")
+                        ? "Dr " + _arrayCallList[i]['nickname']
+                        : _arrayCallList[i]['nickname'],
+                    _arrayCallList[i]['image'],
+                    _arrayCallList[i]['sendtime'],
+                    _arrayCallList[i]['prescription'],
+                    _arrayCallList[i]['online'],
+                  ),
               ],
             ),
           );
   }
 
-  Widget _messageRow(String callId, String callerId, String acceptCall,
-      String name, String image, String sendTime, String prescription) {
+  Widget _messageRow(
+      String callId,
+      String callerId,
+      String acceptCall,
+      String name,
+      String image,
+      String sendTime,
+      String prescription,
+      String online) {
     return InkWell(
       onTap: () {},
       child: Padding(
@@ -123,7 +132,7 @@ class _CallListPageState extends State<CallListPage> {
           children: <Widget>[
             Row(
               children: <Widget>[
-                showIconProfileImage(image, 65),
+                showIconProfileImage(image, 65, online),
                 SizedBox(
                   width: 15,
                 ),

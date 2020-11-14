@@ -97,7 +97,7 @@ class _MessageState extends State<Message> {
     return Container(
       child: Row(
         children: <Widget>[
-          showSmallIconProfileImage(widget.data['doctor_image']),
+          showSmallIconProfileImage(widget.data['doctor_image'],widget.data['doctor_online']),
           SizedBox(width: 10),
           Flexible(
             child: Container(child: Text(widget.data['doctor_name'])),

@@ -93,7 +93,7 @@ class _ConfirmCallPageState extends State<ConfirmCallPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    showIconProfileImage(_userData['image'], 100),
+                    showIconProfileImage(_userData['image'], 100, "0"),
                     SizedBox(
                       height: 20,
                     ),

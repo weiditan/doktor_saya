@@ -174,7 +174,7 @@ class _CallPageState extends State<CallPage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          showIconProfileImage(widget.doctorImage, 100),
+                          showIconProfileImage(widget.doctorImage, 100, "0"),
                           SizedBox(
                             height: 20,
                           ),

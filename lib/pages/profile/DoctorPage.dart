@@ -155,18 +155,33 @@ class _DoctorPageState extends State<DoctorPage> {
                   Row(
                     children: <Widget>[
                       SizedBox(width: 5),
-                      showIconProfileImage(doctor['image'], 80),
+                      showIconProfileImage(doctor['image'], 80, doctor['online']),
                       SizedBox(width: 10),
                       SizedBox(
                         width: _screenWidth - 260,
-                        child: Text(
-                          "Dr " + doctor['nickname'],
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontFamily: "Montserrat",
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        height: 80,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Dr " + doctor['nickname'],
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontFamily: "Montserrat",
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              "100% Kadar Tindakbalas",
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontFamily: "Montserrat",
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
+                        )
                       ),
                     ],
                   ),

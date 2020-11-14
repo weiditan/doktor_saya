@@ -1,8 +1,10 @@
+import 'package:doktorsaya/pages/SearchPage.dart';
 import 'package:doktorsaya/pages/profile/DoctorPage.dart';
 import 'package:doktorsaya/pages/message/MessageListPage.dart';
 import 'package:doktorsaya/pages/profile/ProfilePage.dart';
 import 'package:doktorsaya/pages/profile/ext/profileDatabase.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'call/CallListPage.dart';
@@ -16,10 +18,11 @@ class HomePage extends StatefulWidget {
   _TestState createState() => _TestState();
 }
 
-class _TestState extends State<HomePage> {
+class _TestState extends State<HomePage> with WidgetsBindingObserver {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
-
-  String _role, _roleId;
+  String _roleId;
+  bool _showConfirmCallPage = false;
+  bool _loop = true;
   int _selectedIndex = 2;
   var _arrayTitle = ['Mesej', 'Panggilan', 'Doktor', 'Profil'];
 
@@ -31,11 +34,51 @@ class _TestState extends State<HomePage> {
   ];
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    print('$state');
+    if (state == AppLifecycleState.paused) {
+      print("stop loop");
+      _loop = false;
+      updateDoctorStatus(_roleId, "offline");
+    }
+
+    if (state == AppLifecycleState.resumed) {
+      print("resumed loop");
+      _loopFunction();
+    }
+  }
+
+  @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _init();
+  }
 
+  Future _init() async {
     updateToken();
+    _firebaseMessagingFunction();
+    _roleId = await sp.getRoleId();
+    _loopFunction();
+  }
 
+  Future _loopFunction() async {
+    _loop = true;
+
+    if (_roleId[0] == 'd') {
+      int _noLoop = 0;
+      while (_loop) {
+        if (_noLoop % 20 == 0) {
+          _updateOnlineStatus();
+        }
+        _checkCall();
+        _noLoop++;
+        await Future.delayed(Duration(seconds: 3));
+      }
+    }
+  }
+
+  Future _firebaseMessagingFunction() async {
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
         print("onMessage: $message");
@@ -60,43 +103,33 @@ class _TestState extends State<HomePage> {
     );
     _firebaseMessaging.requestNotificationPermissions(
         const IosNotificationSettings(sound: true, badge: true, alert: true));
-
-    _updateOnlineStatus().then((_) {
-      _checkCall();
-    });
   }
 
   Future _updateOnlineStatus() async {
-    _role = await sp.getRole();
-
-    if (_role == 'doctor') {
-      _roleId = await sp.getRoleId();
-
-      while (true) {
-        await updateDoctorStatus(_roleId, "online");
-        await Future.delayed(Duration(minutes: 1));
-      }
-    }
+    print("updateDoctorStatus " + DateTime.now().toString());
+    await updateDoctorStatus(_roleId, "online");
   }
 
   Future _checkCall() async {
-    bool _showConfirmCallPage = false;
-
-    if (_role == 'doctor') {
-      while (true) {
-        await checkCall(_roleId).then((s) {
-          if (s['status'] == true) {
-            if (_showConfirmCallPage == false) {
-              _showConfirmCallPage = true;
-              Navigator.pushNamed(context, '/ConfirmCallPage', arguments: s);
-            }
-          } else {
-            _showConfirmCallPage = false;
-          }
-        });
-        await Future.delayed(Duration(seconds: 3));
+    print("checkCall " + DateTime.now().toString());
+    await checkCall(_roleId).then((s) {
+      if (s['status'] == true) {
+        if (_showConfirmCallPage == false) {
+          _showConfirmCallPage = true;
+          Navigator.pushNamed(context, '/ConfirmCallPage', arguments: s);
+        }
+      } else {
+        _showConfirmCallPage = false;
       }
-    }
+    });
+  }
+
+  @override
+  void dispose() {
+    print('dispose+++');
+    _loop = false;
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   @override
@@ -108,7 +141,15 @@ class _TestState extends State<HomePage> {
         title: Text(_arrayTitle[_selectedIndex]),
 
         actions: <Widget>[
-          //IconButton(icon: Icon(Icons.search),onPressed: (){})
+          if (_selectedIndex == 2)
+            IconButton(
+                icon: Icon(Icons.search),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SearchPage()),
+                  );
+                })
         ],
       ),
       body: WillPopScope(child: _body[_selectedIndex], onWillPop: onWillPop),
