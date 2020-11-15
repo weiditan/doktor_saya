@@ -35,11 +35,17 @@ Future<Map> getUserDetail(String roleId) async {
   return data;
 }
 
-Future<List> getAllDoctor() async {
+Future<List> getAllDoctor(
+    String name, String specialistId, String subSpecialist) async {
   var url = 'http://www.breakvoid.com/DoktorSaya/ViewAllDoctor.php';
   http.Response response = await retry(
     // Make a GET request
-    () => http.post(url, body: {'action': 'get'}).timeout(Duration(seconds: 5)),
+    () => http.post(url, body: {
+      'action': 'get',
+      'name': name,
+      'specialistId': specialistId,
+      'subSpecialist': subSpecialist
+    }).timeout(Duration(seconds: 5)),
     // Retry on SocketException or TimeoutException
     retryIf: (e) => e is SocketException || e is TimeoutException,
   );

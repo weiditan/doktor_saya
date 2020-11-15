@@ -39,7 +39,7 @@ class _DoctorPageState extends State<DoctorPage> {
   }
 
   Future _getData() async {
-    await getAllDoctor().then((onValue) async {
+    await getAllDoctor("","","").then((onValue) async {
       _arrayDoctor = onValue;
 
       await Future.wait([
