@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doktorsaya/functions/viewImage.dart';
@@ -41,6 +42,7 @@ class _MessageState extends State<Message> {
   }
 
   Future _getData() async {
+
     while (_loop) {
       await getMessage(widget.data['sender'], widget.data['receiver'])
           .then((onValue) {
@@ -97,7 +99,8 @@ class _MessageState extends State<Message> {
     return Container(
       child: Row(
         children: <Widget>[
-          showSmallIconProfileImage(widget.data['doctor_image'],widget.data['doctor_online']),
+          showSmallIconProfileImage(
+              widget.data['doctor_image'], widget.data['doctor_online']),
           SizedBox(width: 10),
           Flexible(
             child: Container(child: Text(widget.data['doctor_name'])),
@@ -321,7 +324,11 @@ class _MessageState extends State<Message> {
                         Icons.file_download,
                         color: Colors.white,
                       ),
-                      onPressed: () {}),
+                      onPressed: () {
+                      /*  _downloadFile(
+                            "http://www.breakvoid.com/DoktorSaya/Files/Attachments/" +
+                                message["filepath"]);*/
+                      }),
                 ),
               ],
             ),
@@ -447,4 +454,18 @@ class _MessageState extends State<Message> {
       }
     });
   }
+
+  /*Future _downloadFile(String fileUrl) async {
+    final Directory downloadsDirectory =
+        await DownloadsPathProvider.downloadsDirectory;
+    final String downloadsPath = downloadsDirectory.path;
+    await FlutterDownloader.enqueue(
+      url: fileUrl,
+      savedDir: downloadsPath,
+      showNotification:
+          true, // show download progress in status bar (for Android)
+      openFileFromNotification:
+          true, // click on notification to open downloaded file (for Android)
+    );
+  }*/
 }

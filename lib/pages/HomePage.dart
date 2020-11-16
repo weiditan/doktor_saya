@@ -58,6 +58,12 @@ class _TestState extends State<HomePage> with WidgetsBindingObserver {
   Future _init() async {
     updateToken();
     _firebaseMessagingFunction();
+/*
+    WidgetsFlutterBinding.ensureInitialized();
+    await FlutterDownloader.initialize(
+        debug: true // optional: set false to disable printing logs to console
+    );
+*/
     _roleId = await sp.getRoleId();
     _loopFunction();
   }
