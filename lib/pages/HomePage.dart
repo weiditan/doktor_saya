@@ -1,4 +1,4 @@
-import 'package:doktorsaya/pages/SearchPage.dart';
+import 'file:///D:/Flutter/doktor_saya/lib/pages/profile/SearchPage.dart';
 import 'package:doktorsaya/pages/profile/DoctorPage.dart';
 import 'package:doktorsaya/pages/message/MessageListPage.dart';
 import 'package:doktorsaya/pages/profile/ProfilePage.dart';

@@ -1,24 +1,18 @@
-import 'dart:async';
-
+import 'package:doktorsaya/functions/loadingScreen.dart';
 import 'package:doktorsaya/functions/sharedPreferences.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:doktorsaya/pages/profile/ext/doctorExpDatabase.dart';
+import 'package:doktorsaya/pages/profile/ext/profileDatabase.dart';
+import 'package:doktorsaya/pages/profile/ext/profileImage.dart';
+import 'package:doktorsaya/pages/profile/ext/specialistDatabase.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-
-import '../../functions/loadingScreen.dart';
-import 'ext/doctorExpDatabase.dart';
-import 'ext/profileDatabase.dart';
-import 'ext/profileImage.dart';
-
 import 'ext/diffDate.dart' as dd;
-import 'ext/specialistDatabase.dart';
 
-class DoctorPage extends StatefulWidget {
+class SearchPage extends StatefulWidget {
   @override
-  _DoctorPageState createState() => _DoctorPageState();
+  _SearchPageState createState() => _SearchPageState();
 }
 
-class _DoctorPageState extends State<DoctorPage> {
+class _SearchPageState extends State<SearchPage> {
   final _searchController = TextEditingController();
   List _arraySpecialist, _arraySubSpecialist, _arrayDoctor;
   String _valueSpecialist = "";
@@ -50,6 +44,38 @@ class _DoctorPageState extends State<DoctorPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          title: TextField(
+            controller: _searchController,
+            onChanged: (s) {
+              _search();
+            },
+            decoration: new InputDecoration(
+                prefixIcon: new Icon(Icons.search), hintText: 'Search...'),
+          ),
+          actions: <Widget>[
+            IconButton(
+                icon: Icon(Icons.close),
+                onPressed: () {
+                  _searchController.text = "";
+                  _search();
+                })
+          ],
+          bottom: PreferredSize(
+              child: Container(
+                margin: EdgeInsets.only(bottom: 5, left: 10, right: 10),
+                child: Row(
+                  children: [
+                    _selectSpecialist(),
+                    if (_valueSpecialist != "0" && _valueSpecialist != "1")
+                      SizedBox(width: 5),
+                    _selectSubSpecialist(),
+                  ],
+                ),
+              ),
+              preferredSize: Size.fromHeight(60.0)),
+        ),
         body: AnimatedCrossFade(
           // If the widget is visible, animate to 0.0 (invisible).
           // If the widget is hidden, animate to 1.0 (fully visible).
@@ -62,6 +88,108 @@ class _DoctorPageState extends State<DoctorPage> {
           firstChild: loadingScreen(_loadingIconVisible),
           secondChild: _secondScreen(),
         ));
+  }
+
+  Widget _selectSpecialist() {
+    return (_arraySpecialist == null)
+        ? Container()
+        : Flexible(
+            // width: 150,
+            child: DropdownButtonFormField(
+              decoration: new InputDecoration(
+                contentPadding: const EdgeInsets.only(left: 10, bottom: 10),
+                labelText: "Jenis Pakar",
+                labelStyle: TextStyle(
+                  fontFamily: "Montserrat",
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              items: [
+                DropdownMenuItem<String>(
+                  child: Text("Semua"),
+                  value: "",
+                ),
+                for (int i = 0; i < _arraySpecialist.length; i++)
+                  DropdownMenuItem<String>(
+                    child: Text(_arraySpecialist[i]['malay']),
+                    value: _arraySpecialist[i]['specialist_id'],
+                  ),
+              ],
+              onChanged: (value) {
+                setState(() {
+                  _valueSpecialist = value;
+                  _valueSubSpecialist = "";
+                });
+                _search();
+              },
+              value: _valueSpecialist,
+            ),
+          );
+  }
+
+  Widget _selectSubSpecialist() {
+    return (_arraySubSpecialist == null ||
+            _valueSpecialist == null ||
+            _valueSpecialist == "" ||
+            _valueSpecialist == "0" ||
+            _valueSpecialist == "1")
+        ? Container()
+        : Flexible(
+            //width: 150,
+            child: DropdownButtonFormField(
+              decoration: new InputDecoration(
+                contentPadding: const EdgeInsets.only(left: 10, bottom: 10),
+                labelText: "Pakar",
+                labelStyle: TextStyle(
+                  fontFamily: "Montserrat",
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              isExpanded: true,
+              items: [
+                DropdownMenuItem<String>(
+                  child: Text("Semua"),
+                  value: "",
+                ),
+                for (int i = 0; i < _arraySubSpecialist.length; i++)
+                  if (_valueSpecialist ==
+                      _arraySubSpecialist[i]['specialist_id'])
+                    DropdownMenuItem<String>(
+                      child: Text(
+                        _arraySubSpecialist[i]['sub_specialist'],
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      value: _arraySubSpecialist[i]['sub_specialist'],
+                    ),
+              ],
+              onChanged: (String value) {
+                setState(() {
+                  _valueSubSpecialist = value;
+                });
+                _search();
+              },
+              value: _valueSubSpecialist,
+            ),
+          );
+  }
+
+  Future _search() async {
+    setState(() {
+      _loadingVisible = true;
+      _loadingIconVisible = true;
+    });
+
+    _arrayDoctor = await getAllDoctor(
+        _searchController.text, _valueSpecialist, _valueSubSpecialist);
+
+    await Future.wait([
+      for (int i = 0; i < _arrayDoctor.length; i++)
+        _getTotalExp(_arrayDoctor[i]),
+    ]);
+
+    setState(() {
+      _hideLoadingScreen();
+    });
   }
 
   Future _getTotalExp(Map doctor) async {
@@ -86,16 +214,16 @@ class _DoctorPageState extends State<DoctorPage> {
     return (_arrayDoctor == null)
         ? _noDoctor()
         : SingleChildScrollView(
-      physics: BouncingScrollPhysics(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          for (int i = 0; i < _arrayDoctor.length; i++)
-            if (_arrayDoctor[i]['doctor_id'] != _roleId)
-              _doctorRow(_arrayDoctor[i]),
-        ],
-      ),
-    );
+            physics: BouncingScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                for (int i = 0; i < _arrayDoctor.length; i++)
+                  if (_arrayDoctor[i]['doctor_id'] != _roleId)
+                    _doctorRow(_arrayDoctor[i]),
+              ],
+            ),
+          );
   }
 
   Widget _noDoctor() {
