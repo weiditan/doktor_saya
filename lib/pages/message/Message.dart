@@ -362,6 +362,7 @@ class _MessageState extends State<Message> {
 
   Widget _messageBar() {
     return Container(
+      color: Colors.white,
       child: Row(
         children: <Widget>[
           Flexible(
@@ -373,7 +374,7 @@ class _MessageState extends State<Message> {
                   color: Colors.black,
                 ),
                 decoration: InputDecoration.collapsed(
-                  hintText: 'Type a message',
+                  hintText: 'Tulis mesej',
                   hintStyle: TextStyle(color: Colors.grey),
                 ),
                 controller: _messageController,

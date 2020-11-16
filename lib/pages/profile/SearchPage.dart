@@ -211,7 +211,7 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Widget _secondScreen() {
-    return (_arrayDoctor == null)
+    return (_arrayDoctor == null  || _arrayDoctor.length == 0)
         ? _noDoctor()
         : SingleChildScrollView(
             physics: BouncingScrollPhysics(),
@@ -260,7 +260,7 @@ class _SearchPageState extends State<SearchPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "Dr " + doctor['nickname'] + "hghhhikjjkjlll",
+                              "Dr " + doctor['nickname'],
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontSize: 18,

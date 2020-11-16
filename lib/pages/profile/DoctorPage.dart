@@ -11,7 +11,6 @@ import 'ext/profileDatabase.dart';
 import 'ext/profileImage.dart';
 
 import 'ext/diffDate.dart' as dd;
-import 'ext/specialistDatabase.dart';
 
 class DoctorPage extends StatefulWidget {
   @override
@@ -19,10 +18,7 @@ class DoctorPage extends StatefulWidget {
 }
 
 class _DoctorPageState extends State<DoctorPage> {
-  final _searchController = TextEditingController();
-  List _arraySpecialist, _arraySubSpecialist, _arrayDoctor;
-  String _valueSpecialist = "";
-  String _valueSubSpecialist = "";
+  List _arrayDoctor;
   String _roleId;
   bool _loadingIconVisible = true;
   bool _loadingVisible = true;
@@ -35,8 +31,6 @@ class _DoctorPageState extends State<DoctorPage> {
 
   Future _init() async {
     _roleId = await getRoleId();
-    _arraySpecialist = await getSpecialist();
-    _arraySubSpecialist = await getSubSpecialist();
     _arrayDoctor = await getAllDoctor("", "", "");
     await Future.wait([
       for (int i = 0; i < _arrayDoctor.length; i++)
@@ -83,7 +77,7 @@ class _DoctorPageState extends State<DoctorPage> {
   }
 
   Widget _secondScreen() {
-    return (_arrayDoctor == null)
+    return (_arrayDoctor == null || _arrayDoctor.length==0)
         ? _noDoctor()
         : SingleChildScrollView(
       physics: BouncingScrollPhysics(),
@@ -132,7 +126,7 @@ class _DoctorPageState extends State<DoctorPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "Dr " + doctor['nickname'] + "hghhhikjjkjlll",
+                              "Dr " + doctor['nickname'],
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontSize: 18,
@@ -144,7 +138,7 @@ class _DoctorPageState extends State<DoctorPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "100% Kadar Tindakbalas",
+                                  doctor['rate'] + "% Kadar Tindakbalas",
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontFamily: "Montserrat",

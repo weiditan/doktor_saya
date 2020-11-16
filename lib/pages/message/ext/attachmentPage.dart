@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:doktorsaya/pages/message/ext/uploadAttachment.dart';
 import 'package:flick_video_player/flick_video_player.dart';
 import 'package:flutter/material.dart';
-import 'package:photo_view/photo_view.dart';
 import 'package:video_player/video_player.dart';
 
 class AttachmentPage extends StatefulWidget {
@@ -68,9 +67,8 @@ class _AttachmentPageState extends State<AttachmentPage> {
     switch (widget.type) {
       case "Gambar":
         {
-          return PhotoView(
-            imageProvider: AssetImage(widget.file.path),
-          );
+          return
+            Container(height: double.infinity,child: Image.file(widget.file));
         }
         break;
 

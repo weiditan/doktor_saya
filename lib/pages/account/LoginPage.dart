@@ -17,6 +17,7 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  final _focus1 = FocusNode();
 
   @override
   void initState() {
@@ -101,7 +102,7 @@ class _LoginPageState extends State<LoginPage> {
       textInputAction: TextInputAction.next,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       onFieldSubmitted: (_) {
-        FocusScope.of(context).nextFocus();
+        FocusScope.of(context).requestFocus(_focus1);
       },
       validator: (String value) {
         if (value.isNotEmpty) {
@@ -138,6 +139,7 @@ class _LoginPageState extends State<LoginPage> {
             },
           ),
         ),
+        focusNode: _focus1,
         keyboardType: TextInputType.text,
         obscureText: _obscureText,
         controller: _passwordController,

@@ -13,11 +13,8 @@ logout(BuildContext context) {
 }
 
 Future _updateOfflineStatus() async {
-  String _role = await sp.getRole();
-
-  if (_role == 'doctor') {
-    String _roleId = await sp.getRoleId();
-
+  String _roleId = await sp.getRoleId();
+  if (_roleId[0] == "d") {
     await updateDoctorStatus(_roleId, "offline");
   }
 }
