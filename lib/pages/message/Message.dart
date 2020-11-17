@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doktorsaya/functions/viewImage.dart';
@@ -42,7 +41,6 @@ class _MessageState extends State<Message> {
   }
 
   Future _getData() async {
-
     while (_loop) {
       await getMessage(widget.data['sender'], widget.data['receiver'])
           .then((onValue) {
@@ -200,6 +198,14 @@ class _MessageState extends State<Message> {
                 : Colors.white,
             child: Column(
               children: <Widget>[
+                Text(
+                  message['context'],
+                  textAlign: (message['sender'] == widget.data['sender'])
+                      ? TextAlign.right
+                      : TextAlign.left,
+                  style: TextStyle(fontSize: 16, color: Colors.black),
+                ),
+                SizedBox(height: 5),
                 Container(
                   width: 130,
                   height: 80,
@@ -281,6 +287,14 @@ class _MessageState extends State<Message> {
                 : Colors.white,
             child: Column(
               children: <Widget>[
+                Text(
+                  message['context'],
+                  textAlign: (message['sender'] == widget.data['sender'])
+                      ? TextAlign.right
+                      : TextAlign.left,
+                  style: TextStyle(fontSize: 16, color: Colors.black),
+                ),
+                SizedBox(height: 5),
                 Container(
                   width: 130,
                   height: 80,
@@ -325,7 +339,7 @@ class _MessageState extends State<Message> {
                         color: Colors.white,
                       ),
                       onPressed: () {
-                      /*  _downloadFile(
+                        /*  _downloadFile(
                             "http://www.breakvoid.com/DoktorSaya/Files/Attachments/" +
                                 message["filepath"]);*/
                       }),

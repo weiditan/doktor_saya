@@ -44,7 +44,8 @@ dependencies:
   dio: ^3.0.10
   cached_network_image: ^2.3.3
   #downloads_path_provider: ^0.1.0
-  #flutter_downloader: ^1.5.2
+  path_provider: ^1.6.24
+  flutter_downloader: ^1.5.2
 
 dev_dependencies:
   flutter_test:

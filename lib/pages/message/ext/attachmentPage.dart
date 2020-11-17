@@ -15,7 +15,6 @@ class AttachmentPage extends StatefulWidget {
 }
 
 class _AttachmentPageState extends State<AttachmentPage> {
-
   FlickManager flickManager;
 
   @override
@@ -67,8 +66,8 @@ class _AttachmentPageState extends State<AttachmentPage> {
     switch (widget.type) {
       case "Gambar":
         {
-          return
-            Container(height: double.infinity,child: Image.file(widget.file));
+          return Container(
+              height: double.infinity, child: Image.file(widget.file));
         }
         break;
 
@@ -92,7 +91,28 @@ class _AttachmentPageState extends State<AttachmentPage> {
 
       default:
         {
-          return Text(widget.type);
+          return Container(
+              height: double.infinity,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.insert_drive_file,
+                    color: Colors.white,
+                    size: 50,
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Text(
+                    widget.file.path.split("/").last,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ));
         }
         break;
     }
@@ -123,7 +143,8 @@ class _AttachmentPageState extends State<AttachmentPage> {
             if (widget.type == "Video") {
               flickManager.flickControlManager.pause();
             }
-            uploadAttachment(context, widget.file.path, widget.type ,widget.sender, widget.receiver);
+            uploadAttachment(context, widget.file.path, widget.type,
+                widget.sender, widget.receiver);
           },
         ),
       ),
