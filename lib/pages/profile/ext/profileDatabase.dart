@@ -58,6 +58,7 @@ Future<List> getAllDoctor(
 Future<Map> updateToken() async {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   String _token = await _firebaseMessaging.getToken();
+  print(_token);
   String _roleId = await getRoleId();
 
   var url = 'http://www.breakvoid.com/DoktorSaya/UpdateToken.php';

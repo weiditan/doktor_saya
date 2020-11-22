@@ -17,28 +17,40 @@ class _WelcomePageState extends State<WelcomePage> {
   @override
   void initState() {
     super.initState();
+    _init();
+  }
 
-    sp.getUserId().then((id) {
-      if (id == null) {
-        setState(() {
-          _loadingIconVisible = false;
-        });
-        Timer(Duration(milliseconds: 500), () {
-          setState(() {
-            _buttonVisible = false;
-          });
-        });
-      } else {
-        sp.getRoleId().then((roleId) {
-          if (roleId == null) {
-            Navigator.pushNamedAndRemoveUntil(
-                context, '/RolePage', (Route<dynamic> route) => false);
-          } else {
-            Navigator.pushNamedAndRemoveUntil(
-                context, '/HomePage', (Route<dynamic> route) => false);
-          }
-        });
+  Future<void> _init() async{
+
+    if(await sp.getUserId()==null){
+      _hideLoadingScreen();
+    }else{
+      String _role = await sp.getRole();
+
+      if(_role=="admin"){
+        Navigator.pushNamedAndRemoveUntil(
+            context, '/AdminHomePage', (Route<dynamic> route) => false);
+      }else if(_role=="user"){
+
+        if(await sp.getRoleId()!=null){
+          Navigator.pushNamedAndRemoveUntil(
+              context, '/HomePage', (Route<dynamic> route) => false);
+        }else {
+          Navigator.pushNamedAndRemoveUntil(
+              context, '/RolePage', (Route<dynamic> route) => false);
+        }
+
       }
+    }
+  }
+
+  Future _hideLoadingScreen() async {
+    setState(() {
+      _loadingIconVisible = false;
+    });
+    await Future.delayed(Duration(milliseconds: 500));
+    setState(() {
+      _buttonVisible = false;
     });
   }
 
@@ -167,9 +179,8 @@ class _WelcomePageState extends State<WelcomePage> {
   Widget _registerButton() {
     return InkWell(
       onTap: () {
-        Navigator.pushNamedAndRemoveUntil(
-            context, '/EditUserPage1', ModalRoute.withName('/'),
-            arguments: "Register");
+        Navigator.pushNamed(
+            context, '/EditUserPage1', arguments: "Register");
       },
       child: Container(
         width: MediaQuery.of(context).size.width,

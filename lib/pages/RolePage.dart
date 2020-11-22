@@ -113,7 +113,6 @@ class RolePage extends StatelessWidget {
   void _submit(context, _role) async {
     await pr.show(context, "Memuatkan");
 
-    sp.saveRole(_role);
     sp.getUserId().then((id) {
       _checkRole(id.toString(), _role)
           .timeout(new Duration(seconds: 15))

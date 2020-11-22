@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'sharedPreferences.dart' as sp;
 
-
 DateTime currentBackPressTime;
 
 Future<bool> onWillPop() {
@@ -23,11 +22,8 @@ Future<bool> onWillPop() {
 }
 
 Future _updateOfflineStatus() async {
-  String _role = await sp.getRole();
-
-  if (_role == 'doctor') {
-    String _roleId = await sp.getRoleId();
-
+  String _roleId = await sp.getRoleId();
+  if (_roleId[0] == "d") {
     await updateDoctorStatus(_roleId, "offline");
   }
 }

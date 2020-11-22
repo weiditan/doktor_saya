@@ -43,11 +43,14 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future _getData() async {
     await Future.wait([
-      sp.getRole().then((onValue) {
-        _role = onValue;
-      }),
       sp.getRoleId().then((onValue) {
         _roleId = onValue;
+
+        if(_roleId[0]=="d"){
+          _role = "doctor";
+        }else{
+          _role = "patient";
+        }
       }),
     ]);
 

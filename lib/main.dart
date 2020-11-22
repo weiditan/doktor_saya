@@ -1,4 +1,5 @@
 import 'package:doktorsaya/pages/account/ChangePasswordPage.dart';
+import 'package:doktorsaya/pages/admin/AdminHomePage.dart';
 import 'package:doktorsaya/pages/call/ConfirmCallPage.dart';
 import 'package:doktorsaya/pages/message/Message.dart';
 import 'package:flutter/material.dart';
@@ -87,6 +88,14 @@ class MyApp extends StatelessWidget {
           case '/HomePage':
             return PageTransition(
               child: HomePage(),
+              type: PageTransitionType.fade,
+              settings: settings,
+            );
+            break;
+
+          case '/AdminHomePage':
+            return PageTransition(
+              child: AdminHomePage(),
               type: PageTransitionType.fade,
               settings: settings,
             );

@@ -4,7 +4,6 @@ import 'package:doktorsaya/pages/profile/ProfilePage.dart';
 import 'package:doktorsaya/pages/profile/SearchPage.dart';
 import 'package:doktorsaya/pages/profile/ext/profileDatabase.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'call/CallListPage.dart';
@@ -15,10 +14,10 @@ import '../functions/sharedPreferences.dart' as sp;
 
 class HomePage extends StatefulWidget {
   @override
-  _TestState createState() => _TestState();
+  _HomePage createState() => _HomePage();
 }
 
-class _TestState extends State<HomePage> with WidgetsBindingObserver {
+class _HomePage extends State<HomePage> with WidgetsBindingObserver {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   String _roleId;
   bool _showConfirmCallPage = false;
@@ -56,8 +55,9 @@ class _TestState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Future _init() async {
-    updateToken();
+
     _firebaseMessagingFunction();
+    updateToken();
 /*
     WidgetsFlutterBinding.ensureInitialized();
     await FlutterDownloader.initialize(

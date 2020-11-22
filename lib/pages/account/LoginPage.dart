@@ -238,16 +238,23 @@ class _LoginPageState extends State<LoginPage> {
           onPressed: () async {
             if (_formKey.currentState.validate()) {
               await pr.show(context, "Log Masuk");
-
               login(_emailController.text, _passwordController.text)
                   .timeout(new Duration(seconds: 15))
                   .then((s) async {
                 if (s["status"]) {
-                  sp.saveUserId(int.parse(s["data"]));
+                  sp.saveUserId(int.parse(s["user_id"]));
+                  sp.saveRole(s["role"]);
                   sp.saveEmail(_emailController.text);
                   await pr.hide();
-                  Navigator.pushNamedAndRemoveUntil(
-                      context, '/RolePage', (Route<dynamic> route) => false);
+
+                  if(s["role"]=="admin"){
+                    Navigator.pushNamedAndRemoveUntil(
+                        context, '/AdminHomePage', (Route<dynamic> route) => false);
+                  }else if(s["role"]=="user"){
+                    Navigator.pushNamedAndRemoveUntil(
+                        context, '/RolePage', (Route<dynamic> route) => false);
+                  }
+
                 } else {
                   await pr.error(s["data"]);
                 }
