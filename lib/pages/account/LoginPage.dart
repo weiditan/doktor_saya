@@ -249,7 +249,7 @@ class _LoginPageState extends State<LoginPage> {
 
                   if(s["role"]=="admin"){
                     Navigator.pushNamedAndRemoveUntil(
-                        context, '/AdminHomePage', (Route<dynamic> route) => false);
+                        context, '/ManageDoctorPage', (Route<dynamic> route) => false);
                   }else if(s["role"]=="user"){
                     Navigator.pushNamedAndRemoveUntil(
                         context, '/RolePage', (Route<dynamic> route) => false);

@@ -192,7 +192,7 @@ class _ProfilePageState extends State<ProfilePage> {
           borderRadius: BorderRadius.all(Radius.circular(5)),
         ),
         child: Text(
-          "Logout",
+          "Log Keluar",
           style: TextStyle(
             fontFamily: "Montserrat",
             fontSize: 14,

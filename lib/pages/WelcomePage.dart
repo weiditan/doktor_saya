@@ -29,7 +29,7 @@ class _WelcomePageState extends State<WelcomePage> {
 
       if(_role=="admin"){
         Navigator.pushNamedAndRemoveUntil(
-            context, '/AdminHomePage', (Route<dynamic> route) => false);
+            context, '/ManageDoctorPage', (Route<dynamic> route) => false);
       }else if(_role=="user"){
 
         if(await sp.getRoleId()!=null){
