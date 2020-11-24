@@ -30,7 +30,8 @@ class NavDrawer extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.border_color),
             title: Text('Menguruskan Doktor'),
-            onTap: () => { Navigator.of(context).pop(),
+            onTap: () => {
+              Navigator.of(context).pop(),
               Navigator.of(context).pushReplacement(
                   MaterialPageRoute(builder: (context) => ManageDoctorPage())),
             },

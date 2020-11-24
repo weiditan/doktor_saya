@@ -42,14 +42,15 @@ Future<Map> googleLogin(String email) async {
   return data;
 }
 
-Future<Map> registerAccount(String email, String password) async {
+Future<Map> registerAccount(String email, String password, String role) async {
 
   http.Response response = await retry(
     // Make a GET request
     () => http.post(url, body: {
       'action': 'registerAccount',
       'email': email,
-      'password': encrypt(password)
+      'password': encrypt(password),
+      'role': role
     }).timeout(Duration(seconds: 5)),
     // Retry on SocketException or TimeoutException
     retryIf: (e) => e is SocketException || e is TimeoutException,
@@ -95,6 +96,23 @@ Future<Map> changePassword(String password, String newPassword) async {
   );
 
   Map data = jsonDecode(response.body);
+
+  return data;
+}
+
+Future<List> getAllAdmin(String email) async {
+
+  http.Response response = await retry(
+    // Make a GET request
+        () => http.post(url, body: {
+      'action': 'getAllAdmin',
+      'email': email,
+    }).timeout(Duration(seconds: 5)),
+    // Retry on SocketException or TimeoutException
+    retryIf: (e) => e is SocketException || e is TimeoutException,
+  );
+
+  List data = jsonDecode(response.body);
 
   return data;
 }

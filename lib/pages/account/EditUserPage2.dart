@@ -317,7 +317,7 @@ class _EditUserPage2State extends State<EditUserPage2> {
             await pr.show(context, "Memuatkan");
 
             registerAccount(
-                    widget.arguments['email'], _password1Controller.text)
+                    widget.arguments['email'], _password1Controller.text, "user")
                 .timeout(new Duration(seconds: 15))
                 .then((s) async {
               if (s["status"]) {
