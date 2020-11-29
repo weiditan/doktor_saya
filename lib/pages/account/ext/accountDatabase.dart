@@ -116,3 +116,20 @@ Future<List> getAllAdmin(String email) async {
 
   return data;
 }
+
+Future<Map> deleteUser(String userId) async {
+
+  http.Response response = await retry(
+    // Make a GET request
+        () => http.post(url, body: {
+      'action': 'deleteUser',
+      'userId': userId,
+    }).timeout(Duration(seconds: 5)),
+    // Retry on SocketException or TimeoutException
+    retryIf: (e) => e is SocketException || e is TimeoutException,
+  );
+
+  Map data = jsonDecode(response.body);
+
+  return data;
+}
