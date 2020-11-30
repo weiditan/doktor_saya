@@ -8,7 +8,7 @@
 
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="doktorsaya"
+        android:label="Doktor Saya"
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true">
         <activity

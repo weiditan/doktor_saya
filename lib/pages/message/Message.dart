@@ -5,7 +5,7 @@ import 'package:doktorsaya/functions/viewImage.dart';
 import 'package:doktorsaya/functions/viewVideo.dart';
 import 'package:flutter/material.dart';
 
-import 'package:doktorsaya/pages/message/bubble.dart';
+import 'file:///C:/Users/WeiDi/StudioProjects/doktor_saya/lib/pages/message/ext/bubble.dart';
 import 'package:doktorsaya/functions/loadingScreen.dart';
 import 'package:doktorsaya/pages/profile/ext/profileImage.dart';
 
@@ -383,7 +383,13 @@ class _MessageState extends State<Message> {
 
   Widget _messageBar() {
     return Container(
-      color: Colors.white,
+      height: 51.0,
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(color: Colors.grey[300],width: 1.5),
+        ),
+        color: Colors.white,
+      ),
       child: Row(
         children: <Widget>[
           Flexible(
@@ -404,56 +410,41 @@ class _MessageState extends State<Message> {
               color: Colors.white,
             ),
           ),
-          Material(
-            child: Container(
-              margin: EdgeInsets.symmetric(horizontal: 8.0),
-              child: Row(
-                children: <Widget>[
-                  IconButton(
-                    icon: Icon(
-                      Icons.attach_file,
-                      color: Colors.black,
-                    ),
-                    onPressed: () {
-                      showAttachmentBottomSheet(context, widget.data['sender'],
-                          widget.data['receiver']);
-                    },
-                  ),
-                  IconButton(
-                    icon: Icon(
-                      Icons.send,
-                      color: Colors.black,
-                    ),
-                    onPressed: () {
-                      if (_messageController.text != "") {
-                        addTextMessage(
-                                widget.data['sender'],
-                                widget.data['receiver'],
-                                _messageController.text)
-                            .then((s) {
-                          if (s['status']) {
-                            getMessage(widget.data['sender'],
-                                    widget.data['receiver'])
-                                .then((onValue) {
-                              setState(() {
-                                _arrayMessage = onValue;
-                                _messageController.text = "";
-                              });
-                            });
-                          }
-                        });
-                      }
-                    },
-                  ),
-                ],
-              ),
-              color: Colors.white,
+          IconButton(
+            icon: Icon(
+              Icons.attach_file,
+              color: Colors.black,
             ),
+            onPressed: () {
+              showAttachmentBottomSheet(
+                  context, widget.data['sender'], widget.data['receiver']);
+            },
+          ),
+          IconButton(
+            icon: Icon(
+              Icons.send,
+              color: Colors.black,
+            ),
+            onPressed: () {
+              if (_messageController.text != "") {
+                addTextMessage(widget.data['sender'], widget.data['receiver'],
+                        _messageController.text)
+                    .then((s) {
+                  if (s['status']) {
+                    getMessage(widget.data['sender'], widget.data['receiver'])
+                        .then((onValue) {
+                      setState(() {
+                        _arrayMessage = onValue;
+                        _messageController.text = "";
+                      });
+                    });
+                  }
+                });
+              }
+            },
           ),
         ],
       ),
-      width: double.infinity,
-      height: 50.0,
     );
   }
 

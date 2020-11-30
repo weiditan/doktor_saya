@@ -23,16 +23,16 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: 'Doktor Saya',
       theme: ThemeData(
-        //brightness: Brightness.light,
         primarySwatch: Colors.orange,
         scaffoldBackgroundColor: Colors.grey[200],
+        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       darkTheme: ThemeData(
         brightness: Brightness.dark,
-        //primaryColor: Colors.black,
         accentColor: Colors.orange,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: WelcomePage(),
       onGenerateRoute: (settings) {
