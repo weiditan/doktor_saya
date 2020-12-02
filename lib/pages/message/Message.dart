@@ -383,7 +383,7 @@ class _MessageState extends State<Message> {
 
   Widget _messageBar() {
     return Container(
-      height: 51.0,
+      height: 51.5,
       decoration: BoxDecoration(
         border: Border(
           top: BorderSide(color: Colors.grey[300],width: 1.5),

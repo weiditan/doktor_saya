@@ -11,6 +11,7 @@ class WelcomePage extends StatefulWidget {
 }
 
 class _WelcomePageState extends State<WelcomePage> {
+  BoxDecoration _boxDecoration;
   bool _buttonVisible = true;
   bool _loadingIconVisible = true;
 
@@ -20,26 +21,23 @@ class _WelcomePageState extends State<WelcomePage> {
     _init();
   }
 
-  Future<void> _init() async{
-
-    if(await sp.getUserId()==null){
+  Future<void> _init() async {
+    if (await sp.getUserId() == null) {
       _hideLoadingScreen();
-    }else{
+    } else {
       String _role = await sp.getRole();
 
-      if(_role=="admin"){
+      if (_role == "admin") {
         Navigator.pushNamedAndRemoveUntil(
             context, '/ManageDoctorPage', (Route<dynamic> route) => false);
-      }else if(_role=="user"){
-
-        if(await sp.getRoleId()!=null){
+      } else if (_role == "user") {
+        if (await sp.getRoleId() != null) {
           Navigator.pushNamedAndRemoveUntil(
               context, '/HomePage', (Route<dynamic> route) => false);
-        }else {
+        } else {
           Navigator.pushNamedAndRemoveUntil(
               context, '/RolePage', (Route<dynamic> route) => false);
         }
-
       }
     }
   }
@@ -57,7 +55,6 @@ class _WelcomePageState extends State<WelcomePage> {
   @override
   Widget build(BuildContext context) {
     Brightness _brightness = MediaQuery.of(context).platformBrightness;
-    BoxDecoration _boxDecoration;
 
     if (_brightness == Brightness.light) {
       _boxDecoration = BoxDecoration(
@@ -67,59 +64,54 @@ class _WelcomePageState extends State<WelcomePage> {
               colors: [Color(0xfffbb448), Color(0xffe46b10)]));
     }
 
-    double _screenHeight = MediaQuery.of(context).size.height;
-    double _screenWidth = MediaQuery.of(context).size.width;
-    double _maxWidth;
-
-    if (_screenWidth > _screenHeight) {
-      _maxWidth = _screenWidth * 0.6;
-    } else {
-      _maxWidth = _screenWidth * 0.9;
-    }
-
     return Scaffold(
       body: WillPopScope(
-          child: SingleChildScrollView(
-            physics: BouncingScrollPhysics(),
-            child: Container(
-              decoration: _boxDecoration,
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: _screenHeight,
-                    minWidth: 20,
-                    maxWidth: _maxWidth,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      _logo(_maxWidth),
-                      AnimatedCrossFade(
-                          // If the widget is visible, animate to 0.0 (invisible).
-                          // If the widget is hidden, animate to 1.0 (fully visible).
-                          crossFadeState: _buttonVisible
-                              ? CrossFadeState.showFirst
-                              : CrossFadeState.showSecond,
-                          firstCurve: Curves.easeOut,
-                          secondCurve: Curves.easeIn,
-                          duration: Duration(milliseconds: 500),
-                          firstChild: _loadingIcon(),
-                          secondChild: _showButton()),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
+          child: (MediaQuery.of(context).orientation == Orientation.portrait)
+              ? _portrait()
+              : _landscape(),
           onWillPop: onWillPop),
     );
   }
 
-  Widget _logo(double _maxWidth) {
+  Widget _landscape() {
     return Container(
+      decoration: _boxDecoration,
+      child: Center(
+        child: Row(
+          children: <Widget>[
+            Expanded(
+              child: _logo(),
+            ),
+            Expanded(
+              child: _showButton(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _portrait() {
+    return Container(
+      decoration: _boxDecoration,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            _logo(),
+            _showButton(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _logo() {
+    return Container(
+      margin: EdgeInsets.all(50),
       child: Image(
         image: AssetImage("assets/logo.png"),
-        width: _maxWidth * 0.6,
+        fit: BoxFit.fill,
       ),
     );
   }
@@ -131,23 +123,40 @@ class _WelcomePageState extends State<WelcomePage> {
         // If the widget is visible, animate to 0.0 (invisible).
         // If the widget is hidden, animate to 1.0 (fully visible).
         opacity: _loadingIconVisible ? 1.0 : 0.0,
-        duration: Duration(milliseconds: 1000),
-        child: CircularProgressIndicator(
-            valueColor: new AlwaysStoppedAnimation<Color>(Colors.white)),
+        duration: Duration(milliseconds: 300),
+        child: Center(
+          child: CircularProgressIndicator(
+            valueColor: new AlwaysStoppedAnimation<Color>(Colors.white),
+          ),
+        ),
       ),
     );
   }
 
   Widget _showButton() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        _loginButton(),
-        SizedBox(
-          height: 10,
+    return AnimatedCrossFade(
+      // If the widget is visible, animate to 0.0 (invisible).
+      // If the widget is hidden, animate to 1.0 (fully visible).
+      crossFadeState:
+          _buttonVisible ? CrossFadeState.showFirst : CrossFadeState.showSecond,
+      firstCurve: Curves.easeOut,
+      secondCurve: Curves.easeIn,
+      duration: Duration(milliseconds: 500),
+      firstChild: _loadingIcon(),
+      secondChild: Container(
+        margin: EdgeInsets.all(30),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            _loginButton(),
+            SizedBox(
+              height: 10,
+            ),
+            _registerButton(),
+          ],
         ),
-        _registerButton(),
-      ],
+      ),
     );
   }
 
@@ -179,11 +188,9 @@ class _WelcomePageState extends State<WelcomePage> {
   Widget _registerButton() {
     return InkWell(
       onTap: () {
-        Navigator.pushNamed(
-            context, '/EditUserPage1', arguments: "Register");
+        Navigator.pushNamed(context, '/EditUserPage1', arguments: "Register");
       },
       child: Container(
-        width: MediaQuery.of(context).size.width,
         padding: EdgeInsets.symmetric(vertical: 13),
         alignment: Alignment.center,
         decoration: BoxDecoration(
