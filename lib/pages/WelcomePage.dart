@@ -11,7 +11,6 @@ class WelcomePage extends StatefulWidget {
 }
 
 class _WelcomePageState extends State<WelcomePage> {
-  BoxDecoration _boxDecoration;
   bool _buttonVisible = true;
   bool _loadingIconVisible = true;
 
@@ -55,6 +54,7 @@ class _WelcomePageState extends State<WelcomePage> {
   @override
   Widget build(BuildContext context) {
     Brightness _brightness = MediaQuery.of(context).platformBrightness;
+    BoxDecoration _boxDecoration;
 
     if (_brightness == Brightness.light) {
       _boxDecoration = BoxDecoration(
@@ -66,52 +66,62 @@ class _WelcomePageState extends State<WelcomePage> {
 
     return Scaffold(
       body: WillPopScope(
-          child: (MediaQuery.of(context).orientation == Orientation.portrait)
-              ? _portrait()
-              : _landscape(),
+          child: Container(
+            decoration: _boxDecoration,
+            child: (MediaQuery.of(context).orientation == Orientation.portrait)
+                ? _portrait()
+                : _landscape(),
+          ),
           onWillPop: onWillPop),
     );
   }
 
   Widget _landscape() {
-    return Container(
-      decoration: _boxDecoration,
-      child: Center(
-        child: Row(
-          children: <Widget>[
-            Expanded(
-              child: _logo(),
-            ),
-            Expanded(
-              child: _showButton(),
-            ),
-          ],
-        ),
+    return Center(
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: _logo(),
+          ),
+          Expanded(
+            child: _showButton(),
+          ),
+        ],
       ),
     );
   }
 
   Widget _portrait() {
-    return Container(
-      decoration: _boxDecoration,
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            _logo(),
-            _showButton(),
-          ],
+    return SingleChildScrollView(
+      physics: BouncingScrollPhysics(),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height,
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              _logo(),
+              _showButton(),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _logo() {
-    return Container(
-      margin: EdgeInsets.all(50),
-      child: Image(
-        image: AssetImage("assets/logo.png"),
-        fit: BoxFit.fill,
+    return Center(
+      child: AspectRatio(
+        aspectRatio: 1 / 1,
+        child: Container(
+          margin: EdgeInsets.all(50),
+          child: Image(
+            image: AssetImage("assets/logo.png"),
+            fit: BoxFit.fill,
+          ),
+        ),
       ),
     );
   }

@@ -20,6 +20,7 @@ class ViewDoctorDetail extends StatefulWidget {
 }
 
 class _ViewDoctorDetailState extends State<ViewDoctorDetail> {
+
   double _screenWidth;
   List _arrayDoctorSpecialist;
   List _arrayDoctorExp;
@@ -61,51 +62,73 @@ class _ViewDoctorDetailState extends State<ViewDoctorDetail> {
     _screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      body: ListView(
-        physics: BouncingScrollPhysics(),
+      body: (MediaQuery.of(context).orientation == Orientation.portrait)
+          ? _portrait()
+          : _landscape(),
+    );
+  }
+
+
+  Widget _landscape() {
+    return Center(
+      child: Row(
         children: <Widget>[
-          Stack(
-            alignment: Alignment.bottomCenter,
-            children: <Widget>[
-              Stack(
-                alignment: Alignment.bottomCenter,
-                children: <Widget>[
-                  showProfileImage(widget.doctor['image'], _screenWidth),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      _callButton(),
-                      SizedBox(width: 10),
-                      _messageButton(),
-                      SizedBox(width: 10),
-                    ],
-                  )
-                ],
-              ),
-              Positioned(top: 0, left: 0, child: _backButton(context)),
-            ],
+          Expanded(
+            child: showProfileImage(widget.doctor['image'], _screenWidth*0.5),
           ),
-          SizedBox(height: 10),
-          showProfileDetail("doctor", widget.doctor),
-          AnimatedCrossFade(
-            crossFadeState: _loadingVisible
-                ? CrossFadeState.showFirst
-                : CrossFadeState.showSecond,
-            firstCurve: Curves.easeOut,
-            secondCurve: Curves.easeIn,
-            duration: Duration(milliseconds: 500),
-            firstChild: loadingScreen(_loadingIconVisible),
-            secondChild: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                showDoctorSpecialist(_arrayDoctorSpecialist),
-                showDoctorWorkplace(widget.doctor),
-                showDoctorExperience(_arrayDoctorExp),
-              ],
-            ),
+          Expanded(
+            child: Text(''),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _portrait() {
+    return ListView(
+      physics: BouncingScrollPhysics(),
+      children: <Widget>[
+        Stack(
+          alignment: Alignment.bottomCenter,
+          children: <Widget>[
+            Stack(
+              alignment: Alignment.bottomCenter,
+              children: <Widget>[
+                showProfileImage(widget.doctor['image'], _screenWidth),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    _callButton(),
+                    SizedBox(width: 10),
+                    _messageButton(),
+                    SizedBox(width: 10),
+                  ],
+                )
+              ],
+            ),
+            Positioned(top: 0, left: 0, child: _backButton(context)),
+          ],
+        ),
+        SizedBox(height: 10),
+        showProfileDetail("doctor", widget.doctor),
+        AnimatedCrossFade(
+          crossFadeState: _loadingVisible
+              ? CrossFadeState.showFirst
+              : CrossFadeState.showSecond,
+          firstCurve: Curves.easeOut,
+          secondCurve: Curves.easeIn,
+          duration: Duration(milliseconds: 500),
+          firstChild: loadingScreen(_loadingIconVisible),
+          secondChild: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              showDoctorSpecialist(_arrayDoctorSpecialist),
+              showDoctorWorkplace(widget.doctor),
+              showDoctorExperience(_arrayDoctorExp),
+            ],
+          ),
+        ),
+      ],
     );
   }
 

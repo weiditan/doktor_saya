@@ -27,34 +27,76 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    double _screenHeight = MediaQuery.of(context).size.height;
-    double _screenWidth = MediaQuery.of(context).size.width;
-    double _maxWidth;
-
-    if (_screenWidth > _screenHeight) {
-      _maxWidth = _screenWidth * 0.7;
-    } else {
-      _maxWidth = _screenWidth * 0.9;
-    }
 
     return Scaffold(
       appBar: AppBar(
         title: Text("Log Masuk"),
       ),
-      body: SingleChildScrollView(
-        physics: BouncingScrollPhysics(),
-        child: Center(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: _screenHeight - 80,
-              maxWidth: _maxWidth,
+      body: (MediaQuery.of(context).orientation == Orientation.portrait)
+          ? _portrait()
+          : _landscape(),
+    );
+  }
+
+  Widget _landscape() {
+    return Row(
+      children: <Widget>[
+        Expanded(
+          child: _logo(),
+        ),
+        Expanded(
+          child: SingleChildScrollView(
+            physics: BouncingScrollPhysics(),
+            child: Container(
+              margin: EdgeInsets.all(20),
+              child: Center(
+                child: Column(
+                  children: <Widget>[
+                    Form(
+                      key: _formKey,
+                      child: Column(
+                        children: <Widget>[
+                          _emailField(),
+                          SizedBox(height: 8),
+                          _passwordField(),
+                          _forgotPassword(),
+                          SizedBox(height: 5),
+                          _loginButton(),
+                          _divider(),
+                          googleButton()
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 10, bottom: 10),
+                      child: _register(),
+                    ),
+                  ],
+                ),
+              ),
             ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _portrait() {
+    return SingleChildScrollView(
+      physics: BouncingScrollPhysics(),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height - 80,
+        ),
+        child: Container(
+          margin: EdgeInsets.all(50),
+          child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(top: 10, bottom: 10),
-                  child: logo(_maxWidth),
+                SizedBox(
+                  width: MediaQuery.of(context).size.height * 0.3,
+                  child: _logo(),
                 ),
                 Form(
                   key: _formKey,
@@ -77,6 +119,21 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _logo() {
+    return Center(
+      child: AspectRatio(
+        aspectRatio: 1 / 1,
+        child: Container(
+          margin: EdgeInsets.all(30),
+          child: Image(
+            image: AssetImage("assets/logo.png"),
+            fit: BoxFit.fill,
           ),
         ),
       ),
@@ -247,14 +304,13 @@ class _LoginPageState extends State<LoginPage> {
                   sp.saveEmail(_emailController.text);
                   await pr.hide();
 
-                  if(s["role"]=="admin"){
-                    Navigator.pushNamedAndRemoveUntil(
-                        context, '/ManageDoctorPage', (Route<dynamic> route) => false);
-                  }else if(s["role"]=="user"){
+                  if (s["role"] == "admin") {
+                    Navigator.pushNamedAndRemoveUntil(context,
+                        '/ManageDoctorPage', (Route<dynamic> route) => false);
+                  } else if (s["role"] == "user") {
                     Navigator.pushNamedAndRemoveUntil(
                         context, '/RolePage', (Route<dynamic> route) => false);
                   }
-
                 } else {
                   await pr.error(s["data"]);
                 }
