@@ -46,9 +46,9 @@ class _ProfilePageState extends State<ProfilePage> {
       sp.getRoleId().then((onValue) {
         _roleId = onValue;
 
-        if(_roleId[0]=="d"){
+        if (_roleId[0] == "d") {
           _role = "doctor";
-        }else{
+        } else {
           _role = "patient";
         }
       }),
@@ -126,6 +126,7 @@ class _ProfilePageState extends State<ProfilePage> {
               padding: EdgeInsets.only(left: 10, right: 10),
               child: Column(
                 children: <Widget>[
+                  _registerDoctorButton(),
                   _editProfileButton(),
                   _changePasswordButton(),
                   _logoutButton(),
@@ -137,6 +138,208 @@ class _ProfilePageState extends State<ProfilePage> {
       );
     }
     return Container();
+  }
+
+  Widget _registerDoctorButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: RaisedButton(
+        color: Colors.grey,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(5)),
+        ),
+        child: Text(
+          "Memohon Untuk Menjadi Doktor",
+          style: TextStyle(
+            fontFamily: "Montserrat",
+            fontSize: 14,
+          ),
+        ),
+        onPressed: () {
+          _registerDoctorDialog("1");
+        },
+      ),
+    );
+  }
+
+  Future<void> _registerDoctorDialog(String status) async {
+    Widget _dialogBody() {
+      switch (status) {
+        case "1":
+          {
+            return ListBody(
+              children: <Widget>[
+                Text(
+                  'Tarikh Mohon',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: 20),
+                  child: Text('20ot 2013'),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Status',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: 20),
+                  child: Text(
+                    'Mengesahkan',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.orange,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          }
+          break;
+
+        case "2":
+          {
+            return ListBody(
+              children: <Widget>[
+                Text(
+                  'Tarikh Mohon',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: 20),
+                  child: Text('20ot 2013'),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Tarikh Mengesahkan',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: 20),
+                  child: Text('20ot 2013'),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Status',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: 20),
+                  child: Text(
+                    'Lulus',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          }
+          break;
+
+        case "3":
+          {
+            return ListBody(
+              children: <Widget>[
+                Text(
+                  'Tarikh Mohon',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: 20),
+                  child: Text('20ot 2013'),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Tarikh Mengesahkan',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: 20),
+                  child: Text('20ot 2013'),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Status',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: 20),
+                  child: Text(
+                    'Tidak Lulus',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Komen',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: 20),
+                  child: Text('Tidak Lulus'),
+                ),
+              ],
+            );
+          }
+          break;
+
+        default:
+          {
+            return ListBody(
+              children: <Widget>[
+                Text(
+                  'Status',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: 20),
+                  child: Text(
+                    'Belum Mohon',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          }
+          break;
+      }
+    }
+
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Memohon Untuk Menjadi Doktor'),
+          content: SingleChildScrollView(
+            child: _dialogBody(),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Mohon'),
+              onPressed: () {
+                Navigator.pushNamed(context, '/EditProfilePage',
+                    arguments: "doctor");
+              },
+            ),
+            TextButton(
+              child: Text('Tutup'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Widget _editProfileButton() {

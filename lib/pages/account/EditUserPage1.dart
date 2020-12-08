@@ -55,9 +55,9 @@ class _EditUserPage1State extends State<EditUserPage1> {
             children: <Widget>[
               Column(
                 children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.only(top: 10, bottom: 20),
-                    child: logo(_maxWidth),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.height * 0.3,
+                    child: logo(),
                   ),
                   Form(
                     key: _formKey,

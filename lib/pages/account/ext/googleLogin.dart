@@ -30,7 +30,7 @@ Widget googleButton() {
                 "Log masuk dengan Google",
                 style: TextStyle(
                   fontFamily: "Montserrat",
-                  fontSize: 20,
+                  fontSize: 16,
                   color: Colors.black,
                 ),
               ),

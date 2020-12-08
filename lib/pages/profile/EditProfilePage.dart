@@ -43,6 +43,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   File _image;
   String _imageName = "";
   String _base64Image = "";
+  int _userId;
   String _roleId;
   String _uploadedImage = "";
 
@@ -65,10 +66,19 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Future _getData() async {
-    _roleId = await sp.getRoleId();
+    _userId = await sp.getUserId();
 
-    if (_roleId != null) {
-      Map userData = await getUserDetail(_roleId);
+    if(widget.role=="doctor"){
+      _roleId = "d"+_userId.toString();
+    }else{
+      _roleId = "p"+_userId.toString();
+    }
+
+    Map userData = await getUserDetail(_roleId);
+    print(userData);
+
+    if (userData['status']) {
+
 
       setState(() {
         _fullNameController.text = userData['fullname'];

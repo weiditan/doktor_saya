@@ -1,5 +1,6 @@
 import 'package:doktorsaya/pages/account/ext/accountDatabase.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../functions/sharedPreferences.dart' as sp;
@@ -27,7 +28,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: Text("Log Masuk"),
@@ -42,7 +42,7 @@ class _LoginPageState extends State<LoginPage> {
     return Row(
       children: <Widget>[
         Expanded(
-          child: _logo(),
+          child: logo(),
         ),
         Expanded(
           child: SingleChildScrollView(
@@ -57,10 +57,10 @@ class _LoginPageState extends State<LoginPage> {
                       child: Column(
                         children: <Widget>[
                           _emailField(),
-                          SizedBox(height: 8),
+                          SizedBox(height: 3),
                           _passwordField(),
                           _forgotPassword(),
-                          SizedBox(height: 5),
+                          SizedBox(height: 3),
                           _loginButton(),
                           _divider(),
                           googleButton()
@@ -83,59 +83,36 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _portrait() {
     return SingleChildScrollView(
-      physics: BouncingScrollPhysics(),
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height - 80,
-        ),
+        physics: BouncingScrollPhysics(),
         child: Container(
-          margin: EdgeInsets.all(50),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                SizedBox(
-                  width: MediaQuery.of(context).size.height * 0.3,
-                  child: _logo(),
+          margin: EdgeInsets.only(left: 20, right: 20),
+          child: Column(
+            children: <Widget>[
+              SizedBox(
+                width: MediaQuery.of(context).size.height * 0.3,
+                child: logo(),
+              ),
+              Form(
+                key: _formKey,
+                child: Column(
+                  children: <Widget>[
+                    _emailField(),
+                    SizedBox(height: 10),
+                    _passwordField(),
+                    _forgotPassword(),
+                    SizedBox(height: 3),
+                    _loginButton(),
+                    _divider(),
+                    googleButton()
+                  ],
                 ),
-                Form(
-                  key: _formKey,
-                  child: Column(
-                    children: <Widget>[
-                      _emailField(),
-                      SizedBox(height: 8),
-                      _passwordField(),
-                      _forgotPassword(),
-                      SizedBox(height: 5),
-                      _loginButton(),
-                      _divider(),
-                      googleButton()
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(top: 10, bottom: 10),
-                  child: _register(),
-                ),
-              ],
-            ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 10, bottom: 10),
+                child: _register(),
+              ),
+            ],
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _logo() {
-    return Center(
-      child: AspectRatio(
-        aspectRatio: 1 / 1,
-        child: Container(
-          margin: EdgeInsets.all(30),
-          child: Image(
-            image: AssetImage("assets/logo.png"),
-            fit: BoxFit.fill,
-          ),
-        ),
       ),
     );
   }
@@ -143,7 +120,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget _emailField() {
     return TextFormField(
       style: TextStyle(
-        fontSize: 16,
+        fontSize: 14,
       ),
       decoration: new InputDecoration(
         border: OutlineInputBorder(),
@@ -174,42 +151,39 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _passwordField() {
-    return Padding(
-      padding: EdgeInsets.only(top: 10),
-      child: TextFormField(
-        style: TextStyle(
-          fontSize: 16,
-        ),
-        decoration: new InputDecoration(
-          border: OutlineInputBorder(),
-          labelText: "Kata Laluan",
-          labelStyle: TextStyle(
-            fontFamily: "Montserrat",
-            fontWeight: FontWeight.bold,
-          ),
-          suffixIcon: IconButton(
-            icon: Icon(
-              Icons.remove_red_eye,
-            ),
-            onPressed: () {
-              _toggle();
-            },
-          ),
-        ),
-        focusNode: _focus1,
-        keyboardType: TextInputType.text,
-        obscureText: _obscureText,
-        controller: _passwordController,
-        autovalidateMode: AutovalidateMode.onUserInteraction,
-        validator: (String value) {
-          if (value.isNotEmpty && value.length < 8) {
-            return 'Kata Laluan Tidak Boleh Kurang Daripada 8 Perkataan';
-          } else if (value.isEmpty) {
-            return 'Sila Masukkan Kata Laluan';
-          }
-          return null;
-        },
+    return TextFormField(
+      style: TextStyle(
+        fontSize: 14,
       ),
+      decoration: new InputDecoration(
+        border: OutlineInputBorder(),
+        labelText: "Kata Laluan",
+        labelStyle: TextStyle(
+          fontFamily: "Montserrat",
+          fontWeight: FontWeight.bold,
+        ),
+        suffixIcon: IconButton(
+          icon: Icon(
+            Icons.remove_red_eye,
+          ),
+          onPressed: () {
+            _toggle();
+          },
+        ),
+      ),
+      focusNode: _focus1,
+      keyboardType: TextInputType.text,
+      obscureText: _obscureText,
+      controller: _passwordController,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      validator: (String value) {
+        if (value.isNotEmpty && value.length < 8) {
+          return 'Kata Laluan Tidak Boleh Kurang Daripada 8 Perkataan';
+        } else if (value.isEmpty) {
+          return 'Sila Masukkan Kata Laluan';
+        }
+        return null;
+      },
     );
   }
 

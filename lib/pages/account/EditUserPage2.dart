@@ -51,9 +51,9 @@ class _EditUserPage2State extends State<EditUserPage2> {
             ),
             child: Column(
               children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(top: 10, bottom: 20),
-                  child: logo(_maxWidth),
+                SizedBox(
+                  width: MediaQuery.of(context).size.height * 0.3,
+                  child: logo(),
                 ),
                 _emailField(),
                 AnimatedCrossFade(
