@@ -1,10 +1,10 @@
 import 'package:doktorsaya/pages/profile/ext/diffDate.dart';
+import 'package:doktorsaya/pages/profile/ext/editProfileDatabase.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../functions/progressDialog.dart' as pr;
-import '../../functions/sharedPreferences.dart' as sp;
 import 'ext/doctorExpDatabase.dart';
 import 'ext/profileDatabase.dart';
 import 'ext/specialistDatabase.dart';
@@ -15,6 +15,9 @@ import 'ext/workplaceDatabase.dart';
 class EditDoctorPage extends StatefulWidget {
   @override
   _EditDoctorPageState createState() => _EditDoctorPageState();
+
+  final String roleId, type;
+  EditDoctorPage({Key key, @required this.roleId, @required this.type}): super(key: key);
 }
 
 class _EditDoctorPageState extends State<EditDoctorPage> {
@@ -25,7 +28,6 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
 
   double _screenWidth;
 
-  String _roleId;
   List _arraySpecialist;
   List _arrayState;
   List _arrayDoctorSpecialist;
@@ -49,19 +51,17 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
   }
 
   Future _getData() async {
-    _roleId = await sp.getRoleId();
-
     await Future.wait([
       getSpecialist().then((onValue) {
         _arraySpecialist = onValue;
       }),
-      getDoctorSpecialist(_roleId).then((onValue) {
+      getDoctorSpecialist(widget.roleId).then((onValue) {
         _arrayDoctorSpecialist = onValue;
       }),
       getState().then((onValue) {
         _arrayState = onValue;
       }),
-      getWorkplace(_roleId).then((array) {
+      getWorkplace(widget.roleId).then((array) {
         if (array["workplace"] != "") {
           _workplaceController.text = array["workplace"];
           if (array["state_id"] == null) {
@@ -74,7 +74,7 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
           _stateController.text = array["state"];
         }
       }),
-      getDoctorExp(_roleId).then((onValue) {
+      getDoctorExp(widget.roleId).then((onValue) {
         _arrayDoctorExp = onValue;
       })
     ]);
@@ -270,7 +270,7 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
                 .timeout(new Duration(seconds: 15))
                 .then((s) async {
               if (s['status']) {
-                getDoctorSpecialist(_roleId).then((onValue) async {
+                getDoctorSpecialist(widget.roleId).then((onValue) async {
                   setState(() {
                     _arrayDoctorSpecialist = onValue;
                   });
@@ -323,7 +323,7 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
                   .timeout(new Duration(seconds: 15))
                   .then((s) async {
                 if (s['status']) {
-                  getDoctorExp(_roleId).then((onValue) async {
+                  getDoctorExp(widget.roleId).then((onValue) async {
                     setState(() {
                       _arrayDoctorExp = onValue;
                     });
@@ -578,7 +578,7 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
                       await pr.show(context, "Memuatkan");
 
                       addDoctorExp(
-                              _roleId,
+                              widget.roleId,
                               _expWorkplaceController.text,
                               DateFormat('yyyy-MM-dd').format(_startDate),
                               DateFormat('yyyy-MM-dd').format(_endDate))
@@ -586,7 +586,7 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
                           .then(
                         (s) async {
                           if (s['status']) {
-                            getDoctorExp(_roleId).then((onValue) async {
+                            getDoctorExp(widget.roleId).then((onValue) async {
                               pageSetState(() {
                                 _arrayDoctorExp = onValue;
                               });
@@ -608,13 +608,13 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
                   } else {
                     await pr.show(context, "Memuatkan");
 
-                    addDoctorExp(_roleId, _expWorkplaceController.text,
+                    addDoctorExp(widget.roleId, _expWorkplaceController.text,
                             DateFormat('yyyy-MM-dd').format(_startDate), "")
                         .timeout(new Duration(seconds: 15))
                         .then(
                       (s) async {
                         if (s['status']) {
-                          getDoctorExp(_roleId).then((onValue) async {
+                          getDoctorExp(widget.roleId).then((onValue) async {
                             pageSetState(() {
                               _arrayDoctorExp = onValue;
                             });
@@ -741,12 +741,12 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
                 if (_specialistFormKey.currentState.validate()) {
                   await pr.show(context, "Memuatkan");
 
-                  addDoctorSpecialist(_roleId, _valueSpecialist,
+                  addDoctorSpecialist(widget.roleId, _valueSpecialist,
                           _subSpecialistController.text)
                       .timeout(new Duration(seconds: 15))
                       .then((s) async {
                     if (s['status']) {
-                      getDoctorSpecialist(_roleId).then((onValue) {
+                      getDoctorSpecialist(widget.roleId).then((onValue) {
                         pageSetState(() {
                           _arrayDoctorSpecialist = onValue;
                         });
@@ -962,14 +962,14 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
                 if (_formKey.currentState.validate()) {
                   if (_workplaceController.text.isNotEmpty) {
                     if (_valueCountry == 0) {
-                      _updateWorkplace(_roleId, _workplaceController.text,
+                      _updateWorkplace(widget.roleId, _workplaceController.text,
                           _valueState, '', '');
                     } else if (_valueCountry == 1) {
-                      _updateWorkplace(_roleId, _workplaceController.text, null,
+                      _updateWorkplace(widget.roleId, _workplaceController.text, null,
                           _countryController.text, _stateController.text);
                     }
                   } else {
-                    _updateWorkplace(_roleId, '', null, '', '');
+                    _updateWorkplace(widget.roleId, '', null, '', '');
                   }
                 }
               } else {
@@ -989,9 +989,14 @@ class _EditDoctorPageState extends State<EditDoctorPage> {
         .timeout(new Duration(seconds: 15))
         .then((s) async {
       if (s['status']) {
+
+        if(widget.type=="request") {
+          await requestDoctor(roleId);
+        }
+
         await pr.hide();
-        Navigator.pushNamedAndRemoveUntil(
-            context, '/HomePage', (Route<dynamic> route) => false);
+        Navigator.popUntil(
+            context,ModalRoute.withName('/HomePage'));
       } else {
         await pr.warning("Sila cuba lagi !");
         print(s);

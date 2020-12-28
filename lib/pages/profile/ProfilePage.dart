@@ -1,6 +1,8 @@
 import 'package:doktorsaya/pages/account/ext/logout.dart';
+import 'package:doktorsaya/pages/profile/EditProfilePage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'dart:async';
 
 import '../../functions/sharedPreferences.dart' as sp;
@@ -126,7 +128,7 @@ class _ProfilePageState extends State<ProfilePage> {
               padding: EdgeInsets.only(left: 10, right: 10),
               child: Column(
                 children: <Widget>[
-                  _registerDoctorButton(),
+                  if(_roleId[0]!="d")_registerDoctorButton(),
                   _editProfileButton(),
                   _changePasswordButton(),
                   _logoutButton(),
@@ -156,15 +158,15 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ),
         onPressed: () {
-          _registerDoctorDialog("1");
+          _registerDoctorDialog(_userData['date_request'],_userData['date_verification'],_userData['request_status'],_userData['comment']);
         },
       ),
     );
   }
 
-  Future<void> _registerDoctorDialog(String status) async {
+  Future<void> _registerDoctorDialog(dateRequest, dateVerification, requestStatus, comment) async {
     Widget _dialogBody() {
-      switch (status) {
+      switch (requestStatus) {
         case "1":
           {
             return ListBody(
@@ -175,7 +177,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 Padding(
                   padding: EdgeInsets.only(left: 20),
-                  child: Text('20ot 2013'),
+                  child: Text(DateFormat('MMM d, yyyy').format(
+                      DateTime.parse(dateRequest))),
                 ),
                 SizedBox(height: 10),
                 Text(
@@ -207,7 +210,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 Padding(
                   padding: EdgeInsets.only(left: 20),
-                  child: Text('20ot 2013'),
+                  child: Text(DateFormat('MMM d, yyyy').format(
+                      DateTime.parse(dateRequest))),
                 ),
                 SizedBox(height: 10),
                 Text(
@@ -216,7 +220,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 Padding(
                   padding: EdgeInsets.only(left: 20),
-                  child: Text('20ot 2013'),
+                  child: Text(DateFormat('MMM d, yyyy').format(
+                      DateTime.parse(dateVerification))),
                 ),
                 SizedBox(height: 10),
                 Text(
@@ -248,7 +253,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 Padding(
                   padding: EdgeInsets.only(left: 20),
-                  child: Text('20ot 2013'),
+                  child: Text(DateFormat('MMM d, yyyy').format(
+                      DateTime.parse(dateRequest))),
                 ),
                 SizedBox(height: 10),
                 Text(
@@ -257,7 +263,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 Padding(
                   padding: EdgeInsets.only(left: 20),
-                  child: Text('20ot 2013'),
+                  child: Text(DateFormat('MMM d, yyyy').format(
+                      DateTime.parse(dateVerification))),
                 ),
                 SizedBox(height: 10),
                 Text(
@@ -281,7 +288,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 Padding(
                   padding: EdgeInsets.only(left: 20),
-                  child: Text('Tidak Lulus'),
+                  child: Text(comment),
                 ),
               ],
             );
@@ -313,6 +320,52 @@ class _ProfilePageState extends State<ProfilePage> {
       }
     }
 
+    Widget _dialogButton() {
+      switch (requestStatus) {
+        case "1":
+          {
+            return TextButton(
+              child: Text('Kemas Kini'),
+              onPressed: () {
+                Navigator.pushNamed(context, '/EditProfilePage',
+                    arguments: EditProfilePage(role: "doctor", type: "request"));
+              },
+            );
+          }
+          break;
+
+        case "2":
+          {
+            return null;
+          }
+          break;
+
+        case "3":
+          {
+            return TextButton(
+              child: Text('Mohon'),
+              onPressed: () {
+                Navigator.pushNamed(context, '/EditProfilePage',
+                    arguments: EditProfilePage(role: "doctor", type: "request"));
+              },
+            );
+          }
+          break;
+
+        default:
+          {
+            return TextButton(
+              child: Text('Mohon'),
+              onPressed: () {
+                Navigator.pushNamed(context, '/EditProfilePage',
+                    arguments: EditProfilePage(role: "doctor", type: "request"));
+              },
+            );
+          }
+          break;
+      }
+    }
+
     return showDialog<void>(
       context: context,
       barrierDismissible: true,
@@ -323,13 +376,7 @@ class _ProfilePageState extends State<ProfilePage> {
             child: _dialogBody(),
           ),
           actions: <Widget>[
-            TextButton(
-              child: Text('Mohon'),
-              onPressed: () {
-                Navigator.pushNamed(context, '/EditProfilePage',
-                    arguments: "doctor");
-              },
-            ),
+            _dialogButton(),
             TextButton(
               child: Text('Tutup'),
               onPressed: () {
@@ -358,7 +405,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ),
         onPressed: () {
-          Navigator.pushNamed(context, '/EditProfilePage', arguments: _role);
+          Navigator.pushNamed(context, '/EditProfilePage', arguments: EditProfilePage(role: _role, type: null));
         },
       ),
     );

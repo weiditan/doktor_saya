@@ -1,4 +1,5 @@
 import 'package:doktorsaya/functions/loadingScreen.dart';
+import 'package:doktorsaya/pages/profile/EditDoctorPage.dart';
 import 'package:doktorsaya/pages/profile/ext/editProfileDatabase.dart';
 import 'package:doktorsaya/pages/profile/ext/text.dart';
 import 'package:file_picker/file_picker.dart';
@@ -20,8 +21,8 @@ class EditProfilePage extends StatefulWidget {
   @override
   _EditProfilePageState createState() => _EditProfilePageState();
 
-  final String role;
-  EditProfilePage(this.role);
+  final String role, type;
+  EditProfilePage({Key key, @required this.role, @required this.type}): super(key: key);
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
@@ -75,10 +76,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
 
     Map userData = await getUserDetail(_roleId);
-    print(userData);
 
     if (userData['status']) {
-
 
       setState(() {
         _fullNameController.text = userData['fullname'];
@@ -510,14 +509,19 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       .timeout(new Duration(seconds: 15))
                       .then((s) async {
                     if (s["status"]) {
-                      sp.saveRoleId(s["data"]);
+
+                      String _login = await sp.getRoleId();
+                      if(_login==null){
+                        sp.saveRoleId(s["data"]);
+                      }
+
                       await pr.hide();
                       if (widget.role == "patient") {
                         Navigator.pushNamedAndRemoveUntil(context, '/HomePage',
                             (Route<dynamic> route) => false);
                       } else {
-                        Navigator.pushReplacementNamed(
-                            context, '/EditDoctorPage');
+                        Navigator.pushNamed(
+                            context, '/EditDoctorPage',arguments: EditDoctorPage(roleId: _roleId, type: widget.type));
                       }
                     } else {
                       await pr.warning("Sila cuba lagi !");

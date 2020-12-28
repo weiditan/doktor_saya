@@ -102,16 +102,18 @@ class MyApp extends StatelessWidget {
             break;
 
           case '/EditProfilePage':
+            final EditProfilePage args = settings.arguments;
             return PageTransition(
-              child: EditProfilePage(settings.arguments),
+              child: EditProfilePage(role: args.role,type: args.type),
               type: PageTransitionType.fade,
               settings: settings,
             );
             break;
 
           case '/EditDoctorPage':
+            final EditDoctorPage args = settings.arguments;
             return PageTransition(
-              child: EditDoctorPage(),
+              child: EditDoctorPage(roleId: args.roleId,type: args.type ),
               type: PageTransitionType.fade,
               settings: settings,
             );
