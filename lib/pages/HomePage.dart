@@ -28,7 +28,7 @@ class _HomePage extends State<HomePage> with WidgetsBindingObserver {
   List<Widget> _body = [
     MessageListPage(),
     CallListPage(),
-    DoctorPage(),
+    DoctorPage(requestStatus: "2",),
     ProfilePage(),
   ];
 

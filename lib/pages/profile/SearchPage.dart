@@ -31,7 +31,7 @@ class _SearchPageState extends State<SearchPage> {
     _roleId = await getRoleId();
     _arraySpecialist = await getSpecialist();
     _arraySubSpecialist = await getSubSpecialist();
-    _arrayDoctor = await getAllDoctor("", "", "");
+    _arrayDoctor = await getAllDoctor("", "", "","2");
     await Future.wait([
       for (int i = 0; i < _arrayDoctor.length; i++)
         _getTotalExp(_arrayDoctor[i]),
@@ -180,7 +180,7 @@ class _SearchPageState extends State<SearchPage> {
     });
 
     _arrayDoctor = await getAllDoctor(
-        _searchController.text, _valueSpecialist, _valueSubSpecialist);
+        _searchController.text, _valueSpecialist, _valueSubSpecialist,"2");
 
     await Future.wait([
       for (int i = 0; i < _arrayDoctor.length; i++)

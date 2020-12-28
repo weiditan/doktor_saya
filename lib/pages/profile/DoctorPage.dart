@@ -5,7 +5,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-import '../../functions/loadingScreen.dart';
 import 'ext/doctorExpDatabase.dart';
 import 'ext/profileDatabase.dart';
 import 'ext/profileImage.dart';
@@ -15,13 +14,14 @@ import 'ext/diffDate.dart' as dd;
 class DoctorPage extends StatefulWidget {
   @override
   _DoctorPageState createState() => _DoctorPageState();
+
+  final String requestStatus;
+  DoctorPage({Key key, @required this.requestStatus}) : super(key: key);
 }
 
 class _DoctorPageState extends State<DoctorPage> {
   List _arrayDoctor;
   String _roleId;
-  bool _loadingIconVisible = true;
-  bool _loadingVisible = true;
 
   @override
   void initState() {
@@ -31,65 +31,51 @@ class _DoctorPageState extends State<DoctorPage> {
 
   Future _init() async {
     _roleId = await getRoleId();
-    _arrayDoctor = await getAllDoctor("", "", "");
-    await Future.wait([
-      for (int i = 0; i < _arrayDoctor.length; i++)
-        _getTotalExp(_arrayDoctor[i]),
-    ]);
-    setState(() {
-      _hideLoadingScreen();
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: AnimatedCrossFade(
-          // If the widget is visible, animate to 0.0 (invisible).
-          // If the widget is hidden, animate to 1.0 (fully visible).
-          crossFadeState: _loadingVisible
-              ? CrossFadeState.showFirst
-              : CrossFadeState.showSecond,
-          firstCurve: Curves.easeOut,
-          secondCurve: Curves.easeIn,
-          duration: Duration(milliseconds: 500),
-          firstChild: loadingScreen(_loadingIconVisible),
-          secondChild: _secondScreen(),
-        ));
+      body: FutureBuilder<List>(
+        future: getAllDoctor("", "", "", widget.requestStatus),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            _arrayDoctor = snapshot.data;
+            return _secondScreen();
+          } else {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        },
+      ),
+    );
   }
 
-  Future _getTotalExp(Map doctor) async {
-    await getDoctorExp(doctor['doctor_id']).then((onValue) {
+  Future<String> _getTotalExp(doctorId) async {
+    String _data;
+    await getDoctorExp(doctorId).then((onValue) {
       if (onValue != null) {
-        doctor['total_exp'] = dd.outputDiffDate(dd.totalExp(onValue));
+        _data = dd.outputDiffDate(dd.totalExp(onValue));
       }
     });
-  }
-
-  Future _hideLoadingScreen() async {
-    setState(() {
-      _loadingIconVisible = false;
-    });
-    await Future.delayed(Duration(milliseconds: 500));
-    setState(() {
-      _loadingVisible = false;
-    });
+    return _data;
   }
 
   Widget _secondScreen() {
-    return (_arrayDoctor == null || _arrayDoctor.length==0)
+    return (_arrayDoctor == null || _arrayDoctor.length == 0)
         ? _noDoctor()
         : SingleChildScrollView(
-      physics: BouncingScrollPhysics(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          for (int i = 0; i < _arrayDoctor.length; i++)
-            if (_arrayDoctor[i]['doctor_id'] != _roleId)
-              _doctorRow(_arrayDoctor[i]),
-        ],
-      ),
-    );
+            physics: BouncingScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                for (int i = 0; i < _arrayDoctor.length; i++)
+                  if (_arrayDoctor[i]['doctor_id'] != _roleId)
+                    _doctorRow(_arrayDoctor[i]),
+              ],
+            ),
+          );
   }
 
   Widget _noDoctor() {
@@ -99,8 +85,17 @@ class _DoctorPageState extends State<DoctorPage> {
   }
 
   Widget _doctorRow(Map doctor) {
+    Color _bgColour;
+
+    if (widget.requestStatus == "3") {
+      _bgColour = Colors.pink[200];
+    } else if (widget.requestStatus == "1") {
+      _bgColour = Colors.amber[300];
+    }
+
     return Card(
       margin: EdgeInsets.only(left: 15, right: 15, top: 10),
+      color: _bgColour,
       child: InkWell(
         onTap: () {
           Navigator.pushNamed(context, '/ViewDoctorDetail', arguments: doctor);
@@ -145,14 +140,22 @@ class _DoctorPageState extends State<DoctorPage> {
                                     color: Colors.grey[600],
                                   ),
                                 ),
-                                if (doctor['total_exp'] != null)
-                                  Text(
-                                    doctor['total_exp'] + " Pengalaman",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontFamily: "Montserrat",
-                                    ),
-                                  ),
+                                FutureBuilder<String>(
+                                    future: _getTotalExp(doctor['doctor_id']),
+                                    builder: (context,
+                                        AsyncSnapshot<String> snapshot) {
+                                      if (snapshot.hasData) {
+                                        return Text(
+                                          snapshot.data,
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontFamily: "Montserrat",
+                                          ),
+                                        );
+                                      } else {
+                                        return Container();
+                                      }
+                                    }),
                               ],
                             ),
                           ],

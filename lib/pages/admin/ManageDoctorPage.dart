@@ -1,3 +1,4 @@
+import 'package:doktorsaya/pages/profile/DoctorPage.dart';
 import 'package:flutter/material.dart';
 
 import 'navDrawer.dart';
@@ -31,9 +32,9 @@ class _ManageDoctorPageState extends State<ManageDoctorPage> {
         ),
         body: TabBarView(
           children: [
-            Center(child: Text("Page 1")),
-            Center(child: Text("Page 2")),
-            Center(child: Text("Page 3")),
+            DoctorPage(requestStatus: "1",),
+            DoctorPage(requestStatus: "2",),
+            DoctorPage(requestStatus: "3",),
           ],
         ),
       ),

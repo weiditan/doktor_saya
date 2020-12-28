@@ -36,7 +36,7 @@ Future<Map> getUserDetail(String roleId) async {
 }
 
 Future<List> getAllDoctor(
-    String name, String specialistId, String subSpecialist) async {
+    String name, String specialistId, String subSpecialist, String requestStatus) async {
   var url = 'http://www.breakvoid.com/DoktorSaya/ViewAllDoctor.php';
   http.Response response = await retry(
     // Make a GET request
@@ -44,8 +44,9 @@ Future<List> getAllDoctor(
       'action': 'get',
       'name': name,
       'specialistId': specialistId,
-      'subSpecialist': subSpecialist
-    }).timeout(Duration(seconds: 5)),
+      'subSpecialist': subSpecialist,
+      'requestStatus': requestStatus
+    }).timeout(Duration(seconds: 10)),
     // Retry on SocketException or TimeoutException
     retryIf: (e) => e is SocketException || e is TimeoutException,
   );
