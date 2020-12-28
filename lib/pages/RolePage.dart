@@ -1,12 +1,6 @@
 import 'package:flutter/material.dart';
-import 'dart:io';
-import 'dart:async';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:retry/retry.dart';
 
 import '../functions/sharedPreferences.dart' as sp;
-import '../functions/progressDialog.dart' as pr;
 
 class RolePage extends StatelessWidget {
   @override
@@ -111,40 +105,15 @@ class RolePage extends StatelessWidget {
   }
 
   void _submit(context, _role) async {
-    await pr.show(context, "Memuatkan");
+    int _id = await sp.getUserId();
 
-    sp.getUserId().then((id) {
-      _checkRole(id.toString(), _role)
-          .timeout(new Duration(seconds: 15))
-          .then((s) async {
-        if (s["status"]) {
-          sp.saveRoleId(s["data"]);
-          await pr.hide();
-          Navigator.pushNamedAndRemoveUntil(
-              context, '/HomePage', (Route<dynamic> route) => false);
-        } else {
-          await pr.hide();
-          Navigator.pushNamed(context, '/EditProfilePage', arguments: _role);
-        }
-      }).catchError((e) async {
-        await pr.hide();
-        print(e);
-      });
-    });
-  }
+    if (_role == "doctor") {
+      await sp.saveRoleId("d" + _id.toString());
+    } else {
+      await sp.saveRoleId("p" + _id.toString());
+    }
 
-  Future<Map> _checkRole(_userId, _role) async {
-    var url = 'http://www.breakvoid.com/DoktorSaya/CheckRole.php';
-    http.Response response = await retry(
-      // Make a GET request
-      () => http.post(url, body: {'user_id': _userId, 'role': _role}).timeout(
-          Duration(seconds: 5)),
-      // Retry on SocketException or TimeoutException
-      retryIf: (e) => e is SocketException || e is TimeoutException,
-    );
-
-    Map data = jsonDecode(response.body);
-
-    return data;
+    Navigator.pushNamedAndRemoveUntil(
+        context, '/HomePage', (Route<dynamic> route) => false);
   }
 }

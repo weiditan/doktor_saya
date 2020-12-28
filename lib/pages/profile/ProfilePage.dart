@@ -1,3 +1,4 @@
+import 'package:doktorsaya/functions/dateConvert.dart';
 import 'package:doktorsaya/pages/account/ext/logout.dart';
 import 'package:doktorsaya/pages/profile/EditProfilePage.dart';
 import 'package:flutter/cupertino.dart';
@@ -177,8 +178,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 Padding(
                   padding: EdgeInsets.only(left: 20),
-                  child: Text(DateFormat('MMM d, yyyy').format(
-                      DateTime.parse(dateRequest))),
+                  child: Text(toLocalDateTime(dateRequest)),
                 ),
                 SizedBox(height: 10),
                 Text(
@@ -210,8 +210,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 Padding(
                   padding: EdgeInsets.only(left: 20),
-                  child: Text(DateFormat('MMM d, yyyy').format(
-                      DateTime.parse(dateRequest))),
+                  child: Text(toLocalDateTime(dateRequest)),
                 ),
                 SizedBox(height: 10),
                 Text(
@@ -220,8 +219,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 Padding(
                   padding: EdgeInsets.only(left: 20),
-                  child: Text(DateFormat('MMM d, yyyy').format(
-                      DateTime.parse(dateVerification))),
+                  child: Text(toLocalDateTime(dateVerification)),
                 ),
                 SizedBox(height: 10),
                 Text(
@@ -253,8 +251,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 Padding(
                   padding: EdgeInsets.only(left: 20),
-                  child: Text(DateFormat('MMM d, yyyy').format(
-                      DateTime.parse(dateRequest))),
+                  child: Text(toLocalDateTime(dateRequest)),
                 ),
                 SizedBox(height: 10),
                 Text(
@@ -263,8 +260,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 Padding(
                   padding: EdgeInsets.only(left: 20),
-                  child: Text(DateFormat('MMM d, yyyy').format(
-                      DateTime.parse(dateVerification))),
+                  child: Text(toLocalDateTime(dateVerification)),
                 ),
                 SizedBox(height: 10),
                 Text(
@@ -336,7 +332,13 @@ class _ProfilePageState extends State<ProfilePage> {
 
         case "2":
           {
-            return null;
+            return TextButton(
+              child: Text('Buka Platform Doktor'),
+              onPressed: () {
+                Navigator.pushNamedAndRemoveUntil(context, '/RolePage',
+                        (Route<dynamic> route) => false);
+              },
+            );
           }
           break;
 

@@ -1,7 +1,14 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:doktorsaya/pages/account/ext/accountDatabase.dart';
+import 'package:doktorsaya/pages/profile/EditProfilePage.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:retry/retry.dart';
 
 import '../../functions/sharedPreferences.dart' as sp;
 import '../../functions/progressDialog.dart' as pr;
@@ -83,36 +90,36 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _portrait() {
     return SingleChildScrollView(
-        physics: BouncingScrollPhysics(),
-        child: Container(
-          margin: EdgeInsets.only(left: 20, right: 20),
-          child: Column(
-            children: <Widget>[
-              SizedBox(
-                width: MediaQuery.of(context).size.height * 0.3,
-                child: logo(),
+      physics: BouncingScrollPhysics(),
+      child: Container(
+        margin: EdgeInsets.only(left: 20, right: 20),
+        child: Column(
+          children: <Widget>[
+            SizedBox(
+              width: MediaQuery.of(context).size.height * 0.3,
+              child: logo(),
+            ),
+            Form(
+              key: _formKey,
+              child: Column(
+                children: <Widget>[
+                  _emailField(),
+                  SizedBox(height: 10),
+                  _passwordField(),
+                  _forgotPassword(),
+                  SizedBox(height: 3),
+                  _loginButton(),
+                  _divider(),
+                  googleButton()
+                ],
               ),
-              Form(
-                key: _formKey,
-                child: Column(
-                  children: <Widget>[
-                    _emailField(),
-                    SizedBox(height: 10),
-                    _passwordField(),
-                    _forgotPassword(),
-                    SizedBox(height: 3),
-                    _loginButton(),
-                    _divider(),
-                    googleButton()
-                  ],
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 10, bottom: 10),
-                child: _register(),
-              ),
-            ],
-          ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 10, bottom: 10),
+              child: _register(),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -276,14 +283,34 @@ class _LoginPageState extends State<LoginPage> {
                   sp.saveUserId(int.parse(s["user_id"]));
                   sp.saveRole(s["role"]);
                   sp.saveEmail(_emailController.text);
-                  await pr.hide();
 
                   if (s["role"] == "admin") {
+                    await pr.hide();
                     Navigator.pushNamedAndRemoveUntil(context,
                         '/ManageDoctorPage', (Route<dynamic> route) => false);
                   } else if (s["role"] == "user") {
-                    Navigator.pushNamedAndRemoveUntil(
-                        context, '/RolePage', (Route<dynamic> route) => false);
+                    _checkRole(s["user_id"], "doctor").then((checkDoctorValue) async {
+                      if (checkDoctorValue['status']) {
+                        await pr.hide();
+                        Navigator.pushNamedAndRemoveUntil(context, '/RolePage',
+                            (Route<dynamic> route) => false);
+                      } else {
+                        _checkRole(s["user_id"], "patient")
+                            .then((checkPatientValue) async {
+                          if (checkPatientValue["status"]) {
+                            await sp.saveRoleId(checkPatientValue["data"]);
+                            await pr.hide();
+                            Navigator.pushNamedAndRemoveUntil(context,
+                                '/HomePage', (Route<dynamic> route) => false);
+                          } else {
+                            await pr.hide();
+                            Navigator.pushNamed(context, '/EditProfilePage',
+                                arguments: EditProfilePage(
+                                    role: "patient", type: null));
+                          }
+                        });
+                      }
+                    });
                   }
                 } else {
                   await pr.error(s["data"]);
@@ -295,6 +322,21 @@ class _LoginPageState extends State<LoginPage> {
             }
           }),
     );
+  }
+
+  Future<Map> _checkRole(_userId, _role) async {
+    var url = 'http://www.breakvoid.com/DoktorSaya/CheckRole.php';
+    http.Response response = await retry(
+      // Make a GET request
+      () => http.post(url, body: {'user_id': _userId, 'role': _role}).timeout(
+          Duration(seconds: 5)),
+      // Retry on SocketException or TimeoutException
+      retryIf: (e) => e is SocketException || e is TimeoutException,
+    );
+
+    Map data = jsonDecode(response.body);
+
+    return data;
   }
 
   Widget _register() {

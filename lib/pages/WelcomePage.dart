@@ -34,8 +34,7 @@ class _WelcomePageState extends State<WelcomePage> {
           Navigator.pushNamedAndRemoveUntil(
               context, '/HomePage', (Route<dynamic> route) => false);
         } else {
-          Navigator.pushNamedAndRemoveUntil(
-              context, '/RolePage', (Route<dynamic> route) => false);
+          _hideLoadingScreen();
         }
       }
     }
