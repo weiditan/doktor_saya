@@ -21,53 +21,21 @@ class Message extends StatefulWidget {
 }
 
 class _MessageState extends State<Message> {
-  bool _loadingIconVisible = true;
-  bool _loadingVisible = true;
-  bool _loop = true;
-  List _arrayMessage;
+
   final _messageController = TextEditingController();
   final _scrollController = new ScrollController();
 
-  @override
-  void initState() {
-    super.initState();
-    _getData();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _loop = false;
-  }
-
-  Future _getData() async {
-    while (_loop) {
-      await getMessage(widget.data['sender'], widget.data['receiver'])
-          .then((onValue) {
-        if (_arrayMessage == null) {
-          setState(() {
-            _arrayMessage = onValue;
-            _hideLoadingScreen();
-          });
-        } else if (_arrayMessage.length != onValue.length) {
-          setState(() {
-            _arrayMessage = onValue;
-          });
-        }
-      });
-      await Future.delayed(Duration(seconds: 5));
+  Stream<List> _getData() async* {
+    int i = 0;
+    while (true) {
+      if(i!=0) {
+        await Future.delayed(Duration(seconds: 5));
+      }
+      yield await getMessage(widget.data['sender'], widget.data['receiver']);
+      i++;
     }
   }
 
-  Future _hideLoadingScreen() async {
-    setState(() {
-      _loadingIconVisible = false;
-    });
-    await Future.delayed(Duration(milliseconds: 500));
-    setState(() {
-      _loadingVisible = false;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,17 +45,25 @@ class _MessageState extends State<Message> {
 
     return Scaffold(
       appBar: AppBar(title: _title()),
-      body: AnimatedCrossFade(
-        // If the widget is visible, animate to 0.0 (invisible).
-        // If the widget is hidden, animate to 1.0 (fully visible).
-        crossFadeState: _loadingVisible
-            ? CrossFadeState.showFirst
-            : CrossFadeState.showSecond,
-        firstCurve: Curves.easeOut,
-        secondCurve: Curves.easeIn,
-        duration: Duration(milliseconds: 500),
-        firstChild: loadingScreen(_loadingIconVisible),
-        secondChild: _secondScreen(),
+      body: StreamBuilder<List>(
+        stream: _getData(),
+        builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+          if (snapshot.hasError) return Text('Error: ${snapshot.error}');
+          switch (snapshot.connectionState) {
+            case ConnectionState.none:
+              return Text('没有Stream');
+            case ConnectionState.waiting:
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            case ConnectionState.active:
+              return _secondScreen(snapshot.data);
+          //return Text('active: ${snapshot.data}');
+            case ConnectionState.done:
+              return Text('Stream已关闭');
+          }
+          return null; // unreachable
+        },
       ),
       bottomSheet: _messageBar(),
     );
@@ -109,7 +85,7 @@ class _MessageState extends State<Message> {
     );
   }
 
-  Widget _secondScreen() {
+  Widget _secondScreen(_arrayMessage) {
     return Padding(
       padding: EdgeInsets.all(10),
       child: ListView(
@@ -434,7 +410,7 @@ class _MessageState extends State<Message> {
                     getMessage(widget.data['sender'], widget.data['receiver'])
                         .then((onValue) {
                       setState(() {
-                        _arrayMessage = onValue;
+                        //_arrayMessage = onValue;
                         _messageController.text = "";
                       });
                     });
