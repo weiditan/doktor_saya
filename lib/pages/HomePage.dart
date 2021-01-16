@@ -1,3 +1,4 @@
+
 import 'package:doktorsaya/pages/profile/DoctorPage.dart';
 import 'package:doktorsaya/pages/message/MessageListPage.dart';
 import 'package:doktorsaya/pages/profile/ProfilePage.dart';
@@ -25,12 +26,7 @@ class _HomePage extends State<HomePage> with WidgetsBindingObserver {
   int _selectedIndex = 2;
   var _arrayTitle = ['Mesej', 'Panggilan', 'Doktor', 'Profil'];
 
-  List<Widget> _body = [
-    MessageListPage(),
-    CallListPage(),
-    DoctorPage(requestStatus: "2",),
-    ProfilePage(),
-  ];
+  List<Widget> _body;
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -55,7 +51,6 @@ class _HomePage extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Future _init() async {
-
     _firebaseMessagingFunction();
     updateToken();
 /*
@@ -65,6 +60,7 @@ class _HomePage extends State<HomePage> with WidgetsBindingObserver {
     );
 */
     _roleId = await sp.getRoleId();
+
     _loopFunction();
   }
 
@@ -158,7 +154,24 @@ class _HomePage extends State<HomePage> with WidgetsBindingObserver {
                 })
         ],
       ),
-      body: WillPopScope(child: _body[_selectedIndex], onWillPop: onWillPop),
+      body: WillPopScope(
+          child: FutureBuilder<String>(
+              future: sp.getRoleId(),
+              builder: (context, AsyncSnapshot<String> snapshot) {
+                if (snapshot.hasData) {
+                  _body = [
+                    MessageListPage(roleId: snapshot.data),
+                    CallListPage(),
+                    DoctorPage(requestStatus: "2"),
+                    ProfilePage(),
+                  ];
+
+                  return _body[_selectedIndex];
+                } else {
+                  return Text('');
+                }
+              }),
+          onWillPop: onWillPop),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         items: <BottomNavigationBarItem>[
