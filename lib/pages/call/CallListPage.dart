@@ -3,86 +3,54 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'ViewPrescription.dart';
-import '../../functions/sharedPreferences.dart' as sp;
-import '../../functions/loadingScreen.dart';
 import '../profile/ext/profileImage.dart';
 import 'ext/callDatabase.dart';
 
 class CallListPage extends StatefulWidget {
   @override
   _CallListPageState createState() => _CallListPageState();
+
+  final String roleId;
+  CallListPage({Key key, @required this.roleId}) : super(key: key);
 }
 
 class _CallListPageState extends State<CallListPage> {
-  String _roleId;
-  bool _loadingIconVisible = true;
-  bool _loadingVisible = true;
-  bool _loop = true;
-  List _arrayCallList;
 
-  @override
-  void initState() {
-    super.initState();
-
-    getData().then((_) {
-      _refresh();
-    });
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _loop = false;
-  }
-
-  Future getData() async {
-    _roleId = await sp.getRoleId();
-    _arrayCallList = await getCallList(_roleId);
-    setState(() {
-      _hideLoadingScreen();
-    });
-  }
-
-  Future _refresh() async {
-    while (_loop) {
-      await getCallList(_roleId).then((onValue) {
-        setState(() {
-          _arrayCallList = onValue;
-        });
-      });
+  Stream<List> _getData() async* {
+    while (true) {
+      yield await getCallList(widget.roleId);
       await Future.delayed(Duration(seconds: 5));
     }
   }
 
-  Future _hideLoadingScreen() async {
-    setState(() {
-      _loadingIconVisible = false;
-    });
-    await Future.delayed(Duration(milliseconds: 500));
-    setState(() {
-      _loadingVisible = false;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: AnimatedCrossFade(
-        // If the widget is visible, animate to 0.0 (invisible).
-        // If the widget is hidden, animate to 1.0 (fully visible).
-        crossFadeState: _loadingVisible
-            ? CrossFadeState.showFirst
-            : CrossFadeState.showSecond,
-        firstCurve: Curves.easeOut,
-        secondCurve: Curves.easeIn,
-        duration: Duration(milliseconds: 500),
-        firstChild: loadingScreen(_loadingIconVisible),
-        secondChild: _secondScreen(),
+      body: StreamBuilder<List>(
+        stream: _getData(),
+        builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+          if (snapshot.hasError) return Text('Error: ${snapshot.error}');
+          switch (snapshot.connectionState) {
+            case ConnectionState.none:
+              return Text('没有Stream');
+            case ConnectionState.waiting:
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            case ConnectionState.active:
+              return _secondScreen(snapshot.data);
+          //return Text('active: ${snapshot.data}');
+            case ConnectionState.done:
+              return Text('Stream已关闭');
+          }
+          return null; // unreachable
+        },
       ),
     );
   }
 
-  Widget _secondScreen() {
+  Widget _secondScreen(_arrayCallList) {
     return (_arrayCallList == null || _arrayCallList.length == 0)
         ? Container(
             child: Center(
@@ -167,7 +135,7 @@ class _CallListPageState extends State<CallListPage> {
                           textAlign: TextAlign.center,
                         ),
                         (acceptCall == "1")
-                            ? (_roleId == callerId)
+                            ? (widget.roleId == callerId)
                                 ? Icon(
                                     Icons.call_made,
                                     color: Colors.green,
@@ -176,7 +144,7 @@ class _CallListPageState extends State<CallListPage> {
                                     Icons.call_received,
                                     color: Colors.green,
                                   )
-                            : (_roleId == callerId)
+                            : (widget.roleId == callerId)
                                 ? Icon(
                                     Icons.call_missed_outgoing,
                                     color: Colors.red,
@@ -217,7 +185,7 @@ class _CallListPageState extends State<CallListPage> {
 
   Widget _prescriptionButton(String callId, String prescription) {
     return SizedBox(
-      width: 120,
+      width: 100,
       child: RaisedButton(
         color: Colors.orange,
         shape: RoundedRectangleBorder(
@@ -233,7 +201,7 @@ class _CallListPageState extends State<CallListPage> {
               width: 5,
             ),
             Text(
-              "Preskripsi\nPerubatan",
+              "Nasihat",
               style: TextStyle(
                 fontFamily: "Montserrat",
                 fontSize: 12,

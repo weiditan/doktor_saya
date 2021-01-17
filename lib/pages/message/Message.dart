@@ -5,8 +5,7 @@ import 'package:doktorsaya/functions/viewImage.dart';
 import 'package:doktorsaya/functions/viewVideo.dart';
 import 'package:flutter/material.dart';
 
-import 'file:///C:/Users/WeiDi/StudioProjects/doktor_saya/lib/pages/message/ext/bubble.dart';
-import 'package:doktorsaya/functions/loadingScreen.dart';
+import 'ext/bubble.dart';
 import 'package:doktorsaya/pages/profile/ext/profileImage.dart';
 
 import 'ext/attachment.dart';
@@ -26,13 +25,10 @@ class _MessageState extends State<Message> {
   final _scrollController = new ScrollController();
 
   Stream<List> _getData() async* {
-    int i = 0;
+
     while (true) {
-      if(i!=0) {
-        await Future.delayed(Duration(seconds: 5));
-      }
       yield await getMessage(widget.data['sender'], widget.data['receiver']);
-      i++;
+      await Future.delayed(Duration(seconds: 5));
     }
   }
 
@@ -57,8 +53,9 @@ class _MessageState extends State<Message> {
                 child: CircularProgressIndicator(),
               );
             case ConnectionState.active:
+              print(snapshot.data);
               return _secondScreen(snapshot.data);
-          //return Text('active: ${snapshot.data}');
+              //return Text('active: ${snapshot.data}');
             case ConnectionState.done:
               return Text('Stream已关闭');
           }

@@ -15,13 +15,9 @@ class MessageListPage extends StatefulWidget {
 class _MessageListPageState extends State<MessageListPage> {
 
   Stream<List> _getData() async* {
-    int i = 0;
     while (true) {
-      if(i!=0) {
-        await Future.delayed(Duration(seconds: 5));
-      }
       yield await getMessageList(widget.roleId);
-      i++;
+      await Future.delayed(Duration(seconds: 5));
     }
   }
 

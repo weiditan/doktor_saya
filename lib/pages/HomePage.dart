@@ -161,7 +161,7 @@ class _HomePage extends State<HomePage> with WidgetsBindingObserver {
                 if (snapshot.hasData) {
                   _body = [
                     MessageListPage(roleId: snapshot.data),
-                    CallListPage(),
+                    CallListPage(roleId: snapshot.data),
                     DoctorPage(requestStatus: "2"),
                     ProfilePage(),
                   ];
