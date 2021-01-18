@@ -10,6 +10,7 @@ import 'package:doktorsaya/pages/profile/ext/profileImage.dart';
 
 import 'ext/attachment.dart';
 import 'ext/messageDatabase.dart';
+import 'ext/recordAudio.dart';
 
 class Message extends StatefulWidget {
   @override
@@ -25,20 +26,18 @@ class _MessageState extends State<Message> {
   final _scrollController = new ScrollController();
 
   Stream<List> _getData() async* {
-
     while (true) {
       yield await getMessage(widget.data['sender'], widget.data['receiver']);
       await Future.delayed(Duration(seconds: 5));
     }
   }
 
+  FutureOr onGoBack(dynamic value) {
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollToEnd();
-    });
-
     return Scaffold(
       appBar: AppBar(title: _title()),
       body: StreamBuilder<List>(
@@ -53,9 +52,8 @@ class _MessageState extends State<Message> {
                 child: CircularProgressIndicator(),
               );
             case ConnectionState.active:
-              print(snapshot.data);
               return _secondScreen(snapshot.data);
-              //return Text('active: ${snapshot.data}');
+            //return Text('active: ${snapshot.data}');
             case ConnectionState.done:
               return Text('Stream已关闭');
           }
@@ -83,20 +81,17 @@ class _MessageState extends State<Message> {
   }
 
   Widget _secondScreen(_arrayMessage) {
-    return Padding(
-      padding: EdgeInsets.all(10),
+    return Container(
+      margin: EdgeInsets.all(10),
       child: ListView(
-        scrollDirection: Axis.vertical,
-        shrinkWrap: true,
         physics: BouncingScrollPhysics(),
+        reverse: true,
         controller: _scrollController,
         children: <Widget>[
+          SizedBox(height: 60),
           if (_arrayMessage != null)
             for (int i = 0; i < _arrayMessage.length; i++)
               _message(_arrayMessage[i]),
-          SizedBox(
-            height: 60,
-          ),
         ],
       ),
     );
@@ -359,12 +354,22 @@ class _MessageState extends State<Message> {
       height: 51.5,
       decoration: BoxDecoration(
         border: Border(
-          top: BorderSide(color: Colors.grey[300],width: 1.5),
+          top: BorderSide(color: Colors.grey[300], width: 1.5),
         ),
         color: Colors.white,
       ),
       child: Row(
         children: <Widget>[
+          IconButton(
+            icon: Icon(
+              Icons.mic,
+              color: Colors.black,
+            ),
+            onPressed: () {
+              showRecordAudioBottomSheet(
+                  context, widget.data['sender'], widget.data['receiver']);
+            },
+          ),
           Flexible(
             child: Container(
               margin: EdgeInsets.only(left: 20),
@@ -378,7 +383,7 @@ class _MessageState extends State<Message> {
                   hintStyle: TextStyle(color: Colors.grey),
                 ),
                 controller: _messageController,
-                onTap: _scrollToEnd,
+                //onTap: _scrollToEnd,
               ),
               color: Colors.white,
             ),
@@ -421,6 +426,7 @@ class _MessageState extends State<Message> {
     );
   }
 
+/*
   Future _scrollToEnd() async {
     await Future.delayed(Duration(milliseconds: 500)).then((value) async {
       if (_scrollController.hasClients) {
@@ -432,7 +438,7 @@ class _MessageState extends State<Message> {
       }
     });
   }
-
+*/
   /*Future _downloadFile(String fileUrl) async {
     final Directory downloadsDirectory =
         await DownloadsPathProvider.downloadsDirectory;

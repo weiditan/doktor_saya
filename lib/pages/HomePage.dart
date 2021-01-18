@@ -4,6 +4,7 @@ import 'package:doktorsaya/pages/message/MessageListPage.dart';
 import 'package:doktorsaya/pages/profile/ProfilePage.dart';
 import 'package:doktorsaya/pages/profile/SearchPage.dart';
 import 'package:doktorsaya/pages/profile/ext/profileDatabase.dart';
+import 'package:doktorsaya/test.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
@@ -161,7 +162,8 @@ class _HomePage extends State<HomePage> with WidgetsBindingObserver {
                 if (snapshot.hasData) {
                   _body = [
                     MessageListPage(roleId: snapshot.data),
-                    CallListPage(roleId: snapshot.data),
+                    test(),
+                    //CallListPage(roleId: snapshot.data),
                     DoctorPage(requestStatus: "2"),
                     ProfilePage(),
                   ];
