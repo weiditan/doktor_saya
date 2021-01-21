@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:audioplayers/audioplayers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doktorsaya/functions/viewImage.dart';
 import 'package:doktorsaya/functions/viewVideo.dart';
+import 'package:doktorsaya/pages/message/ext/voiceMessagePlayer.dart';
 import 'package:flutter/material.dart';
 
 import 'ext/bubble.dart';
@@ -27,7 +27,6 @@ class _MessageState extends State<Message> {
   final _messageController = TextEditingController();
 
   _getData() async {
-
     _arrayMessage =
         await getMessage(widget.data['sender'], widget.data['receiver']);
 
@@ -44,7 +43,6 @@ class _MessageState extends State<Message> {
     });
   }
 
-
   @override
   void initState() {
     _getData();
@@ -56,6 +54,7 @@ class _MessageState extends State<Message> {
     _t.cancel();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -290,74 +289,7 @@ class _MessageState extends State<Message> {
 
       case "Audio":
         {
-          AudioPlayer _player = AudioPlayer();
-          String _playingFile = "";
-          Duration _duration = new Duration();
-          Duration _position = new Duration();
-
-          _play(url) async {
-            await _player.play(url);
-            _playingFile = url;
-
-            print(_player.state);
-          }
-
-          _pause() async {
-            await _player.pause();
-          }
-
-
-          Widget _icon(filepath) {
-            String _fullFilepath =
-                "http://www.breakvoid.com/DoktorSaya/Files/Attachments/" + filepath;
-
-            if (_playingFile == _fullFilepath &&
-                _player.state == AudioPlayerState.PLAYING) {
-              return IconButton(
-                icon: Icon(
-                  Icons.pause,
-                  color: Colors.grey[600],
-                ),
-                onPressed: () {
-                  _pause();
-                },
-              );
-            } else {
-              return IconButton(
-                icon: Icon(
-                  Icons.play_arrow,
-                  color: Colors.grey[600],
-                ),
-                onPressed: () {
-                  _play(_fullFilepath);
-                },
-              );
-            }
-          }
-
-          _player.onDurationChanged.listen((Duration d) {
-            print('Max duration: $d');
-            setState(() {
-              _duration = d;
-            });
-          });
-
-          _player.onAudioPositionChanged.listen((Duration  p) {
-            print('Current position: $p');
-            setState(() => _position = p);
-          });
-
-          return Row(
-            children: [
-              _icon(message["filepath"]),
-              Slider(
-                value: _position.inSeconds.toDouble(),
-                min: 0.0,
-                max: _duration.inSeconds.toDouble(),
-                onChanged: (double value) {},
-              ),
-            ],
-          );
+          return VoiceMessagePlayer(url: "http://www.breakvoid.com/DoktorSaya/Files/Attachments/" + message["filepath"]);
         }
         break;
 
@@ -452,19 +384,6 @@ class _MessageState extends State<Message> {
     );
   }
 
-/*
-  Future _scrollToEnd() async {
-    await Future.delayed(Duration(milliseconds: 500)).then((value) async {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          curve: Curves.easeOut,
-          duration: const Duration(milliseconds: 100),
-        );
-      }
-    });
-  }
-*/
   /*Future _downloadFile(String fileUrl) async {
     final Directory downloadsDirectory =
         await DownloadsPathProvider.downloadsDirectory;
