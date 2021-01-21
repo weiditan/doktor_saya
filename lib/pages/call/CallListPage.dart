@@ -16,7 +16,7 @@ class CallListPage extends StatefulWidget {
 
 class _CallListPageState extends State<CallListPage> {
 
-  Stream<List> _getData() async* {
+  Stream<List<dynamic>> _getData() async* {
     while (true) {
       yield await getCallList(widget.roleId);
       await Future.delayed(Duration(seconds: 5));

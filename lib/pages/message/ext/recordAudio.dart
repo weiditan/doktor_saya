@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_audio_recorder/flutter_audio_recorder.dart';
 import 'package:path_provider/path_provider.dart';
@@ -11,11 +10,12 @@ import 'uploadAttachment.dart';
 FlutterAudioRecorder _recorder;
 Recording _recording;
 
-Map<String, String> _data;
+Map<String, String> _data = {
+  "label": "Tekan dan tahan untuk merakam audio.",
+  "time": '0:00:00'
+};
 
 Future _init(sender) async {
-  _data = {"label": "Tekan dan tahan untuk merakam audio.", "time": '0:00:00'};
-
   String customPath = '/' + sender + '_';
   Directory appDocDirectory;
   if (Platform.isIOS) {
@@ -42,9 +42,7 @@ Future _prepare(context, sender) async {
   var hasPermission = await FlutterAudioRecorder.hasPermissions;
   if (hasPermission) {
     await _init(sender);
-    var result = await _recorder.current();
-
-    _recording = result;
+    _recording = await _recorder.current();
   } else {
     Navigator.pop(context);
   }
@@ -68,11 +66,6 @@ Future _stopRecording() async {
   _recording = await _recorder.stop();
 }
 
-void _play() {
-  AudioPlayer player = AudioPlayer();
-  player.play(_recording.path, isLocal: true);
-}
-
 Stream<Map<String, String>> _getData() async* {
   while (true) {
     yield _data;
@@ -85,8 +78,9 @@ showRecordAudioBottomSheet(
   showModalBottomSheet(
       context: context,
       builder: (BuildContext bc) {
-        _prepare(context, sender);
-        print('${_recording.path}');
+        _prepare(context, sender).then((_) {
+          print('${_recording.path}');
+        });
 
         return Container(
           height: 150,
@@ -121,10 +115,6 @@ showRecordAudioBottomSheet(
                 },
               ),
               GestureDetector(
-                onDoubleTap: () {
-                  _play();
-                  print('start');
-                },
                 onLongPress: () async {
                   _data["label"] = "Lepas untuk hantar.";
                   _startRecording();

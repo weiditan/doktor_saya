@@ -3,7 +3,6 @@ import 'package:doktorsaya/pages/account/ext/logout.dart';
 import 'package:doktorsaya/pages/profile/EditProfilePage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'dart:async';
 
 import '../../functions/sharedPreferences.dart' as sp;
@@ -20,6 +19,9 @@ import 'ext/specialistDatabase.dart';
 class ProfilePage extends StatefulWidget {
   @override
   _ProfilePageState createState() => _ProfilePageState();
+
+  final String roleId;
+  ProfilePage({Key key, @required this.roleId}) : super(key: key);
 }
 
 class _ProfilePageState extends State<ProfilePage> {
@@ -45,17 +47,14 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future _getData() async {
-    await Future.wait([
-      sp.getRoleId().then((onValue) {
-        _roleId = onValue;
 
-        if (_roleId[0] == "d") {
-          _role = "doctor";
-        } else {
-          _role = "patient";
-        }
-      }),
-    ]);
+    _roleId = widget.roleId;
+
+    if (_roleId[0] == "d") {
+      _role = "doctor";
+    } else {
+      _role = "patient";
+    }
 
     await Future.wait([
       getUserDetail(_roleId).then((onValue) {

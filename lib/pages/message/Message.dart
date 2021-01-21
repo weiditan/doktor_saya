@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doktorsaya/functions/viewImage.dart';
 import 'package:doktorsaya/functions/viewVideo.dart';
@@ -21,45 +22,45 @@ class Message extends StatefulWidget {
 }
 
 class _MessageState extends State<Message> {
-
+  List _arrayMessage = [];
+  Timer _t;
   final _messageController = TextEditingController();
-  final _scrollController = new ScrollController();
 
-  Stream<List> _getData() async* {
-    while (true) {
-      yield await getMessage(widget.data['sender'], widget.data['receiver']);
-      await Future.delayed(Duration(seconds: 5));
-    }
-  }
+  _getData() async {
 
-  FutureOr onGoBack(dynamic value) {
+    _arrayMessage =
+        await getMessage(widget.data['sender'], widget.data['receiver']);
+
     setState(() {});
+
+    List _data;
+    _t = Timer.periodic(Duration(seconds: 5), (Timer timer) async {
+      _data = await getMessage(widget.data['sender'], widget.data['receiver']);
+      if (_arrayMessage != _data) {
+        setState(() {
+          _arrayMessage = _data;
+        });
+      }
+    });
   }
 
+
+  @override
+  void initState() {
+    _getData();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _t.cancel();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: _title()),
-      body: StreamBuilder<List>(
-        stream: _getData(),
-        builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
-          if (snapshot.hasError) return Text('Error: ${snapshot.error}');
-          switch (snapshot.connectionState) {
-            case ConnectionState.none:
-              return Text('没有Stream');
-            case ConnectionState.waiting:
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            case ConnectionState.active:
-              return _secondScreen(snapshot.data);
-            //return Text('active: ${snapshot.data}');
-            case ConnectionState.done:
-              return Text('Stream已关闭');
-          }
-          return null; // unreachable
-        },
-      ),
+      body: _secondScreen(_arrayMessage),
       bottomSheet: _messageBar(),
     );
   }
@@ -86,7 +87,6 @@ class _MessageState extends State<Message> {
       child: ListView(
         physics: BouncingScrollPhysics(),
         reverse: true,
-        controller: _scrollController,
         children: <Widget>[
           SizedBox(height: 60),
           if (_arrayMessage != null)
@@ -98,49 +98,53 @@ class _MessageState extends State<Message> {
   }
 
   Widget _message(Map message) {
+    return Bubble(
+      margin: (message['sender'] == widget.data['sender'])
+          ? BubbleEdges.only(top: 10, left: 50)
+          : BubbleEdges.only(top: 10, right: 50),
+      nipRadius: 2,
+      alignment: (message['sender'] == widget.data['sender'])
+          ? Alignment.topRight
+          : Alignment.topLeft,
+      nipWidth: 10,
+      nipHeight: 8,
+      nip: (message['sender'] == widget.data['sender'])
+          ? BubbleNip.rightTop
+          : BubbleNip.leftTop,
+      color: (message['sender'] == widget.data['sender'])
+          ? Color.fromRGBO(225, 255, 199, 1.0)
+          : Colors.white,
+      child: _messageDetail(message),
+    );
+  }
+
+  Widget _messageDetail(Map message) {
     switch (message['type']) {
       case "Gambar":
         {
-          return Bubble(
-            margin: (message['sender'] == widget.data['sender'])
-                ? BubbleEdges.only(top: 10, left: 50)
-                : BubbleEdges.only(top: 10, right: 50),
-            nipRadius: 2,
-            alignment: (message['sender'] == widget.data['sender'])
-                ? Alignment.topRight
-                : Alignment.topLeft,
-            nipWidth: 10,
-            nipHeight: 8,
-            nip: (message['sender'] == widget.data['sender'])
-                ? BubbleNip.rightTop
-                : BubbleNip.leftTop,
-            color: (message['sender'] == widget.data['sender'])
-                ? Color.fromRGBO(225, 255, 199, 1.0)
-                : Colors.white,
-            child: InkWell(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ViewImage(
-                        message['context'],
-                        "http://www.breakvoid.com/DoktorSaya/Files/Attachments/" +
-                            message["filepath"]),
-                  ),
-                );
-              },
-              child: CachedNetworkImage(
-                imageUrl:
-                    "http://www.breakvoid.com/DoktorSaya/Files/Attachments/" +
-                        message["filepath"],
-                progressIndicatorBuilder: (context, url, downloadProgress) =>
-                    Container(
-                  margin: EdgeInsets.all(15),
-                  child: CircularProgressIndicator(
-                      value: downloadProgress.progress),
+          return InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ViewImage(
+                      message['context'],
+                      "http://www.breakvoid.com/DoktorSaya/Files/Attachments/" +
+                          message["filepath"]),
                 ),
-                errorWidget: (context, url, error) => Icon(Icons.error),
+              );
+            },
+            child: CachedNetworkImage(
+              imageUrl:
+                  "http://www.breakvoid.com/DoktorSaya/Files/Attachments/" +
+                      message["filepath"],
+              progressIndicatorBuilder: (context, url, downloadProgress) =>
+                  Container(
+                margin: EdgeInsets.all(15),
+                child:
+                    CircularProgressIndicator(value: downloadProgress.progress),
               ),
+              errorWidget: (context, url, error) => Icon(Icons.error),
             ),
           );
         }
@@ -148,201 +152,223 @@ class _MessageState extends State<Message> {
 
       case "Video":
         {
-          return Bubble(
-            margin: (message['sender'] == widget.data['sender'])
-                ? BubbleEdges.only(top: 10, left: 50)
-                : BubbleEdges.only(top: 10, right: 50),
-            nipRadius: 2,
-            alignment: (message['sender'] == widget.data['sender'])
-                ? Alignment.topRight
-                : Alignment.topLeft,
-            nipWidth: 10,
-            nipHeight: 8,
-            nip: (message['sender'] == widget.data['sender'])
-                ? BubbleNip.rightTop
-                : BubbleNip.leftTop,
-            color: (message['sender'] == widget.data['sender'])
-                ? Color.fromRGBO(225, 255, 199, 1.0)
-                : Colors.white,
-            child: Column(
-              children: <Widget>[
-                Text(
-                  message['context'],
-                  textAlign: (message['sender'] == widget.data['sender'])
-                      ? TextAlign.right
-                      : TextAlign.left,
-                  style: TextStyle(fontSize: 16, color: Colors.black),
+          return Column(
+            children: <Widget>[
+              Text(
+                message['context'],
+                textAlign: (message['sender'] == widget.data['sender'])
+                    ? TextAlign.right
+                    : TextAlign.left,
+                style: TextStyle(fontSize: 16, color: Colors.black),
+              ),
+              SizedBox(height: 5),
+              Container(
+                width: 130,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: Colors.orange,
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(10),
+                      topRight: Radius.circular(10)),
                 ),
-                SizedBox(height: 5),
-                Container(
-                  width: 130,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: Colors.orange,
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(10),
-                        topRight: Radius.circular(10)),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Icon(
-                        Icons.videocam,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Icon(
+                      Icons.videocam,
+                      color: Colors.white,
+                    ),
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Text(
+                      'Video',
+                      style: TextStyle(
+                        fontSize: 20,
                         color: Colors.white,
                       ),
-                      SizedBox(
-                        height: 5,
-                      ),
-                      Text(
-                        'Video',
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.white,
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                width: 130,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                  borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(10),
+                      bottomRight: Radius.circular(10)),
+                ),
+                child: IconButton(
+                    icon: Icon(
+                      Icons.play_arrow,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ViewVideo(
+                              message['context'],
+                              "http://www.breakvoid.com/DoktorSaya/Files/Attachments/" +
+                                  message["filepath"]),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  width: 130,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(10),
-                        bottomRight: Radius.circular(10)),
-                  ),
-                  child: IconButton(
-                      icon: Icon(
-                        Icons.play_arrow,
-                        color: Colors.white,
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ViewVideo(
-                                message['context'],
-                                "http://www.breakvoid.com/DoktorSaya/Files/Attachments/" +
-                                    message["filepath"]),
-                          ),
-                        );
-                      }),
-                ),
-              ],
-            ),
+                      );
+                    }),
+              ),
+            ],
           );
         }
         break;
 
       case "Dokumen":
         {
-          return Bubble(
-            margin: (message['sender'] == widget.data['sender'])
-                ? BubbleEdges.only(top: 10, left: 50)
-                : BubbleEdges.only(top: 10, right: 50),
-            nipRadius: 2,
-            alignment: (message['sender'] == widget.data['sender'])
-                ? Alignment.topRight
-                : Alignment.topLeft,
-            nipWidth: 10,
-            nipHeight: 8,
-            nip: (message['sender'] == widget.data['sender'])
-                ? BubbleNip.rightTop
-                : BubbleNip.leftTop,
-            color: (message['sender'] == widget.data['sender'])
-                ? Color.fromRGBO(225, 255, 199, 1.0)
-                : Colors.white,
-            child: Column(
-              children: <Widget>[
-                Text(
-                  message['context'],
-                  textAlign: (message['sender'] == widget.data['sender'])
-                      ? TextAlign.right
-                      : TextAlign.left,
-                  style: TextStyle(fontSize: 16, color: Colors.black),
+          return Column(
+            children: <Widget>[
+              Text(
+                message['context'],
+                textAlign: (message['sender'] == widget.data['sender'])
+                    ? TextAlign.right
+                    : TextAlign.left,
+                style: TextStyle(fontSize: 16, color: Colors.black),
+              ),
+              SizedBox(height: 5),
+              Container(
+                width: 130,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: Colors.orange,
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(10),
+                      topRight: Radius.circular(10)),
                 ),
-                SizedBox(height: 5),
-                Container(
-                  width: 130,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: Colors.orange,
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(10),
-                        topRight: Radius.circular(10)),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Icon(
-                        Icons.insert_drive_file,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Icon(
+                      Icons.insert_drive_file,
+                      color: Colors.white,
+                    ),
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Text(
+                      'Dokumen',
+                      style: TextStyle(
+                        fontSize: 20,
                         color: Colors.white,
                       ),
-                      SizedBox(
-                        height: 5,
-                      ),
-                      Text(
-                        'Dokumen',
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-                Container(
-                  width: 130,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(10),
-                        bottomRight: Radius.circular(10)),
-                  ),
-                  child: IconButton(
-                      icon: Icon(
-                        Icons.file_download,
-                        color: Colors.white,
-                      ),
-                      onPressed: () {
-                        /*  _downloadFile(
+              ),
+              Container(
+                width: 130,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                  borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(10),
+                      bottomRight: Radius.circular(10)),
+                ),
+                child: IconButton(
+                    icon: Icon(
+                      Icons.file_download,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      /*  _downloadFile(
                             "http://www.breakvoid.com/DoktorSaya/Files/Attachments/" +
                                 message["filepath"]);*/
-                      }),
+                    }),
+              ),
+            ],
+          );
+        }
+        break;
+
+      case "Audio":
+        {
+          AudioPlayer _player = AudioPlayer();
+          String _playingFile = "";
+          Duration _duration = new Duration();
+          Duration _position = new Duration();
+
+          _play(url) async {
+            await _player.play(url);
+            _playingFile = url;
+
+            print(_player.state);
+          }
+
+          _pause() async {
+            await _player.pause();
+          }
+
+
+          Widget _icon(filepath) {
+            String _fullFilepath =
+                "http://www.breakvoid.com/DoktorSaya/Files/Attachments/" + filepath;
+
+            if (_playingFile == _fullFilepath &&
+                _player.state == AudioPlayerState.PLAYING) {
+              return IconButton(
+                icon: Icon(
+                  Icons.pause,
+                  color: Colors.grey[600],
                 ),
-              ],
-            ),
+                onPressed: () {
+                  _pause();
+                },
+              );
+            } else {
+              return IconButton(
+                icon: Icon(
+                  Icons.play_arrow,
+                  color: Colors.grey[600],
+                ),
+                onPressed: () {
+                  _play(_fullFilepath);
+                },
+              );
+            }
+          }
+
+          _player.onDurationChanged.listen((Duration d) {
+            print('Max duration: $d');
+            setState(() {
+              _duration = d;
+            });
+          });
+
+          _player.onAudioPositionChanged.listen((Duration  p) {
+            print('Current position: $p');
+            setState(() => _position = p);
+          });
+
+          return Row(
+            children: [
+              _icon(message["filepath"]),
+              Slider(
+                value: _position.inSeconds.toDouble(),
+                min: 0.0,
+                max: _duration.inSeconds.toDouble(),
+                onChanged: (double value) {},
+              ),
+            ],
           );
         }
         break;
 
       default:
         {
-          return Bubble(
-            margin: (message['sender'] == widget.data['sender'])
-                ? BubbleEdges.only(top: 10, left: 50)
-                : BubbleEdges.only(top: 10, right: 50),
-            nipRadius: 2,
-            alignment: (message['sender'] == widget.data['sender'])
-                ? Alignment.topRight
-                : Alignment.topLeft,
-            nipWidth: 10,
-            nipHeight: 8,
-            nip: (message['sender'] == widget.data['sender'])
-                ? BubbleNip.rightTop
-                : BubbleNip.leftTop,
-            color: (message['sender'] == widget.data['sender'])
-                ? Color.fromRGBO(225, 255, 199, 1.0)
-                : Colors.white,
-            child: Text(
-              message['context'],
-              textAlign: (message['sender'] == widget.data['sender'])
-                  ? TextAlign.right
-                  : TextAlign.left,
-              style: TextStyle(fontSize: 16, color: Colors.black),
-            ),
+          return Text(
+            message['context'],
+            textAlign: (message['sender'] == widget.data['sender'])
+                ? TextAlign.right
+                : TextAlign.left,
+            style: TextStyle(fontSize: 16, color: Colors.black),
           );
         }
         break;

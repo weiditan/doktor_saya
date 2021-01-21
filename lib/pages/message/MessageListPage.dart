@@ -13,7 +13,6 @@ class MessageListPage extends StatefulWidget {
 }
 
 class _MessageListPageState extends State<MessageListPage> {
-
   Stream<List> _getData() async* {
     while (true) {
       yield await getMessageList(widget.roleId);
@@ -36,7 +35,7 @@ class _MessageListPageState extends State<MessageListPage> {
             );
           case ConnectionState.active:
             return _showList(snapshot.data);
-        //return Text('active: ${snapshot.data}');
+          //return Text('active: ${snapshot.data}');
           case ConnectionState.done:
             return Text('Stream已关闭');
         }
@@ -46,30 +45,31 @@ class _MessageListPageState extends State<MessageListPage> {
   }
 
   Widget _showList(_arrayDoctor) {
-    return SingleChildScrollView(
-      physics: BouncingScrollPhysics(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          SizedBox(
-            height: 10,
-          ),
-          if (_arrayDoctor == null || _arrayDoctor.length == 0) _noMessage(),
-          if (_arrayDoctor != null || _arrayDoctor.length != 0)
-            for (int i = 0; i < _arrayDoctor.length; i++)
-              _messageRow(
-                  _arrayDoctor[i]['doctor_id'],
-                  (_arrayDoctor[i]['doctor_id'][0] == "d")
-                      ? "Dr " + _arrayDoctor[i]['nickname']
-                      : _arrayDoctor[i]['nickname'],
-                  _arrayDoctor[i]['image'],
-                  _arrayDoctor[i]['message'],
-                  _arrayDoctor[i]['sendtime'],
-                  _arrayDoctor[i]['unread'],
-                  _arrayDoctor[i]['online']),
-        ],
-      ),
-    );
+    return (_arrayDoctor == null || _arrayDoctor.length == 0)
+        ? _noMessage()
+        : SingleChildScrollView(
+            physics: BouncingScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                SizedBox(
+                  height: 10,
+                ),
+                if (_arrayDoctor != null || _arrayDoctor.length != 0)
+                  for (int i = 0; i < _arrayDoctor.length; i++)
+                    _messageRow(
+                        _arrayDoctor[i]['doctor_id'],
+                        (_arrayDoctor[i]['doctor_id'][0] == "d")
+                            ? "Dr " + _arrayDoctor[i]['nickname']
+                            : _arrayDoctor[i]['nickname'],
+                        _arrayDoctor[i]['image'],
+                        _arrayDoctor[i]['message'],
+                        _arrayDoctor[i]['sendtime'],
+                        _arrayDoctor[i]['unread'],
+                        _arrayDoctor[i]['online']),
+              ],
+            ),
+          );
   }
 
   Widget _noMessage() {
@@ -146,19 +146,19 @@ class _MessageListPageState extends State<MessageListPage> {
                       ),
                       (unread != "0")
                           ? Container(
-                          width: 25,
-                          height: 25,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.red,
-                          ),
-                          child: Center(
-                            child: (int.parse(unread) < 100)
-                                ? Text(unread,
-                                style: TextStyle(color: Colors.white))
-                                : Text("...",
-                                style: TextStyle(color: Colors.white)),
-                          ))
+                              width: 25,
+                              height: 25,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.red,
+                              ),
+                              child: Center(
+                                child: (int.parse(unread) < 100)
+                                    ? Text(unread,
+                                        style: TextStyle(color: Colors.white))
+                                    : Text("...",
+                                        style: TextStyle(color: Colors.white)),
+                              ))
                           : Text(""),
                     ],
                   ),
@@ -183,11 +183,11 @@ class _MessageListPageState extends State<MessageListPage> {
     DateTime _sendTime = DateTime.parse(sendTime).add(_timeZone);
 
     return (DateFormat('MMM d, yyyy').format(_today) !=
-        DateFormat('MMM d, yyyy').format(_sendTime))
+            DateFormat('MMM d, yyyy').format(_sendTime))
         ? (DateFormat('MMM d, yyyy').format(_today.add(Duration(days: -1))) !=
-        DateFormat('MMM d, yyyy').format(_sendTime))
-        ? DateFormat('MMM d, yyyy\n').add_jm().format(_sendTime)
-        : "Semalam\n" + DateFormat().add_jm().format(_sendTime)
+                DateFormat('MMM d, yyyy').format(_sendTime))
+            ? DateFormat('MMM d, yyyy\n').add_jm().format(_sendTime)
+            : "Semalam\n" + DateFormat().add_jm().format(_sendTime)
         : DateFormat().add_jm().format(_sendTime);
   }
 }
