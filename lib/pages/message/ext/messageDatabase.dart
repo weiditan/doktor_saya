@@ -47,6 +47,22 @@ Future<Map> addTextMessage(
   return data;
 }
 
+Future<Map> deleteMessage(messageId) async {
+  http.Response response = await retry(
+    // Make a GET request
+    () => http.post(url, body: {
+      'action': 'delete',
+      'message_id': messageId
+    }).timeout(Duration(seconds: 5)),
+    // Retry on SocketException or TimeoutException
+    retryIf: (e) => e is SocketException || e is TimeoutException,
+  );
+
+  Map data = jsonDecode(response.body);
+
+  return data;
+}
+
 Future<List> getMessageList(String roleId) async {
   http.Response response = await retry(
     // Make a GET request

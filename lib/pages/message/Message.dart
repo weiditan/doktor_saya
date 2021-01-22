@@ -22,8 +22,6 @@ class Message extends StatefulWidget {
 }
 
 class _MessageState extends State<Message> {
-  List _arrayMessage = [];
-  Timer _t;
   final _messageController = TextEditingController();
 
   Stream<List> _getData() async* {
@@ -33,35 +31,6 @@ class _MessageState extends State<Message> {
     }
   }
 
-  /* _getData() async {
-    _arrayMessage =
-        await getMessage(widget.data['sender'], widget.data['receiver']);
-
-    setState(() {});
-
-    List _data;
-    _t = Timer.periodic(Duration(seconds: 5), (Timer timer) async {
-      _data = await getMessage(widget.data['sender'], widget.data['receiver']);
-      if (_arrayMessage != _data) {
-        setState(() {
-          _arrayMessage = _data;
-        });
-      }
-    });
-  }
-*/
-/*  @override
-  void initState() {
-    _getData();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _t.cancel();
-    super.dispose();
-  }
-*/
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -123,24 +92,60 @@ class _MessageState extends State<Message> {
   }
 
   Widget _message(Map message) {
-    return Bubble(
-      margin: (message['sender'] == widget.data['sender'])
-          ? BubbleEdges.only(top: 10, left: 50)
-          : BubbleEdges.only(top: 10, right: 50),
-      nipRadius: 2,
-      alignment: (message['sender'] == widget.data['sender'])
-          ? Alignment.topRight
-          : Alignment.topLeft,
-      nipWidth: 10,
-      nipHeight: 8,
-      nip: (message['sender'] == widget.data['sender'])
-          ? BubbleNip.rightTop
-          : BubbleNip.leftTop,
-      color: (message['sender'] == widget.data['sender'])
-          ? Color.fromRGBO(225, 255, 199, 1.0)
-          : Colors.white,
-      child: _messageDetail(message),
+    return GestureDetector(
+      onLongPressStart: (LongPressStartDetails details) {
+        _deleteMenu(message["message_id"], details.globalPosition.dx,
+            details.globalPosition.dy);
+      },
+      child: Bubble(
+        margin: (message['sender'] == widget.data['sender'])
+            ? BubbleEdges.only(top: 5, left: 50, bottom: 5)
+            : BubbleEdges.only(top: 5, right: 50, bottom: 5),
+        nipRadius: 2,
+        alignment: (message['sender'] == widget.data['sender'])
+            ? Alignment.topRight
+            : Alignment.topLeft,
+        nipWidth: 10,
+        nipHeight: 8,
+        nip: (message['sender'] == widget.data['sender'])
+            ? BubbleNip.rightTop
+            : BubbleNip.leftTop,
+        color: (message['sender'] == widget.data['sender'])
+            ? Color.fromRGBO(225, 255, 199, 1.0)
+            : Colors.white,
+        child: _messageDetail(message),
+      ),
     );
+  }
+
+  Future _deleteMenu(messageId, positionX, positionY) async {
+    int selected = await showMenu(
+      items: [
+        PopupMenuItem(
+          value: 0,
+          child: Row(
+            children: <Widget>[
+              Icon(Icons.delete),
+              Text("Padam"),
+            ],
+          ),
+        )
+      ],
+      context: context,
+      position: RelativeRect.fromLTRB(
+          positionX,
+          positionY,
+          MediaQuery.of(context).size.width,
+          MediaQuery.of(context).size.height),
+    );
+
+    if (selected == 0) {
+      deleteMessage(messageId).then((s) {
+        if (s['status']) {
+          setState(() {});
+        }
+      });
+    }
   }
 
   Widget _messageDetail(Map message) {
@@ -352,8 +357,8 @@ class _MessageState extends State<Message> {
               color: Colors.black,
             ),
             onPressed: () {
-              showRecordAudioBottomSheet(
-                  context, widget.data['sender'], widget.data['receiver'],setState);
+              showRecordAudioBottomSheet(context, widget.data['sender'],
+                  widget.data['receiver'], setState);
             },
           ),
           Flexible(
@@ -380,8 +385,8 @@ class _MessageState extends State<Message> {
               color: Colors.black,
             ),
             onPressed: () {
-              showAttachmentBottomSheet(
-                  context, widget.data['sender'], widget.data['receiver'],setState);
+              showAttachmentBottomSheet(context, widget.data['sender'],
+                  widget.data['receiver'], setState);
             },
           ),
           IconButton(
