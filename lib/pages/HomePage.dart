@@ -4,7 +4,6 @@ import 'package:doktorsaya/pages/message/MessageListPage.dart';
 import 'package:doktorsaya/pages/profile/ProfilePage.dart';
 import 'package:doktorsaya/pages/profile/SearchPage.dart';
 import 'package:doktorsaya/pages/profile/ext/profileDatabase.dart';
-import 'package:doktorsaya/test.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 

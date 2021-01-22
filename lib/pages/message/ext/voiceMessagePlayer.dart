@@ -12,18 +12,30 @@ class VoiceMessagePlayer extends StatefulWidget {
 }
 
 class _VoiceMessagePlayerState extends State<VoiceMessagePlayer> {
+  String _url = "";
   AudioPlayer _player = AudioPlayer();
-  StreamSubscription _positionSubscription, _completionSubscription;
+  StreamSubscription _durationSubscription,
+      _positionSubscription,
+      _completionSubscription;
 
-  Duration _endTime = new Duration();
-  Duration _position = new Duration();
+  Duration _duration = Duration();
+  Duration _position = Duration();
+  Timer _t;
 
   _prepare() async {
-    await _player.setUrl(widget.url);
+    _t = Timer.periodic(Duration(milliseconds: 100), (Timer timer) async {
+      if (_url != widget.url) {
+        _url = widget.url;
+        _position = Duration();
+        _duration = Duration();
+        await _player.stop();
+        await _player.setUrl(widget.url);
+      }
+    });
 
-    await Future.delayed(Duration(seconds: 1));
-    _endTime = Duration(milliseconds: await _player.getDuration());
-    setState(() {});
+    _durationSubscription = _player.onDurationChanged.listen((Duration d) {
+      setState(() => _duration = d);
+    });
 
     _positionSubscription = _player.onAudioPositionChanged.listen((Duration p) {
       setState(() => _position = p);
@@ -42,7 +54,9 @@ class _VoiceMessagePlayerState extends State<VoiceMessagePlayer> {
 
   @override
   void dispose() {
+    _t.cancel();
     _player.dispose();
+    _durationSubscription?.cancel();
     _positionSubscription?.cancel();
     _completionSubscription?.cancel();
     super.dispose();
@@ -54,16 +68,18 @@ class _VoiceMessagePlayerState extends State<VoiceMessagePlayer> {
       mainAxisSize: MainAxisSize.min,
       children: [
         _icon(),
-        Slider(
-          value: _position.inSeconds.toDouble(),
-          min: 0.0,
-          max: _endTime.inSeconds.toDouble(),
-          onChanged: (v) async {
-            await _player.seek(Duration(seconds: v.round()));
-          },
+        Flexible(
+          child: Slider(
+            value: _position.inMilliseconds.toDouble(),
+            min: 0.0,
+            max: _duration.inMilliseconds.toDouble(),
+            onChanged: (v) async {
+              await _player.seek(Duration(milliseconds: v.toInt()));
+            },
+          ),
         ),
         Text(
-            "${_position.inMinutes}:${_position.inSeconds.remainder(60).toString().padLeft(2, '0')}/${_endTime.inMinutes}:${_endTime.inSeconds.remainder(60).toString().padLeft(2, '0')}"),
+            "${_position.inMinutes}:${_position.inSeconds.remainder(60).toString().padLeft(2, '0')}/${_duration.inMinutes}:${_duration.inSeconds.remainder(60).toString().padLeft(2, '0')}"),
       ],
     );
   }

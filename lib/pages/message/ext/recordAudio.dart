@@ -34,7 +34,7 @@ Future _init(sender) async {
   // AudioFormat is optional, if given value, will overwrite path extension when there is conflicts.
 
   _recorder = FlutterAudioRecorder(customPath,
-      audioFormat: AudioFormat.WAV, sampleRate: 22050);
+      audioFormat: AudioFormat.WAV, sampleRate: 32000);
   await _recorder.initialized;
 }
 
@@ -52,7 +52,7 @@ Future _startRecording() async {
   await _recorder.start();
   _recording = await _recorder.current();
 
-  Timer.periodic(Duration(milliseconds: 100), (Timer t) async {
+  Timer.periodic(Duration(milliseconds: 10), (Timer t) async {
     if (_recording.status == RecordingStatus.Stopped) {
       t.cancel();
     } else {
@@ -74,7 +74,7 @@ Stream<Map<String, String>> _getData() async* {
 }
 
 showRecordAudioBottomSheet(
-    BuildContext context, String sender, String receiver) {
+    BuildContext context, String sender, String receiver,StateSetter messageSetState) {
   showModalBottomSheet(
       context: context,
       builder: (BuildContext bc) {
@@ -123,7 +123,7 @@ showRecordAudioBottomSheet(
                 onLongPressUp: () {
                   _data["label"] = "Tekan dan tahan untuk merakam audio.";
                   _stopRecording().then((value) => uploadAttachment(
-                      context, _recording.path, "Audio", sender, receiver));
+                      context, _recording.path, "Audio", sender, receiver,messageSetState));
                   print('stop recording');
                 },
                 child: Ink(

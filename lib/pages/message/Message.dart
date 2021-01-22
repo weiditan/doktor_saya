@@ -26,7 +26,14 @@ class _MessageState extends State<Message> {
   Timer _t;
   final _messageController = TextEditingController();
 
-  _getData() async {
+  Stream<List> _getData() async* {
+    while (true) {
+      yield await getMessage(widget.data['sender'], widget.data['receiver']);
+      await Future.delayed(Duration(seconds: 5));
+    }
+  }
+
+  /* _getData() async {
     _arrayMessage =
         await getMessage(widget.data['sender'], widget.data['receiver']);
 
@@ -42,8 +49,8 @@ class _MessageState extends State<Message> {
       }
     });
   }
-
-  @override
+*/
+/*  @override
   void initState() {
     _getData();
     super.initState();
@@ -54,12 +61,31 @@ class _MessageState extends State<Message> {
     _t.cancel();
     super.dispose();
   }
-
+*/
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: _title()),
-      body: _secondScreen(_arrayMessage),
+      body: StreamBuilder<List>(
+        stream: _getData(),
+        builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+          if (snapshot.hasError) return Text('Error: ${snapshot.error}');
+          switch (snapshot.connectionState) {
+            case ConnectionState.none:
+              return Text('没有Stream');
+            case ConnectionState.waiting:
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            case ConnectionState.active:
+              return _secondScreen(snapshot.data);
+            //return Text('active: ${snapshot.data}');
+            case ConnectionState.done:
+              return Text('Stream已关闭');
+          }
+          return null; // unreachable
+        },
+      ),
       bottomSheet: _messageBar(),
     );
   }
@@ -289,7 +315,9 @@ class _MessageState extends State<Message> {
 
       case "Audio":
         {
-          return VoiceMessagePlayer(url: "http://www.breakvoid.com/DoktorSaya/Files/Attachments/" + message["filepath"]);
+          return VoiceMessagePlayer(
+              url: "http://www.breakvoid.com/DoktorSaya/Files/Attachments/" +
+                  message["filepath"]);
         }
         break;
 
@@ -325,7 +353,7 @@ class _MessageState extends State<Message> {
             ),
             onPressed: () {
               showRecordAudioBottomSheet(
-                  context, widget.data['sender'], widget.data['receiver']);
+                  context, widget.data['sender'], widget.data['receiver'],setState);
             },
           ),
           Flexible(
@@ -353,7 +381,7 @@ class _MessageState extends State<Message> {
             ),
             onPressed: () {
               showAttachmentBottomSheet(
-                  context, widget.data['sender'], widget.data['receiver']);
+                  context, widget.data['sender'], widget.data['receiver'],setState);
             },
           ),
           IconButton(
@@ -367,12 +395,8 @@ class _MessageState extends State<Message> {
                         _messageController.text)
                     .then((s) {
                   if (s['status']) {
-                    getMessage(widget.data['sender'], widget.data['receiver'])
-                        .then((onValue) {
-                      setState(() {
-                        //_arrayMessage = onValue;
-                        _messageController.text = "";
-                      });
+                    setState(() {
+                      _messageController.text = "";
                     });
                   }
                 });

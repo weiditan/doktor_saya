@@ -5,7 +5,7 @@ import 'package:doktorsaya/pages/message/ext/attachmentPage.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
-showAttachmentBottomSheet(BuildContext context, String sender, String receiver) {
+showAttachmentBottomSheet(BuildContext context, String sender, String receiver,StateSetter messageSetState) {
   showModalBottomSheet(
       context: context,
       builder: (BuildContext bc) {
@@ -15,17 +15,17 @@ showAttachmentBottomSheet(BuildContext context, String sender, String receiver) 
               ListTile(
                 leading: Icon(Icons.image),
                 title: Text('Gambar'),
-                onTap: () => _showFilePicker(context, FileType.image, "Gambar",sender,receiver),
+                onTap: () => _showFilePicker(context, FileType.image, "Gambar",sender,receiver, messageSetState),
               ),
               ListTile(
                   leading: Icon(Icons.videocam),
                   title: Text('Video'),
                   onTap: () =>
-                      _showFilePicker(context, FileType.video, "Video",sender,receiver)),
+                      _showFilePicker(context, FileType.video, "Video",sender,receiver, messageSetState)),
               ListTile(
                 leading: Icon(Icons.insert_drive_file),
                 title: Text('Dokumen'),
-                onTap: () => _showFilePicker(context, FileType.any, "Dokumen",sender,receiver),
+                onTap: () => _showFilePicker(context, FileType.any, "Dokumen",sender,receiver, messageSetState),
               ),
             ],
           ),
@@ -33,7 +33,7 @@ showAttachmentBottomSheet(BuildContext context, String sender, String receiver) 
       });
 }
 
-_showFilePicker(BuildContext context, FileType fileType, String type, String sender, String receiver) async {
+_showFilePicker(BuildContext context, FileType fileType, String type, String sender, String receiver,StateSetter messageSetState) async {
   await pr.show(context, "Memuatkan");
 
   FilePickerResult result = await FilePicker.platform.pickFiles(type: fileType);
@@ -43,6 +43,6 @@ _showFilePicker(BuildContext context, FileType fileType, String type, String sen
   if (result != null) {
     File file = File(result.files.single.path);
     Navigator.push(context,
-        MaterialPageRoute(builder: (context) => AttachmentPage(sender, receiver, type, file)));
+        MaterialPageRoute(builder: (context) => AttachmentPage(sender, receiver, type, file, messageSetState)));
   }
 }
