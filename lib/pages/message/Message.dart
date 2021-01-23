@@ -140,12 +140,46 @@ class _MessageState extends State<Message> {
     );
 
     if (selected == 0) {
-      deleteMessage(messageId).then((s) {
-        if (s['status']) {
-          setState(() {});
-        }
-      });
+      _deleteDialog(messageId);
     }
+  }
+
+  Future<void> _deleteDialog(messageId) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Padamkan mesej'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Adakah anda pasti mahu memadamkan mesej ini?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Membatalkan'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Padam'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                deleteMessage(messageId).then((s) {
+                  if (s['status']) {
+                    setState(() {});
+                  }
+                });
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Widget _messageDetail(Map message) {
