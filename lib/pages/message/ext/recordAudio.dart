@@ -74,7 +74,7 @@ Stream<Map<String, String>> _getData() async* {
 }
 
 showRecordAudioBottomSheet(
-    BuildContext context, String sender, String receiver,StateSetter messageSetState) {
+    BuildContext context, String sender, String receiver) {
   showModalBottomSheet(
       context: context,
       builder: (BuildContext bc) {
@@ -123,7 +123,7 @@ showRecordAudioBottomSheet(
                 onLongPressUp: () {
                   _data["label"] = "Tekan dan tahan untuk merakam audio.";
                   _stopRecording().then((value) => uploadAttachment(
-                      context, _recording.path, "Audio", sender, receiver,messageSetState));
+                      context, _recording.path, "Audio", sender, receiver));
                   print('stop recording');
                 },
                 child: Ink(

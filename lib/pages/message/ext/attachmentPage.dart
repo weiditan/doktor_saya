@@ -11,8 +11,7 @@ class AttachmentPage extends StatefulWidget {
 
   final String type, sender, receiver;
   final File file;
-  final StateSetter messageSetState;
-  AttachmentPage(this.sender, this.receiver, this.type, this.file, this.messageSetState);
+  AttachmentPage(this.sender, this.receiver, this.type, this.file);
 }
 
 class _AttachmentPageState extends State<AttachmentPage> {
@@ -145,7 +144,7 @@ class _AttachmentPageState extends State<AttachmentPage> {
               flickManager.flickControlManager.pause();
             }
             uploadAttachment(context, widget.file.path, widget.type,
-                widget.sender, widget.receiver,widget.messageSetState);
+                widget.sender, widget.receiver);
           },
         ),
       ),

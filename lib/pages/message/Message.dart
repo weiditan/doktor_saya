@@ -1,17 +1,10 @@
-import 'dart:async';
-
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:doktorsaya/functions/viewImage.dart';
-import 'package:doktorsaya/functions/viewVideo.dart';
-import 'package:doktorsaya/pages/message/ext/voiceMessagePlayer.dart';
+import 'package:doktorsaya/pages/message/ext/messageContainer.dart';
 import 'package:flutter/material.dart';
-
-import 'ext/bubble.dart';
 import 'package:doktorsaya/pages/profile/ext/profileImage.dart';
-
 import 'ext/attachment.dart';
 import 'ext/messageDatabase.dart';
 import 'ext/recordAudio.dart';
+import 'package:doktorsaya/functions/progressDialog.dart' as pr;
 
 class Message extends StatefulWidget {
   @override
@@ -24,36 +17,13 @@ class Message extends StatefulWidget {
 class _MessageState extends State<Message> {
   final _messageController = TextEditingController();
 
-  Stream<List> _getData() async* {
-    while (true) {
-      yield await getMessage(widget.data['sender'], widget.data['receiver']);
-      await Future.delayed(Duration(seconds: 5));
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: _title()),
-      body: StreamBuilder<List>(
-        stream: _getData(),
-        builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
-          if (snapshot.hasError) return Text('Error: ${snapshot.error}');
-          switch (snapshot.connectionState) {
-            case ConnectionState.none:
-              return Text('没有Stream');
-            case ConnectionState.waiting:
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            case ConnectionState.active:
-              return _secondScreen(snapshot.data);
-            //return Text('active: ${snapshot.data}');
-            case ConnectionState.done:
-              return Text('Stream已关闭');
-          }
-          return null; // unreachable
-        },
+      body: MessageContainer(
+        sender: widget.data['sender'],
+        receiver: widget.data['receiver'],
       ),
       bottomSheet: _messageBar(),
     );
@@ -75,305 +45,6 @@ class _MessageState extends State<Message> {
     );
   }
 
-  Widget _secondScreen(_arrayMessage) {
-    return Container(
-      margin: EdgeInsets.all(10),
-      child: ListView(
-        physics: BouncingScrollPhysics(),
-        reverse: true,
-        children: <Widget>[
-          SizedBox(height: 60),
-          if (_arrayMessage != null)
-            for (int i = 0; i < _arrayMessage.length; i++)
-              _message(_arrayMessage[i]),
-        ],
-      ),
-    );
-  }
-
-  Widget _message(Map message) {
-    return GestureDetector(
-      onLongPressStart: (LongPressStartDetails details) {
-        _deleteMenu(message["message_id"], details.globalPosition.dx,
-            details.globalPosition.dy);
-      },
-      child: Bubble(
-        margin: (message['sender'] == widget.data['sender'])
-            ? BubbleEdges.only(top: 5, left: 50, bottom: 5)
-            : BubbleEdges.only(top: 5, right: 50, bottom: 5),
-        nipRadius: 2,
-        alignment: (message['sender'] == widget.data['sender'])
-            ? Alignment.topRight
-            : Alignment.topLeft,
-        nipWidth: 10,
-        nipHeight: 8,
-        nip: (message['sender'] == widget.data['sender'])
-            ? BubbleNip.rightTop
-            : BubbleNip.leftTop,
-        color: (message['sender'] == widget.data['sender'])
-            ? Color.fromRGBO(225, 255, 199, 1.0)
-            : Colors.white,
-        child: _messageDetail(message),
-      ),
-    );
-  }
-
-  Future _deleteMenu(messageId, positionX, positionY) async {
-    int selected = await showMenu(
-      items: [
-        PopupMenuItem(
-          value: 0,
-          child: Row(
-            children: <Widget>[
-              Icon(Icons.delete),
-              Text("Padam"),
-            ],
-          ),
-        )
-      ],
-      context: context,
-      position: RelativeRect.fromLTRB(
-          positionX,
-          positionY,
-          MediaQuery.of(context).size.width,
-          MediaQuery.of(context).size.height),
-    );
-
-    if (selected == 0) {
-      _deleteDialog(messageId);
-    }
-  }
-
-  Future<void> _deleteDialog(messageId) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: true, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Padamkan mesej'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text('Adakah anda pasti mahu memadamkan mesej ini?'),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Membatalkan'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text('Padam'),
-              onPressed: () {
-                Navigator.of(context).pop();
-                deleteMessage(messageId).then((s) {
-                  if (s['status']) {
-                    setState(() {});
-                  }
-                });
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _messageDetail(Map message) {
-    switch (message['type']) {
-      case "Gambar":
-        {
-          return InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ViewImage(
-                      message['context'],
-                      "http://www.breakvoid.com/DoktorSaya/Files/Attachments/" +
-                          message["filepath"]),
-                ),
-              );
-            },
-            child: CachedNetworkImage(
-              imageUrl:
-                  "http://www.breakvoid.com/DoktorSaya/Files/Attachments/" +
-                      message["filepath"],
-              progressIndicatorBuilder: (context, url, downloadProgress) =>
-                  Container(
-                margin: EdgeInsets.all(15),
-                child:
-                    CircularProgressIndicator(value: downloadProgress.progress),
-              ),
-              errorWidget: (context, url, error) => Icon(Icons.error),
-            ),
-          );
-        }
-        break;
-
-      case "Video":
-        {
-          return Column(
-            children: <Widget>[
-              Text(
-                message['context'],
-                textAlign: (message['sender'] == widget.data['sender'])
-                    ? TextAlign.right
-                    : TextAlign.left,
-                style: TextStyle(fontSize: 16, color: Colors.black),
-              ),
-              SizedBox(height: 5),
-              Container(
-                width: 130,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: Colors.orange,
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(10),
-                      topRight: Radius.circular(10)),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Icon(
-                      Icons.videocam,
-                      color: Colors.white,
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Text(
-                      'Video',
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                width: 130,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Colors.blue,
-                  borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(10),
-                      bottomRight: Radius.circular(10)),
-                ),
-                child: IconButton(
-                    icon: Icon(
-                      Icons.play_arrow,
-                      color: Colors.white,
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ViewVideo(
-                              message['context'],
-                              "http://www.breakvoid.com/DoktorSaya/Files/Attachments/" +
-                                  message["filepath"]),
-                        ),
-                      );
-                    }),
-              ),
-            ],
-          );
-        }
-        break;
-
-      case "Dokumen":
-        {
-          return Column(
-            children: <Widget>[
-              Text(
-                message['context'],
-                textAlign: (message['sender'] == widget.data['sender'])
-                    ? TextAlign.right
-                    : TextAlign.left,
-                style: TextStyle(fontSize: 16, color: Colors.black),
-              ),
-              SizedBox(height: 5),
-              Container(
-                width: 130,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: Colors.orange,
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(10),
-                      topRight: Radius.circular(10)),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Icon(
-                      Icons.insert_drive_file,
-                      color: Colors.white,
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Text(
-                      'Dokumen',
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                width: 130,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Colors.blue,
-                  borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(10),
-                      bottomRight: Radius.circular(10)),
-                ),
-                child: IconButton(
-                    icon: Icon(
-                      Icons.file_download,
-                      color: Colors.white,
-                    ),
-                    onPressed: () {
-                      /*  _downloadFile(
-                            "http://www.breakvoid.com/DoktorSaya/Files/Attachments/" +
-                                message["filepath"]);*/
-                    }),
-              ),
-            ],
-          );
-        }
-        break;
-
-      case "Audio":
-        {
-          return VoiceMessagePlayer(
-              url: "http://www.breakvoid.com/DoktorSaya/Files/Attachments/" +
-                  message["filepath"]);
-        }
-        break;
-
-      default:
-        {
-          return Text(
-            message['context'],
-            textAlign: (message['sender'] == widget.data['sender'])
-                ? TextAlign.right
-                : TextAlign.left,
-            style: TextStyle(fontSize: 16, color: Colors.black),
-          );
-        }
-        break;
-    }
-  }
-
   Widget _messageBar() {
     return Container(
       height: 51.5,
@@ -391,11 +62,11 @@ class _MessageState extends State<Message> {
               color: Colors.black,
             ),
             onPressed: () {
-              showRecordAudioBottomSheet(context, widget.data['sender'],
-                  widget.data['receiver'], setState);
+              showRecordAudioBottomSheet(
+                  context, widget.data['sender'], widget.data['receiver']);
             },
           ),
-          Flexible(
+          Expanded(
             child: Container(
               margin: EdgeInsets.only(left: 20),
               child: TextFormField(
@@ -408,7 +79,6 @@ class _MessageState extends State<Message> {
                   hintStyle: TextStyle(color: Colors.grey),
                 ),
                 controller: _messageController,
-                //onTap: _scrollToEnd,
               ),
               color: Colors.white,
             ),
@@ -419,8 +89,8 @@ class _MessageState extends State<Message> {
               color: Colors.black,
             ),
             onPressed: () {
-              showAttachmentBottomSheet(context, widget.data['sender'],
-                  widget.data['receiver'], setState);
+              showAttachmentBottomSheet(
+                  context, widget.data['sender'], widget.data['receiver']);
             },
           ),
           IconButton(
@@ -428,16 +98,15 @@ class _MessageState extends State<Message> {
               Icons.send,
               color: Colors.black,
             ),
-            onPressed: () {
+            onPressed: () async {
               if (_messageController.text != "") {
+                await pr.show(context, "Hantar");
+
                 addTextMessage(widget.data['sender'], widget.data['receiver'],
                         _messageController.text)
-                    .then((s) {
-                  if (s['status']) {
-                    setState(() {
-                      _messageController.text = "";
-                    });
-                  }
+                    .then((_) async {
+                  await pr.hide();
+                  _messageController.text = "";
                 });
               }
             },
