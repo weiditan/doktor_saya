@@ -1,12 +1,15 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dio/dio.dart';
 import 'package:doktorsaya/functions/viewImage.dart';
 import 'package:doktorsaya/functions/viewVideo.dart';
 import 'package:doktorsaya/pages/message/ext/voiceMessagePlayer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:sticky_grouped_list/sticky_grouped_list.dart';
 
 import 'bubble.dart';
@@ -24,7 +27,6 @@ class MessageContainer extends StatefulWidget {
 }
 
 class _MessageContainerState extends State<MessageContainer> {
-
   Stream<List> _getData() async* {
     while (true) {
       yield await getMessage(widget.sender, widget.receiver);
@@ -62,7 +64,7 @@ class _MessageContainerState extends State<MessageContainer> {
   Widget _messageList(_arrayMessage) {
     return StickyGroupedListView<dynamic, String>(
       elements: _arrayMessage,
-      groupBy: (dynamic element) => _date(element['sendtime']),
+      groupBy: (dynamic element) => _groupDate(element['sendtime']),
       groupSeparatorBuilder: (dynamic element) => Container(
         height: 50,
         child: Align(
@@ -91,8 +93,8 @@ class _MessageContainerState extends State<MessageContainer> {
         ),
       ),
       itemBuilder: (context, dynamic element) => _message(element),
-      itemComparator: (element1, element2) => element1['sendtime']
-          .compareTo(element2['sendtime']), // optional
+      itemComparator: (element1, element2) =>
+          element1['sendtime'].compareTo(element2['sendtime']), // optional
       itemScrollController: GroupedItemScrollController(), // optional
       order: StickyGroupedListOrder.DESC,
       floatingHeader: true,
@@ -143,6 +145,13 @@ class _MessageContainerState extends State<MessageContainer> {
     DateTime _sendTime = DateTime.parse(sendTime).add(_timeZone);
 
     return DateFormat().add_jm().format(_sendTime);
+  }
+
+  String _groupDate(sendTime) {
+    Duration _timeZone = DateTime.now().timeZoneOffset;
+    DateTime _sendTime = DateTime.parse(sendTime).add(_timeZone);
+
+    return DateFormat('yyyy-MM-dd').format(_sendTime);
   }
 
   String _date(sendTime) {
@@ -263,78 +272,82 @@ class _MessageContainerState extends State<MessageContainer> {
 
       case "Video":
         {
-          return Column(
-            children: <Widget>[
-              Text(
-                message['context'],
-                textAlign: (message['sender'] == widget.sender)
-                    ? TextAlign.right
-                    : TextAlign.left,
-                style: TextStyle(fontSize: 16, color: Colors.black),
-              ),
-              SizedBox(height: 5),
-              Container(
-                width: 130,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: Colors.orange,
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(10),
-                      topRight: Radius.circular(10)),
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ViewVideo(
+                      message['context'],
+                      "http://www.breakvoid.com/DoktorSaya/Files/Attachments/" +
+                          message["filepath"]),
                 ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
+              );
+            },
+            child: Container(
+              color: Colors.grey[300],
+              child: Padding(
+                padding: EdgeInsets.all(10),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
                     Icon(
                       Icons.videocam,
-                      color: Colors.white,
+                      color: Colors.orange,
                     ),
                     SizedBox(
-                      height: 5,
+                      width: 5,
                     ),
-                    Text(
-                      'Video',
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.white,
+                    Flexible(
+                      child: Text(
+                        message['context'],
+                        style: TextStyle(fontSize: 12, color: Colors.black),
                       ),
-                    ),
+                    )
                   ],
                 ),
               ),
-              Container(
-                width: 130,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Colors.blue,
-                  borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(10),
-                      bottomRight: Radius.circular(10)),
-                ),
-                child: IconButton(
-                    icon: Icon(
-                      Icons.play_arrow,
-                      color: Colors.white,
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ViewVideo(
-                              message['context'],
-                              "http://www.breakvoid.com/DoktorSaya/Files/Attachments/" +
-                                  message["filepath"]),
-                        ),
-                      );
-                    }),
-              ),
-            ],
+            ),
           );
         }
         break;
 
       case "Dokumen":
         {
+          return GestureDetector(
+            onTap: () {
+              _download(
+                  "http://www.breakvoid.com/DoktorSaya/Files/Attachments/" +
+                      message["filepath"],
+                  message['context']);
+            },
+            child: Container(
+              color: Colors.grey[300],
+              child: Padding(
+                padding: EdgeInsets.all(10),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.file_download,
+                      //Icons.insert_drive_file,
+                      color: Colors.orange,
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Flexible(
+                      child: Text(
+                        message['context'],
+                        style: TextStyle(fontSize: 12, color: Colors.black),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          );
+
           return Column(
             children: <Widget>[
               Text(
@@ -415,6 +428,29 @@ class _MessageContainerState extends State<MessageContainer> {
           );
         }
         break;
+    }
+  }
+
+  final Dio _dio = Dio();
+
+  Future<void> _download(url, fileName) async {
+    Directory appDocDirectory;
+    if (Platform.isIOS) {
+      appDocDirectory = await getApplicationDocumentsDirectory();
+    } else {
+      appDocDirectory = await getExternalStorageDirectory();
+    }
+
+    String _savePath = appDocDirectory.path + "/" + fileName;
+
+    print(_savePath);
+
+    await _dio.download(url, _savePath, onReceiveProgress: _onReceiveProgress);
+  }
+
+  void _onReceiveProgress(int received, int total) {
+    if (total != -1) {
+      print((received / total * 100).toStringAsFixed(0) + "%");
     }
   }
 }
