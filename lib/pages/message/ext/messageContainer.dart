@@ -90,8 +90,8 @@ class _MessageContainerState extends State<MessageContainer> {
         ),
       ),
       itemBuilder: (context, dynamic element) => _message(element),
-      itemComparator: (element1, element2) => _date(element1['sendtime'])
-          .compareTo(_date(element2['sendtime'])), // optional
+      itemComparator: (element1, element2) => element1['sendtime']
+          .compareTo(element2['sendtime']), // optional
       itemScrollController: GroupedItemScrollController(), // optional
       order: StickyGroupedListOrder.DESC,
       floatingHeader: true,
