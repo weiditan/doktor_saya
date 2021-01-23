@@ -84,6 +84,7 @@ class _MessageContainerState extends State<MessageContainer> {
                     ? "Hari Ini"
                     : _date(element['sendtime']),
                 textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.black),
               ),
             ),
           ),

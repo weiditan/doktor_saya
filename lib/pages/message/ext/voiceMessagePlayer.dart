@@ -79,7 +79,9 @@ class _VoiceMessagePlayerState extends State<VoiceMessagePlayer> {
           ),
         ),
         Text(
-            "${_position.inMinutes}:${_position.inSeconds.remainder(60).toString().padLeft(2, '0')}/${_duration.inMinutes}:${_duration.inSeconds.remainder(60).toString().padLeft(2, '0')}"),
+          "${_position.inMinutes}:${_position.inSeconds.remainder(60).toString().padLeft(2, '0')}/${_duration.inMinutes}:${_duration.inSeconds.remainder(60).toString().padLeft(2, '0')}",
+          style: TextStyle(color: Colors.black),
+        ),
       ],
     );
   }
