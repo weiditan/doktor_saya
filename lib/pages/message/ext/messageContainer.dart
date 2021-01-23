@@ -7,6 +7,7 @@ import 'package:doktorsaya/pages/message/ext/voiceMessagePlayer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:sticky_grouped_list/sticky_grouped_list.dart';
 
 import 'bubble.dart';
 import 'messageDatabase.dart';
@@ -23,45 +24,7 @@ class MessageContainer extends StatefulWidget {
 }
 
 class _MessageContainerState extends State<MessageContainer> {
-  /* Timer _t1, _t2;
-  List _arrayMessage,_arrayMessageOnPass;
 
-
-  _getData() async {
-    _t1 = Timer.periodic(Duration(milliseconds: 100), (Timer timer) {
-      if (_arrayMessageOnPass != widget.arrayMessage) {
-        setState(() {
-          _arrayMessageOnPass = widget.arrayMessage;
-          _arrayMessage = widget.arrayMessage;
-        });
-      }
-    });
-
-    List _data;
-
-    _t2 = Timer.periodic(Duration(seconds: 5), (Timer timer) async {
-      _data = await getMessage(widget.sender, widget.receiver);
-      if (_arrayMessage != _data) {
-        setState(() {
-          _arrayMessage = _data;
-        });
-      }
-    });
-  }
-
-  @override
-  void initState() {
-    _getData();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _t1.cancel();
-    _t2.cancel();
-    super.dispose();
-  }
-*/
   Stream<List> _getData() async* {
     while (true) {
       yield await getMessage(widget.sender, widget.receiver);
@@ -83,7 +46,10 @@ class _MessageContainerState extends State<MessageContainer> {
               child: CircularProgressIndicator(),
             );
           case ConnectionState.active:
-            return _secondScreen(snapshot.data);
+            return (snapshot.data != null)
+                ? _messageList(snapshot.data)
+                : Container();
+          // return _secondScreen(snapshot.data);
           //return Text('active: ${snapshot.data}');
           case ConnectionState.done:
             return Text('Stream已关闭');
@@ -93,19 +59,45 @@ class _MessageContainerState extends State<MessageContainer> {
     );
   }
 
-  Widget _secondScreen(_arrayMessage) {
-    return Container(
-      margin: EdgeInsets.all(10),
-      child: ListView(
-        physics: BouncingScrollPhysics(),
-        reverse: true,
-        children: <Widget>[
-          SizedBox(height: 60),
-          if (_arrayMessage != null)
-            for (int i = 0; i < _arrayMessage.length; i++)
-              _message(_arrayMessage[i]),
-        ],
+  Widget _messageList(_arrayMessage) {
+    return StickyGroupedListView<dynamic, String>(
+      elements: _arrayMessage,
+      groupBy: (dynamic element) => _date(element['sendtime']),
+      groupSeparatorBuilder: (dynamic element) => Container(
+        height: 50,
+        child: Align(
+          alignment: Alignment.center,
+          child: Container(
+            width: 120,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              border: Border.all(
+                color: Colors.grey[300],
+              ),
+              borderRadius: BorderRadius.all(Radius.circular(20.0)),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                (_date(element['sendtime']) ==
+                        DateFormat('MMM d, yyyy').format(DateTime.now()))
+                    ? "Hari Ini"
+                    : _date(element['sendtime']),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        ),
       ),
+      itemBuilder: (context, dynamic element) => _message(element),
+      itemComparator: (element1, element2) => _date(element1['sendtime'])
+          .compareTo(_date(element2['sendtime'])), // optional
+      itemScrollController: GroupedItemScrollController(), // optional
+      order: StickyGroupedListOrder.DESC,
+      floatingHeader: true,
+      physics: BouncingScrollPhysics(),
+      reverse: true, // optional
+      padding: EdgeInsets.only(bottom: 60),
     );
   }
 
@@ -150,6 +142,13 @@ class _MessageContainerState extends State<MessageContainer> {
     DateTime _sendTime = DateTime.parse(sendTime).add(_timeZone);
 
     return DateFormat().add_jm().format(_sendTime);
+  }
+
+  String _date(sendTime) {
+    Duration _timeZone = DateTime.now().timeZoneOffset;
+    DateTime _sendTime = DateTime.parse(sendTime).add(_timeZone);
+
+    return DateFormat('MMM d, yyyy').format(_sendTime);
   }
 
   Future _deleteMenu(
