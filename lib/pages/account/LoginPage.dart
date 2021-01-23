@@ -1,14 +1,10 @@
-import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
 
 import 'package:doktorsaya/pages/account/ext/accountDatabase.dart';
 import 'package:doktorsaya/pages/profile/EditProfilePage.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:retry/retry.dart';
+
 
 import '../../functions/sharedPreferences.dart' as sp;
 import '../../functions/progressDialog.dart' as pr;
@@ -289,13 +285,13 @@ class _LoginPageState extends State<LoginPage> {
                     Navigator.pushNamedAndRemoveUntil(context,
                         '/ManageDoctorPage', (Route<dynamic> route) => false);
                   } else if (s["role"] == "user") {
-                    _checkRole(s["user_id"], "doctor").then((checkDoctorValue) async {
+                    checkRole(s["user_id"], "doctor").then((checkDoctorValue) async {
                       if (checkDoctorValue['status']) {
                         await pr.hide();
                         Navigator.pushNamedAndRemoveUntil(context, '/RolePage',
                             (Route<dynamic> route) => false);
                       } else {
-                        _checkRole(s["user_id"], "patient")
+                        checkRole(s["user_id"], "patient")
                             .then((checkPatientValue) async {
                           if (checkPatientValue["status"]) {
                             await sp.saveRoleId(checkPatientValue["data"]);
@@ -322,21 +318,6 @@ class _LoginPageState extends State<LoginPage> {
             }
           }),
     );
-  }
-
-  Future<Map> _checkRole(_userId, _role) async {
-    var url = 'http://www.breakvoid.com/DoktorSaya/CheckRole.php';
-    http.Response response = await retry(
-      // Make a GET request
-      () => http.post(url, body: {'user_id': _userId, 'role': _role}).timeout(
-          Duration(seconds: 5)),
-      // Retry on SocketException or TimeoutException
-      retryIf: (e) => e is SocketException || e is TimeoutException,
-    );
-
-    Map data = jsonDecode(response.body);
-
-    return data;
   }
 
   Widget _register() {

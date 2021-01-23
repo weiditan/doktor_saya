@@ -1,6 +1,7 @@
 import 'package:doktorsaya/functions/progressDialog.dart' as pr;
 import 'package:doktorsaya/functions/sharedPreferences.dart' as sp;
 import 'package:doktorsaya/pages/account/ext/accountDatabase.dart';
+import 'package:doktorsaya/pages/profile/EditProfilePage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -51,11 +52,38 @@ Future<void> checkGoogleLogin(context) async {
           .timeout(new Duration(seconds: 15))
           .then((s) async {
         if (s["status"]) {
-          sp.saveUserId(int.parse(s["data"]));
+          sp.saveUserId(int.parse(s["user_id"]));
+          sp.saveRole(s["role"]);
           sp.saveEmail(account.email);
-          await pr.hide();
-          Navigator.pushNamedAndRemoveUntil(
-              context, '/RolePage', (Route<dynamic> route) => false);
+
+          if (s["role"] == "admin") {
+            await pr.hide();
+            Navigator.pushNamedAndRemoveUntil(
+                context, '/ManageDoctorPage', (Route<dynamic> route) => false);
+          } else if (s["role"] == "user") {
+            checkRole(s["user_id"], "doctor").then((checkDoctorValue) async {
+              if (checkDoctorValue['status']) {
+                await pr.hide();
+                Navigator.pushNamedAndRemoveUntil(
+                    context, '/RolePage', (Route<dynamic> route) => false);
+              } else {
+                checkRole(s["user_id"], "patient")
+                    .then((checkPatientValue) async {
+                  if (checkPatientValue["status"]) {
+                    await sp.saveRoleId(checkPatientValue["data"]);
+                    await pr.hide();
+                    Navigator.pushNamedAndRemoveUntil(
+                        context, '/HomePage', (Route<dynamic> route) => false);
+                  } else {
+                    await pr.hide();
+                    Navigator.pushNamed(context, '/EditProfilePage',
+                        arguments:
+                            EditProfilePage(role: "patient", type: null));
+                  }
+                });
+              }
+            });
+          }
         } else {
           googleSignOut();
           await pr.warning("Sila cuba lagi !");

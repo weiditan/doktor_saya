@@ -10,7 +10,7 @@ class WritePrescription extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Preskripsi Perubatan"),
+        title: Text("Nasihat"),
       ),
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
