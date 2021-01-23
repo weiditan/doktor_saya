@@ -34,13 +34,47 @@ Future<Map> addOrUpdateProfile(_roleId, _userId, _role, _fullName, _nickName,
 }
 
 Future<Map> requestDoctor(String doctorId) async {
-
   var url = 'http://www.breakvoid.com/DoktorSaya/RequestDoctor.php';
   http.Response response = await retry(
     // Make a GET request
-        () => http.post(url, body: {
+    () => http.post(url, body: {
       'action': 'request',
       'doctor_id': doctorId
+    }).timeout(Duration(seconds: 5)),
+    // Retry on SocketException or TimeoutException
+    retryIf: (e) => e is SocketException || e is TimeoutException,
+  );
+
+  Map data = jsonDecode(response.body);
+
+  return data;
+}
+
+Future<Map> approveDoctor(String doctorId) async {
+  var url = 'http://www.breakvoid.com/DoktorSaya/RequestDoctor.php';
+  http.Response response = await retry(
+    // Make a GET request
+    () => http.post(url, body: {
+      'action': 'approve',
+      'doctor_id': doctorId
+    }).timeout(Duration(seconds: 5)),
+    // Retry on SocketException or TimeoutException
+    retryIf: (e) => e is SocketException || e is TimeoutException,
+  );
+
+  Map data = jsonDecode(response.body);
+
+  return data;
+}
+
+Future<Map> disapproveDoctor(String doctorId, String comment) async {
+  var url = 'http://www.breakvoid.com/DoktorSaya/RequestDoctor.php';
+  http.Response response = await retry(
+    // Make a GET request
+    () => http.post(url, body: {
+      'action': 'disapprove',
+      'doctor_id': doctorId,
+      'comment': comment
     }).timeout(Duration(seconds: 5)),
     // Retry on SocketException or TimeoutException
     retryIf: (e) => e is SocketException || e is TimeoutException,

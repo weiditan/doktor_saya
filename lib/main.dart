@@ -119,14 +119,6 @@ class MyApp extends StatelessWidget {
             );
             break;
 
-          case '/ViewDoctorDetail':
-            return PageTransition(
-              child: ViewDoctorDetail(settings.arguments),
-              type: PageTransitionType.rightToLeft,
-              settings: settings,
-            );
-            break;
-
           case '/Message':
             return PageTransition(
               child: Message(settings.arguments),

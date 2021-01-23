@@ -5,7 +5,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
-import '../../functions/sharedPreferences.dart' as sp;
 import 'ext/doctorExpDatabase.dart';
 import 'ext/doctorExperience.dart';
 import 'ext/doctorSpecialist.dart';

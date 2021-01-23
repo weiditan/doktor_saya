@@ -1,11 +1,8 @@
-
 import 'package:flutter/material.dart';
-
 
 class ViewDoctorDetail2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-
     double _screenHeight = MediaQuery.of(context).size.height;
     double _screenWidth = MediaQuery.of(context).size.width;
     double _maxWidth;
@@ -92,19 +89,25 @@ class ViewDoctorDetail2 extends StatelessWidget {
                   scrollDirection: Axis.horizontal,
                   physics: BouncingScrollPhysics(),
                   children: <Widget>[
-                  SizedBox(width: 15),
-                    _certificateImage("http://www.breakvoid.com/doktorsaya/images/certificates/certificate1.jpg"),
-                    _certificateImage("http://www.breakvoid.com/doktorsaya/images/certificates/certificate2.jpg"),
-                    _certificateImage("http://www.breakvoid.com/doktorsaya/images/certificates/certificate3.jpg"),
-                    _certificateImage("http://www.breakvoid.com/doktorsaya/images/certificates/certificate1.jpg"),
-                    _certificateImage("http://www.breakvoid.com/doktorsaya/images/certificates/certificate2.jpg"),
-                    _certificateImage("http://www.breakvoid.com/doktorsaya/images/certificates/certificate3.jpg"),
-                    _certificateImage("http://www.breakvoid.com/doktorsaya/images/certificates/certificate1.jpg"),
+                    SizedBox(width: 15),
+                    _certificateImage(
+                        "http://www.breakvoid.com/doktorsaya/images/certificates/certificate1.jpg"),
+                    _certificateImage(
+                        "http://www.breakvoid.com/doktorsaya/images/certificates/certificate2.jpg"),
+                    _certificateImage(
+                        "http://www.breakvoid.com/doktorsaya/images/certificates/certificate3.jpg"),
+                    _certificateImage(
+                        "http://www.breakvoid.com/doktorsaya/images/certificates/certificate1.jpg"),
+                    _certificateImage(
+                        "http://www.breakvoid.com/doktorsaya/images/certificates/certificate2.jpg"),
+                    _certificateImage(
+                        "http://www.breakvoid.com/doktorsaya/images/certificates/certificate3.jpg"),
+                    _certificateImage(
+                        "http://www.breakvoid.com/doktorsaya/images/certificates/certificate1.jpg"),
                     SizedBox(width: 15),
                   ],
                 ),
               ),
-
               Divider(
                 thickness: 1,
               ),
@@ -129,7 +132,10 @@ class ViewDoctorDetail2 extends StatelessWidget {
               child: Icon(Icons.keyboard_arrow_left, color: Colors.black),
             ),
             Text('Back',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500,color: Colors.black))
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black))
           ],
         ),
       ),
@@ -223,9 +229,7 @@ class ViewDoctorDetail2 extends StatelessWidget {
             ),
           ],
         ),
-        onPressed: () {
-
-        },
+        onPressed: () {},
       ),
     );
   }
@@ -253,13 +257,12 @@ class ViewDoctorDetail2 extends StatelessWidget {
             ),
           ],
         ),
-        onPressed: () {
-        },
+        onPressed: () {},
       ),
     );
   }
 
-  Widget _certificateImage(_imageUrl){
+  Widget _certificateImage(_imageUrl) {
     return Padding(
       padding: EdgeInsets.all(5),
       child: Container(
@@ -267,9 +270,8 @@ class ViewDoctorDetail2 extends StatelessWidget {
         height: 80,
         decoration: BoxDecoration(
           shape: BoxShape.rectangle,
-          image: DecorationImage(
-              fit: BoxFit.fill,
-              image: NetworkImage(_imageUrl)),
+          image:
+              DecorationImage(fit: BoxFit.fill, image: NetworkImage(_imageUrl)),
           boxShadow: [
             BoxShadow(
               color: Colors.grey.withOpacity(0.3),

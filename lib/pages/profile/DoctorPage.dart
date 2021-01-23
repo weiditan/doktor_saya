@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
+import 'ViewDoctorDetail.dart';
 import 'ext/doctorExpDatabase.dart';
 import 'ext/profileDatabase.dart';
 import 'ext/profileImage.dart';
@@ -98,7 +99,7 @@ class _DoctorPageState extends State<DoctorPage> {
       color: _bgColour,
       child: InkWell(
         onTap: () {
-          Navigator.pushNamed(context, '/ViewDoctorDetail', arguments: doctor);
+          Navigator.push(context,MaterialPageRoute(builder: (context) => ViewDoctorDetail(doctor,setState)));
         },
         child: Padding(
           padding: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 10),

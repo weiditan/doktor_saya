@@ -18,9 +18,6 @@ class _ManageDoctorPageState extends State<ManageDoctorPage> {
         drawer: NavDrawer(),
         appBar: AppBar(
           title: Text('Menguruskan Doktor'),
-          actions: <Widget>[
-            IconButton(icon: Icon(Icons.search), onPressed: () {})
-          ],
           bottom: TabBar(
             isScrollable: true,
             tabs: [

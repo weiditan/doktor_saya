@@ -155,7 +155,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               ],
             ),
             if (widget.role == "doctor")
-              _entryField("Nombor Pendaftaran MMC", _mmcController),
+              _entryField("Nombor Pendaftaran MMC/MDC/AMM/NSR", _mmcController),
             Divider(
               thickness: 1,
             ),
