@@ -18,11 +18,13 @@ class _WelcomePageState extends State<WelcomePage> {
   @override
   void initState() {
     super.initState();
-    checkUpdate();
     _init();
   }
 
   Future<void> _init() async {
+
+    await checkUpdate(context);
+
     if (await sp.getUserId() == null) {
       _hideLoadingScreen();
     } else {
