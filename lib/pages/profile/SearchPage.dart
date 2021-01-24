@@ -5,6 +5,7 @@ import 'package:doktorsaya/pages/profile/ext/profileDatabase.dart';
 import 'package:doktorsaya/pages/profile/ext/profileImage.dart';
 import 'package:doktorsaya/pages/profile/ext/specialistDatabase.dart';
 import 'package:flutter/material.dart';
+import 'ViewDoctorDetail.dart';
 import 'ext/diffDate.dart' as dd;
 
 class SearchPage extends StatefulWidget {
@@ -237,7 +238,7 @@ class _SearchPageState extends State<SearchPage> {
       margin: EdgeInsets.only(left: 15, right: 15, top: 10),
       child: InkWell(
         onTap: () {
-          Navigator.pushNamed(context, '/ViewDoctorDetail', arguments: doctor);
+          Navigator.push(context,MaterialPageRoute(builder: (context) => ViewDoctorDetail(doctor,setState)));
         },
         child: Padding(
           padding: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 10),

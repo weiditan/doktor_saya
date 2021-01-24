@@ -66,7 +66,8 @@ class _MessageListPageState extends State<MessageListPage> {
                         _arrayDoctor[i]['message'],
                         _arrayDoctor[i]['sendtime'],
                         _arrayDoctor[i]['unread'],
-                        _arrayDoctor[i]['online']),
+                        _arrayDoctor[i]['online'],
+                        _arrayDoctor[i]['type']),
               ],
             ),
           );
@@ -81,7 +82,7 @@ class _MessageListPageState extends State<MessageListPage> {
   }
 
   Widget _messageRow(String doctorId, String name, String image, String message,
-      String sendTime, String unread, String online) {
+      String sendTime, String unread, String online, String type) {
     return InkWell(
       onTap: () {
         Navigator.pushNamed(context, '/Message', arguments: {
@@ -120,14 +121,24 @@ class _MessageListPageState extends State<MessageListPage> {
                         SizedBox(
                           height: 10,
                         ),
-                        Text(
-                          message,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontFamily: "Montserrat",
-                          ),
-                        ),
+                        (type == "text" || type == "Dokumen")
+                            ? Text(
+                                message,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontFamily: "Montserrat",
+                                ),
+                              )
+                            : Text(
+                                type,
+                                //message,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontFamily: "Montserrat",
+                                ),
+                              ),
                       ],
                     ),
                   ),

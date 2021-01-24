@@ -1,15 +1,13 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:dio/dio.dart';
 import 'package:doktorsaya/functions/viewImage.dart';
 import 'package:doktorsaya/functions/viewVideo.dart';
+import 'package:doktorsaya/pages/message/ext/downloadAndOpenAttachment.dart';
 import 'package:doktorsaya/pages/message/ext/voiceMessagePlayer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:sticky_grouped_list/sticky_grouped_list.dart';
 
 import 'bubble.dart';
@@ -314,101 +312,8 @@ class _MessageContainerState extends State<MessageContainer> {
 
       case "Dokumen":
         {
-          return GestureDetector(
-            onTap: () {
-              _download(
-                  "http://www.breakvoid.com/DoktorSaya/Files/Attachments/" +
-                      message["filepath"],
-                  message['context']);
-            },
-            child: Container(
-              color: Colors.grey[300],
-              child: Padding(
-                padding: EdgeInsets.all(10),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.file_download,
-                      //Icons.insert_drive_file,
-                      color: Colors.orange,
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Flexible(
-                      child: Text(
-                        message['context'],
-                        style: TextStyle(fontSize: 12, color: Colors.black),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ),
-          );
-
-          return Column(
-            children: <Widget>[
-              Text(
-                message['context'],
-                textAlign: (message['sender'] == widget.sender)
-                    ? TextAlign.right
-                    : TextAlign.left,
-                style: TextStyle(fontSize: 16, color: Colors.black),
-              ),
-              SizedBox(height: 5),
-              Container(
-                width: 130,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: Colors.orange,
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(10),
-                      topRight: Radius.circular(10)),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Icon(
-                      Icons.insert_drive_file,
-                      color: Colors.white,
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Text(
-                      'Dokumen',
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                width: 130,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Colors.blue,
-                  borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(10),
-                      bottomRight: Radius.circular(10)),
-                ),
-                child: IconButton(
-                    icon: Icon(
-                      Icons.file_download,
-                      color: Colors.white,
-                    ),
-                    onPressed: () {
-                      /*  _downloadFile(
-                            "http://www.breakvoid.com/DoktorSaya/Files/Attachments/" +
-                                message["filepath"]);*/
-                    }),
-              ),
-            ],
-          );
+          return DownloadAndOpenAttachment(url: "http://www.breakvoid.com/DoktorSaya/Files/Attachments/" +
+              message["filepath"], fileName: message["filepath"], context: message['context']);
         }
         break;
 
@@ -428,29 +333,6 @@ class _MessageContainerState extends State<MessageContainer> {
           );
         }
         break;
-    }
-  }
-
-  final Dio _dio = Dio();
-
-  Future<void> _download(url, fileName) async {
-    Directory appDocDirectory;
-    if (Platform.isIOS) {
-      appDocDirectory = await getApplicationDocumentsDirectory();
-    } else {
-      appDocDirectory = await getExternalStorageDirectory();
-    }
-
-    String _savePath = appDocDirectory.path + "/" + fileName;
-
-    print(_savePath);
-
-    await _dio.download(url, _savePath, onReceiveProgress: _onReceiveProgress);
-  }
-
-  void _onReceiveProgress(int received, int total) {
-    if (total != -1) {
-      print((received / total * 100).toStringAsFixed(0) + "%");
     }
   }
 }

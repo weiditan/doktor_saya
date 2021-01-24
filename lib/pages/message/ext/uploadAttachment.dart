@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:doktorsaya/functions/progressDialog.dart' as pr;
 import 'package:flutter/material.dart';
 
+import 'messageDatabase.dart';
+
 uploadAttachment(BuildContext context, filePath, type, sender, receiver) async {
   await pr.showWithPercentage(context, "Hantar");
 
@@ -31,6 +33,7 @@ uploadAttachment(BuildContext context, filePath, type, sender, receiver) async {
 
   await pr.hide();
 
+  pushNotification(sender, receiver, type);
   Navigator.popUntil(context, ModalRoute.withName('/Message'));
   print(response);
 }

@@ -115,18 +115,4 @@ class _MessageState extends State<Message> {
       ),
     );
   }
-
-  /*Future _downloadFile(String fileUrl) async {
-    final Directory downloadsDirectory =
-        await DownloadsPathProvider.downloadsDirectory;
-    final String downloadsPath = downloadsDirectory.path;
-    await FlutterDownloader.enqueue(
-      url: fileUrl,
-      savedDir: downloadsPath,
-      showNotification:
-          true, // show download progress in status bar (for Android)
-      openFileFromNotification:
-          true, // click on notification to open downloaded file (for Android)
-    );
-  }*/
 }

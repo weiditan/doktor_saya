@@ -49,6 +49,7 @@ dependencies:
   sticky_grouped_list: ^1.3.0
   flutter_audio_recorder: ^0.5.2
   audioplayers: ^0.17.2
+  open_file: ^3.0.3
 
 dev_dependencies:
   flutter_test:
