@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:doktorsaya/CheckUpdate.dart';
 import 'package:doktorsaya/functions/exitWithDoubleBack.dart';
 import 'package:flutter/material.dart';
 
@@ -17,6 +18,7 @@ class _WelcomePageState extends State<WelcomePage> {
   @override
   void initState() {
     super.initState();
+    checkUpdate();
     _init();
   }
 
