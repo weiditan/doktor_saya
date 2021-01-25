@@ -32,7 +32,7 @@ class _SearchPageState extends State<SearchPage> {
     _roleId = await getRoleId();
     _arraySpecialist = await getSpecialist();
     _arraySubSpecialist = await getSubSpecialist();
-    _arrayDoctor = await getAllDoctor("", "", "","2");
+    _arrayDoctor = await getAllDoctor("", "", "", "2");
     await Future.wait([
       for (int i = 0; i < _arrayDoctor.length; i++)
         _getTotalExp(_arrayDoctor[i]),
@@ -44,16 +44,23 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
+    Brightness _brightness = MediaQuery.of(context).platformBrightness;
+
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: (_brightness == Brightness.light)
+              ? Colors.white
+              : Colors.grey[850],
           title: TextField(
             controller: _searchController,
             onChanged: (s) {
               _search();
             },
             decoration: new InputDecoration(
-                prefixIcon: new Icon(Icons.search), hintText: 'Search...'),
+                prefixIcon: new Icon(
+                  Icons.search,
+                ),
+                hintText: 'Search...'),
           ),
           actions: <Widget>[
             IconButton(
@@ -181,7 +188,7 @@ class _SearchPageState extends State<SearchPage> {
     });
 
     _arrayDoctor = await getAllDoctor(
-        _searchController.text, _valueSpecialist, _valueSubSpecialist,"2");
+        _searchController.text, _valueSpecialist, _valueSubSpecialist, "2");
 
     await Future.wait([
       for (int i = 0; i < _arrayDoctor.length; i++)
@@ -212,7 +219,7 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Widget _secondScreen() {
-    return (_arrayDoctor == null  || _arrayDoctor.length == 0)
+    return (_arrayDoctor == null || _arrayDoctor.length == 0)
         ? _noDoctor()
         : SingleChildScrollView(
             physics: BouncingScrollPhysics(),
@@ -238,7 +245,10 @@ class _SearchPageState extends State<SearchPage> {
       margin: EdgeInsets.only(left: 15, right: 15, top: 10),
       child: InkWell(
         onTap: () {
-          Navigator.push(context,MaterialPageRoute(builder: (context) => ViewDoctorDetail(doctor,setState)));
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => ViewDoctorDetail(doctor, setState)));
         },
         child: Padding(
           padding: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 10),
