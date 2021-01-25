@@ -79,21 +79,6 @@ class _ViewDoctorDetailState extends State<ViewDoctorDetail> {
     );
   }
 
-  Widget _landscape() {
-    return Center(
-      child: Row(
-        children: <Widget>[
-          Expanded(
-            child: showProfileImage(widget.doctor['image'], _screenWidth * 0.5),
-          ),
-          Expanded(
-            child: Text(''),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _portrait() {
     return ListView(
       physics: BouncingScrollPhysics(),

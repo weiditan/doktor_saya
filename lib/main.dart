@@ -11,7 +11,6 @@ import 'pages/HomePage.dart';
 import 'pages/account/EditUserPage1.dart';
 import 'pages/account/EditUserPage2.dart';
 import 'pages/RolePage.dart';
-import 'pages/profile/ViewDoctorDetail.dart';
 import 'pages/WelcomePage.dart';
 import 'pages/account/LoginPage.dart';
 

@@ -1,5 +1,4 @@
 
-import 'package:doktorsaya/pages/account/ext/logout.dart';
 import 'package:doktorsaya/pages/profile/DoctorPage.dart';
 import 'package:doktorsaya/pages/message/MessageListPage.dart';
 import 'package:doktorsaya/pages/profile/ProfilePage.dart';
