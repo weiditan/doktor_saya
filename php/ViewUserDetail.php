@@ -6,7 +6,7 @@
         include "Output.php";
 
         if($role_id[0]=="d"){
-            $sql = "SELECT doctor.doctor_id, fullname, nickname, gender, birthday, phone, image, mmc, workplace, doctor.state_id, country, doctor.state, user.email, state.state AS selected_state, TIMESTAMPDIFF(MINUTE,last_activity,NOW())<3 AS online
+            $sql = "SELECT token, doctor.doctor_id, fullname, nickname, gender, birthday, phone, image, mmc, workplace, doctor.state_id, country, doctor.state, user.email, state.state AS selected_state, TIMESTAMPDIFF(MINUTE,last_activity,NOW())<3 AS online
                     FROM doctor 
                     LEFT JOIN user 
                         ON doctor.user_id = user.user_id 

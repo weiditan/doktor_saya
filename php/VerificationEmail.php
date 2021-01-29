@@ -1,27 +1,28 @@
 <?php
+/*
     // Import PHPMailer classes into the global namespace
     // These must be at the top of your script, not inside a function
     use PHPMailer\PHPMailer\PHPMailer;
     use PHPMailer\PHPMailer\SMTP;
     use PHPMailer\PHPMailer\Exception;
-    
+    */
 
     if (isset($_POST['action'])) {
-    
+
         $action = $_POST['action'];
         $email = $_POST['email'];
         $code = $_POST['code'];
         $type = $_POST['type'];
-        
+
         include "dbconnect.php";
         include "Output.php";
-        
+
         switch ($action) {
-            
+
             case "sendVerificationEmail":
                 sendVerificationEmail($conn, $email, $type);
                 break;
-            
+
             case "checkRegisterCode":
                 checkCode($conn, $email, $code, $type);
                 break;
@@ -29,14 +30,14 @@
             default:
                 OutputStatusWithData(false, "Error: No action");
         }
-        
+
         $conn->close();
     }
 
     function checkCode($conn,$email,$code,$type){
-    
+
         $sql = "SELECT * FROM verification_email WHERE (email='$email' AND code=$code AND TIMESTAMPDIFF(SECOND,NOW(),exptime)>0 AND type ='$type')";
-    
+
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
@@ -44,15 +45,15 @@
         } else {
             OutputStatusWithData(false, "Kod pengesahan salah.");
         }
-    
+
     }
 
     function checkEmailExists($conn, $email)
     {
         $sql = "SELECT * FROM user WHERE email='$email'";
-        
+
         $result = $conn->query($sql);
-        
+
         if ($result->num_rows > 0) {
             return true;
         }
@@ -61,9 +62,9 @@
     }
 
     function sendVerificationEmail($conn,$email,$type){
-        
+
         $code = rand(0,9).rand(0,9).rand(0,9).rand(0,9).rand(0,9).rand(0,9);
-        
+
 
         if($type=="Forgot Password"){
             if(CheckEmailExists($conn, $email)){
@@ -88,9 +89,9 @@
                 OutputStatusWithData(false,"Email tersebut telah didaftarkan.");
             }
         }
-        
+
     }
-    
+
 
     function SaveToDatabase($conn,$email,$code,$type){
 
@@ -107,7 +108,61 @@
     }
 
     function SendMail($email,$code,$type){
-        
+        $subject = "E-mel Pengesahan";
+
+        if($type=="Forgot Password"){
+            $a = "mengguna";
+        }else{
+            $a = "mendaftar";
+        }
+
+        $message = "
+        <html>
+            <body>
+
+                <table align='center' border='0' cellpadding='0' cellspacing='0' style='max-width:600px' width='100%'>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <img src='http://www.breakvoid.com/DoktorSaya/Images/logo.png' width='150px'/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Terima kasih anda $a DoktorSaya app.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <center>
+                                    <h2>Kod pengesahan anda ialah :</h2>
+                                    <h1>$code</h1>
+                                </center>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </body>
+        </html>
+        ";
+
+        // Always set content-type when sending HTML email
+        $headers = "MIME-Version: 1.0" . "\r\n";
+        $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+
+        // More headers
+        $headers .= 'From:Doktor Saya<noreply@breakvoid.com>' . "\r\n";
+
+        mail($email,$subject,$message,$headers);
+
+        $sendstatus = "Done";
+
+        return $sendstatus;
+    }
+
+/*
+    function SendMail($email,$code,$type){
+
         // Load
         require 'PHPMailer-6.1.7/src/Exception.php';
         require 'PHPMailer-6.1.7/src/PHPMailer.php';
@@ -148,7 +203,7 @@
             }else{
                 $a = "mendaftar";
             }
-            
+
             $mail->Body    = '  <table align="center" border="0" cellpadding="0" cellspacing="0" style="max-width:600px" width="100%">
                                     <tbody>
                                         <tr>
@@ -172,7 +227,7 @@
                                     </tbody>
                                 </table>
                             ';
-                            
+
             $mail->AltBody = 'Terima kasih anda mendaftar DoktorSaya app. Kod pengesahan anda ialah : '.$code.'';
 
             $mail->send();
@@ -183,5 +238,5 @@
 
         return $sendstatus;
     }
-
+*/
 ?>
